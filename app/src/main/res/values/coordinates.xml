@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="sgw_hall_building_lat" type="dimen" format="float">45.49701</item>
+    <item name="sgw_hall_building_lon" type="dimen" format="float">-73.57877</item>
+</resources>
