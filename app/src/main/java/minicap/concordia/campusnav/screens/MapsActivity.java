@@ -14,15 +14,28 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
+import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+    public static final String KEY_STARTING_LAT = "starting_lat";
+    public static final String KEY_STARTING_LNG = "starting_lng";
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
 
+    private double startingLat;
+    private double startingLng;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            startingLat = bundle.getDouble(KEY_STARTING_LAT);
+            startingLng = bundle.getDouble(KEY_STARTING_LNG);
+        }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -46,20 +59,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        TypedValue hallLat = new TypedValue();
-        TypedValue hallLon = new TypedValue();
-
-        getResources().getValue(R.dimen.sgw_hall_building_lat, hallLat, true);
-        getResources().getValue(R.dimen.sgw_hall_building_lon, hallLon, true);
-
-        float hallLatFloat = hallLat.getFloat();
-        float hallLonFloat = hallLon.getFloat();
-
-        LatLng concordia = new LatLng(hallLatFloat, hallLonFloat);
+        LatLng concordia = new LatLng(startingLat, startingLng);
         mMap.addMarker(new MarkerOptions().position(concordia).title("Marker at Concordia"));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, 18f));
+        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
 
-
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
     }
 }
