@@ -42,9 +42,4 @@ public class ExampleInstrumentedTest {
         assertEquals(expectedHallLat, testCoords.latitude, 0.001);
         assertEquals(expectedHallLng, testCoords.longitude, 0.001);
     }
-
-    @Test
-    public void shouldFail() {
-        assertEquals(0,1);
-    }
 }
