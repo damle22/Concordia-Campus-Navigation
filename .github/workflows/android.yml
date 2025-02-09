@@ -28,3 +28,5 @@ jobs:
         MAPS_API_KEY="${{secrets.MAPS_API_KEY}}"
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Run tests with Gradle
+      run: ./gadlew test --stacktrace
