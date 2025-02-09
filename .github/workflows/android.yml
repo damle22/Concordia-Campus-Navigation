@@ -14,14 +14,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: set up JDK 11
+    - name: set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Generate local.properties for gradle
+      run: |
+        cat <<EOF > local.properties
+        MAPS_API_KEY="${{secrets.MAPS_API_KEY}}"
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Run tests with Gradle
+      run: ./gradlew test --stacktrace
