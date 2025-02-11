@@ -48,11 +48,11 @@ public class MainActivityEndToEndTest {
         assertEquals("minicap.concordia.campusnav.screens.MapsActivity", actualIntent.getComponent().getClassName());
 
         // Check that the extras contain the correct latitude and longitude using TOLERANCE AS PRECISION HERE
-        double startingLat = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LAT, 0.0f);
-        double startingLng = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LNG, 0.0f);
+        double startingLat = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LAT, 0.0);
+        double startingLng = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LNG, 0.0);
 
-        assertEquals(45.49701f, startingLat, 0.0001f);
-        assertEquals(-73.57877f, startingLng, 0.0001f);
+        assertEquals(45.49701, startingLat, 0.0001);
+        assertEquals(-73.57877, startingLng, 0.0001);
     }
 
     @Test
@@ -67,10 +67,10 @@ public class MainActivityEndToEndTest {
         assertEquals("minicap.concordia.campusnav.screens.MapsActivity", actualIntent.getComponent().getClassName());
 
         // Check that the extras contain the correct latitude and longitude USING TOLERANCE AS PRECISION HERE
-        double startingLat = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LAT, 0.0f);
-        double startingLng = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LNG, 0.0f);
+        double startingLat = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LAT, 0.0);
+        double startingLng = actualIntent.getDoubleExtra(MapsActivity.KEY_STARTING_LNG, 0.0);
 
-        assertEquals(45.45863f, startingLat, 0.0001f);
-        assertEquals(-73.64188f, startingLng, 0.0001f);
+        assertEquals(45.45863, startingLat, 0.0001);
+        assertEquals(-73.64188, startingLng, 0.0001);
     }
 }
