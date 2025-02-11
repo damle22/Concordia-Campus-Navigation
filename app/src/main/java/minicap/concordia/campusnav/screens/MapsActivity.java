@@ -38,8 +38,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            startingLat = bundle.getDouble(KEY_STARTING_LAT);
-            startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            startingLat =  (float) bundle.getDouble(KEY_STARTING_LAT);
+            startingLng = (float) bundle.getDouble(KEY_STARTING_LNG);
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());

@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if(coords != null) {
                     Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                    i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
-                    i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                    i.putExtra(MapsActivity.KEY_STARTING_LAT, (float) coords.latitude);
+                    i.putExtra(MapsActivity.KEY_STARTING_LNG, (float) coords.longitude);
                     startActivity(i);
                 }
             }
@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if(coords != null) {
                     Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                    i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
-                    i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                    i.putExtra(MapsActivity.KEY_STARTING_LAT, (float) coords.latitude);
+                    i.putExtra(MapsActivity.KEY_STARTING_LNG, (float) coords.longitude);
                     startActivity(i);
                 }
             }
