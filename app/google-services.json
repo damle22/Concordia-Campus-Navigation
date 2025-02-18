@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "726601137298",
+    "project_id": "concordia-campus-navigation",
+    "storage_bucket": "concordia-campus-navigation.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726601137298:android:434c3551d224c78c8aba4b",
+        "android_client_info": {
+          "package_name": "minicap.concordia.campusnav"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqVG2hZPS_-oC8eq_V34TRn8IxWU9IdK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
