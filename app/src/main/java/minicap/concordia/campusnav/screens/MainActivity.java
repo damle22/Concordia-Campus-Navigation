@@ -10,8 +10,13 @@ import android.widget.Button;
 import com.google.android.gms.maps.model.LatLng;
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import com.google.firebase.firestore.FirebaseFirestore;
+import minicap.concordia.campusnav.beans.Building;
+
+
 
 public class MainActivity extends AppCompatActivity {
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
