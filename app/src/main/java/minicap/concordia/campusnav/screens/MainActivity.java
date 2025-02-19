@@ -1,52 +1,22 @@
 package minicap.concordia.campusnav.screens;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.beans.Building;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 
 public class MainActivity extends AppCompatActivity {
-
-    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /**
-         * Example on how to fetch object from DB using ID
-         * Building u = new Building();
-         * u.setId("ID HERE");
-         * u.fetch(aVoid -> {
-         *    Log.d("MainActivity", "User fetched successfully: " + u.getName());
-         *   });
-         **/
-
-        /**
-         * Example on how to save Object to DB
-         * Building u = new Building("test","test","Test");
-         * u.save();
-         */
-
-        /**
-         * Example on how to Fetch object using Field
-         * Building u = new Building();
-         * u.fetch("name", "test", aVoid -> {
-         *    Log.d("MainActivity", "User fetched successfully: " + u.getName());
-         * });
-         **/
 
         subscribeButtons(this);
     }
@@ -62,13 +32,14 @@ public class MainActivity extends AppCompatActivity {
                     coords = CoordinateResHelper.getCoordsForGoogleMaps(appContext, CoordinateResHelper.BuildingNames.SGWHallBuilding);
                 }
                 catch (IllegalArgumentException e) {
-                    Log.d("SGWCampusButton", "Error while retrieving coordinates for SGW Hall Building");
+                    Log.d("SGWCampusButton", "Error while retrieving coordinates for SGW Campus");
                 }
 
                 if(coords != null) {
                     Intent i = new Intent(MainActivity.this, MapsActivity.class);
                     i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                     i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                    i.putExtra("SHOW_SGW", false); // When opening SGW, allow toggle to LOY
                     startActivity(i);
                 }
             }
@@ -84,13 +55,14 @@ public class MainActivity extends AppCompatActivity {
                     coords = CoordinateResHelper.getCoordsForGoogleMaps(appContext, CoordinateResHelper.BuildingNames.LoyHUBuilding);
                 }
                 catch (IllegalArgumentException e) {
-                    Log.d("LoyCampusBtn", "Error while retrieving coordinates for Loyola HU Building");
+                    Log.d("LoyCampusBtn", "Error while retrieving coordinates for Loyola Campus");
                 }
 
                 if(coords != null) {
                     Intent i = new Intent(MainActivity.this, MapsActivity.class);
                     i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                     i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                    i.putExtra("SHOW_SGW", true); // When opening LOY, allow toggle to SGW
                     startActivity(i);
                 }
             }

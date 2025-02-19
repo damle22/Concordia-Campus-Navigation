@@ -4,28 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".screens.MainActivity">
+    tools:context=".screens.MainActivity"
+    android:background="@color/black">
+
+    <ImageView
+        android:id="@+id/mapImageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:contentDescription="First Background Image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/map_background_1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/secondImageView"
+        app:layout_constraintHeight_percent="0.5" />
+
+    <ImageView
+        android:id="@+id/secondImageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:contentDescription="Second Background Image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/map_background_2"
+        app:layout_constraintTop_toBottomOf="@id/mapImageView"
+        app:layout_constraintBottom_toTopOf="@+id/viewSGWCampusButton"
+        app:layout_constraintHeight_percent="0.5" />
+
+    <View
+        android:id="@+id/separatorView"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/mapImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/viewLoyCampusButton"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="184dp"
+        android:backgroundTint="@color/red"
+        android:elevation="8dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="16dp"
         android:text="Loyola campus"
-        app:layout_constraintBottom_toTopOf="@+id/viewSGWCampusButton"
+        android:textColor="@android:color/white"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/viewSGWCampusButton"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="248dp"
+        android:backgroundTint="@color/red"
+        android:elevation="8dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="16dp"
         android:text="SGW Campus"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@android:color/white"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/viewLoyCampusButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.563" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

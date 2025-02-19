@@ -5,8 +5,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,6 +28,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String KEY_STARTING_LNG = "starting_lng";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
+    private boolean showSGW; // Flag to track building to be toggled to
+
+    private Button toggleButton;
+
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
 
@@ -40,10 +46,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bundle != null) {
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            showSGW = bundle.getBoolean("SHOW_SGW");
         }
+
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        toggleButton = findViewById(R.id.toggleButton);
+        updateToggleButtonText();
+        toggleButton.setOnClickListener(v -> toggleCampus());
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -56,6 +68,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // start map
             initializeMap();
         }
+    }
+
+    private void toggleCampus() {
+        // Flipping the building state
+        showSGW = !showSGW;
+        // Reloading MapsActivity with the new building coordinates
+        Intent i = new Intent(MapsActivity.this, MapsActivity.class);
+        i.putExtra(KEY_STARTING_LAT, getNewLatitude());
+        i.putExtra(KEY_STARTING_LNG, getNewLongitude());
+        i.putExtra("SHOW_SGW", showSGW); // Maintaining the toggle state here
+        startActivity(i);
+        finish();
+    }
+
+    private void updateToggleButtonText() {
+        if (showSGW) { //we are showing SGW because we are already on LOY
+            toggleButton.setText("Go to → SGW");
+        } else { //we are showing LOY because we are already on SGW
+            toggleButton.setText("Go to → LOY");
+        }
+    }
+    private double getNewLatitude() {
+        return getResources().getDimension(showSGW ? R.dimen.sgw_hall_building_lat : R.dimen.loy_hu_building_lat);
+    }
+
+    private double getNewLongitude() {
+        return getResources().getDimension(showSGW ? R.dimen.sgw_hall_building_lng : R.dimen.loy_hu_building_lng);
     }
 
     @Override
