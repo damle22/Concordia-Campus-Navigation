@@ -17,6 +17,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
@@ -31,6 +32,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean showSGW; // Flag to track building to be toggled to
 
     private Button toggleButton;
+
+    private Marker campusMarker;
+
+    private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
+    private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -71,15 +77,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void toggleCampus() {
-        // Flipping the building state
+        // Flip the campus state
         showSGW = !showSGW;
-        // Reloading MapsActivity with the new building coordinates
-        Intent i = new Intent(MapsActivity.this, MapsActivity.class);
-        i.putExtra(KEY_STARTING_LAT, getNewLatitude());
-        i.putExtra(KEY_STARTING_LNG, getNewLongitude());
-        i.putExtra("SHOW_SGW", showSGW); // Maintaining the toggle state here
-        startActivity(i);
-        finish();
+
+        // Get the new location (pre-defined at the beginning)
+        LatLng campus = showSGW ? LOY_LOCATION : SGW_LOCATION;
+
+        // Move the existing marker instead of relaunching the activity
+        if (campusMarker != null) {
+            campusMarker.setPosition(campus); // Update marker position
+            campusMarker.setTitle(showSGW ? "Loyola Campus" : "SGW Campus"); // Update title
+        } else {
+            campusMarker = mMap.addMarker(new MarkerOptions().position(campus).title(showSGW ? "Loyola Campus" : "SGW Campus"));
+        }
+
+        // Move the camera smoothly
+        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(campus,defaultZoom));
+
+        // Update the toggle button text
+        updateToggleButtonText();
     }
 
     private void updateToggleButtonText() {
@@ -88,13 +105,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else { //we are showing LOY because we are already on SGW
             toggleButton.setText("Go to → LOY");
         }
-    }
-    private double getNewLatitude() {
-        return getResources().getDimension(showSGW ? R.dimen.sgw_hall_building_lat : R.dimen.loy_hu_building_lat);
-    }
-
-    private double getNewLongitude() {
-        return getResources().getDimension(showSGW ? R.dimen.sgw_hall_building_lng : R.dimen.loy_hu_building_lng);
     }
 
     @Override
@@ -122,11 +132,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng concordia = new LatLng(startingLat, startingLng);
-        mMap.addMarker(new MarkerOptions().position(concordia).title("Marker at Concordia"));
+        LatLng initialLocation = new LatLng(startingLat, startingLng);
+        campusMarker = mMap.addMarker(new MarkerOptions().position(initialLocation).title("Current Campus"));
 
         float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, defaultZoom));
 
         // track location layer
         enableMyLocation();
