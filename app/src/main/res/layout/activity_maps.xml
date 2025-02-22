@@ -10,10 +10,13 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/campusSwitch"
@@ -56,13 +59,54 @@
 
     <ImageView
         android:id="@+id/arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="63dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="88dp"
-        android:layout_marginBottom="8dp"
         android:importantForAccessibility="no"
         android:src="@drawable/down_arrow"
-        app:layout_constraintBottom_toBottomOf="@+id/campusSwitch"
-        app:layout_constraintEnd_toEndOf="@+id/campusSwitch" />
+        app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
+        app:layout_constraintTop_toTopOf="@+id/goTo" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buildingView"
+        android:layout_width="100dp"
+        android:layout_height="107dp"
+        android:layout_marginTop="580dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundTint="@color/buttons"
+        app:cornerRadius="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/map" />
+
+    <ImageView
+        android:id="@+id/campusIcon"
+        android:layout_width="47dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="28dp"
+        android:src="@drawable/university"
+        app:layout_constraintEnd_toEndOf="@+id/buildingView"
+        app:layout_constraintTop_toTopOf="@+id/buildingView" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/locationTracker"
+        android:layout_width="70dp"
+        android:layout_height="77dp"
+        android:layout_marginTop="484dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundTint="@color/buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/map" />
+
+    <ImageView
+        android:id="@+id/nav"
+        android:layout_width="63dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="7dp"
+        android:src="@drawable/navigation"
+        app:layout_constraintEnd_toEndOf="@+id/locationTracker"
+        app:layout_constraintTop_toTopOf="@+id/locationTracker" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
