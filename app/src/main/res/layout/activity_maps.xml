@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,19 +8,61 @@
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="79dp"
-        tools:layout_editor_absoluteY="-49dp" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="127dp"
-        android:layout_height="78dp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/campusSwitch"
+        android:layout_width="216dp"
+        android:layout_height="74dp"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="Button"
-        tools:layout_editor_absoluteX="36dp"
-        tools:layout_editor_absoluteY="669dp" />
+        android:layout_marginStart="-50dp"
+        android:layout_marginTop="608dp"
+        android:backgroundTint="#9F3353"
+        app:cornerRadius="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/goTo"
+        android:layout_width="51dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="100dp"
+        android:text="@string/go_to"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
+        app:layout_constraintTop_toTopOf="@+id/campusSwitch" />
+
+    <TextView
+        android:id="@+id/ToCampus"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/inter"
+        android:text="NAN"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
+        app:layout_constraintTop_toTopOf="@+id/campusSwitch" />
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="88dp"
+        android:layout_marginBottom="8dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/down_arrow"
+        app:layout_constraintBottom_toBottomOf="@+id/campusSwitch"
+        app:layout_constraintEnd_toEndOf="@+id/campusSwitch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
