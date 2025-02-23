@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,17 +12,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.beans.Building;
-import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Campus;
+import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ConcordiaBuildingManager buildingManager;
     private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        buildingManager = ConcordiaBuildingManager.getInstance();
 
         /**
          * Example on how to fetch object from DB using ID
@@ -58,19 +61,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 LatLng coords = null;
-                try {
-                    coords = CoordinateResHelper.getCoordsForGoogleMaps(appContext, CoordinateResHelper.BuildingNames.SGWHallBuilding);
-                }
-                catch (IllegalArgumentException e) {
-                    Log.d("SGWCampusButton", "Error while retrieving coordinates for SGW Hall Building");
-                }
 
-                if(coords != null) {
-                    Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                    i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
-                    i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
-                    startActivity(i);
-                }
+                Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
+                float[] campusCoordinates = sgwCampus.getLocation();
+                coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
+
+                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
+                i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                startActivity(i);
             }
         });
 
@@ -80,19 +79,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 LatLng coords = null;
-                try {
-                    coords = CoordinateResHelper.getCoordsForGoogleMaps(appContext, CoordinateResHelper.BuildingNames.LoyHUBuilding);
-                }
-                catch (IllegalArgumentException e) {
-                    Log.d("LoyCampusBtn", "Error while retrieving coordinates for Loyola HU Building");
-                }
 
-                if(coords != null) {
-                    Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                    i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
-                    i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
-                    startActivity(i);
-                }
+                Campus loyolaCampus = buildingManager.getCampus(CampusName.LOYOLA);
+                float[] campusCoordinates = loyolaCampus.getLocation();
+                coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
+
+                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
+                i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                startActivity(i);
             }
         });
     }
