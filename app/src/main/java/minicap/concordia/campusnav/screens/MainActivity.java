@@ -19,7 +19,6 @@ import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 public class MainActivity extends AppCompatActivity {
 
     private ConcordiaBuildingManager buildingManager;
-    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,29 +26,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         buildingManager = ConcordiaBuildingManager.getInstance();
-
-        /**
-         * Example on how to fetch object from DB using ID
-         * Building u = new Building();
-         * u.setId("ID HERE");
-         * u.fetch(aVoid -> {
-         *    Log.d("MainActivity", "User fetched successfully: " + u.getName());
-         *   });
-         **/
-
-        /**
-         * Example on how to save Object to DB
-         * Building u = new Building("test","test","Test");
-         * u.save();
-         */
-
-        /**
-         * Example on how to Fetch object using Field
-         * Building u = new Building();
-         * u.fetch("name", "test", aVoid -> {
-         *    Log.d("MainActivity", "User fetched successfully: " + u.getName());
-         * });
-         **/
 
         subscribeButtons(this);
     }

@@ -45,10 +45,7 @@ public class ConcordiaBuildingManager {
      * @return The Building if found, null if not
      */
     public Building getBuilding(BuildingName name) {
-        if(buildings.containsKey(name)){
-            return buildings.get(name);
-        }
-        return null;
+        return buildings.get(name);
     }
 
     /**
@@ -57,10 +54,7 @@ public class ConcordiaBuildingManager {
      * @return The Campus object for the given name, null if not found
      */
     public Campus getCampus(CampusName name){
-        if(campuses.containsKey(name)){
-            return campuses.get(name);
-        }
-        return null;
+        return campuses.get(name);
     }
 
     /**
@@ -73,9 +67,7 @@ public class ConcordiaBuildingManager {
         ArrayList<BuildingName> buildingNames = new ArrayList<>();
         ArrayList<Building> finalBuildings = new ArrayList<>();
 
-        if(campuses.containsKey(name)) {
-            campus = campuses.get(name);
-        }
+        campus = campuses.get(name);
 
         if(campus != null){
             buildingNames = campus.getAssociatedBuildings();
