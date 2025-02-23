@@ -16,7 +16,7 @@ public class InternalGoogleMaps extends AbstractMap{
 
     @Override
     public void centerOnCoordinates(float latitude, float longitude) {
-        centerOnCoordinates(latitude, longitude);
+        centerOnCoordinates((double)latitude, (double)longitude);
     }
 
     @Override
