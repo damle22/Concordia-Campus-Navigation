@@ -32,19 +32,13 @@ public class InternalGoogleMaps extends AbstractMap{
     }
 
     @Override
-    public boolean enableLocationTracking(boolean isEnabled) {
-        try{
+    public boolean toggleLocationTracking(boolean isEnabled) {
+        try {
             mMap.setMyLocationEnabled(isEnabled);
             return true;
-        }
-        catch(SecurityException e){
+        } catch (SecurityException e) {
             Log.d("InternalGoogleMaps", "Permissions not granted for location");
             return false;
         }
-    }
-
-    @Override
-    public void displayRoute() {
-        //TODO: To be implemented
     }
 }

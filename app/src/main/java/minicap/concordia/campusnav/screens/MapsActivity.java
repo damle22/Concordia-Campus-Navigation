@@ -98,10 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Enables location tracking on the map
      */
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            gMapController.enableLocationTracking(true);
-        } else {
+        if (!gMapController.toggleLocationTracking(true)) {
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
     }
