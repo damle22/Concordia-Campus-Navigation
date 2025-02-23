@@ -1,5 +1,6 @@
 package minicap.concordia.campusnav.screens;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -32,6 +33,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double startingLat;
     private double startingLng;
 
+    // most recent latLng clicked
+    private LatLng latLngClicked;
+    private boolean isMarked = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             // start map
             initializeMap();
+
         }
     }
 
@@ -81,6 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
 
         LatLng concordia = new LatLng(startingLat, startingLng);
@@ -91,9 +98,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // track location layer
         enableMyLocation();
+
+
+        //Listener for when the user clicks on the map
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+
+                setLatLng(latLng);
+
+                //ensures only one marker is on the map at any time
+                if (isMarked) {
+
+                    //removes existing marker
+                    mMap.clear();
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("Placeholder"));
+
+                }
+                else {
+
+                    //adds new marker
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("Placeholder"));
+                    isMarked=true;
+
+                }
+
+            }
+
+        });
+
     }
 
     private void enableMyLocation() {
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true); // layer
@@ -102,4 +140,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void setLatLng(LatLng latLng){
+
+        latLngClicked = latLng;
+
+    }
+
+    public LatLng getLatLng() {
+
+        return latLngClicked;
+
+    }
+
 }
