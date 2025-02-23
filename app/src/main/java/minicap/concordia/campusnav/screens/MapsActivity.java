@@ -34,8 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double startingLng;
 
     // most recent latLng clicked
-    private LatLng latLngClicked;
-    private boolean isMarked = false;
+    private LatLng lastClickedMapLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,23 +105,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(@NonNull LatLng latLng) {
 
-                setLatLng(latLng);
+                // update last clicked latLng
+                setLastClickedMapLocation(latLng);
 
-                //ensures only one marker is on the map at any time
-                if (isMarked) {
+                // clear all markers on the map
+                mMap.clear();
 
-                    //removes existing marker
-                    mMap.clear();
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("Placeholder"));
-
-                }
-                else {
-
-                    //adds new marker
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("Placeholder"));
-                    isMarked=true;
-
-                }
+                // add new marker to the map
+                mMap.addMarker(new MarkerOptions().position(latLng).title("Placeholder"));
 
             }
 
@@ -141,15 +131,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void setLatLng(LatLng latLng){
+    /**
+     * Set the last clicked latLng
+     * @param latLng lastClickedMapLocation
+     */
+    public void setLastClickedMapLocation(LatLng latLng){
 
-        latLngClicked = latLng;
+        lastClickedMapLocation = latLng;
 
     }
 
-    public LatLng getLatLng() {
+    /**
+     * Get the last clicked latLng
+     * @return lastClickedMapLocation
+     */
+    public LatLng getLastClickedMapLocation() {
 
-        return latLngClicked;
+        return lastClickedMapLocation;
 
     }
 

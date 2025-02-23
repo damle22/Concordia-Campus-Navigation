@@ -11,16 +11,21 @@ import minicap.concordia.campusnav.screens.MapsActivity;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
+/*
+ * Unit test for MapsActivity
+ */
 public class SelectCoordinatesUnitTest {
 
-    //Test if coordinates retrieved matches coordinates clicked
     @Test
+    /*
+     * Test if coordinates retrieved matches coordinates clicked
+     */
     public void isValidCoordinatesRouted() {
 
         MapsActivity activity = new MapsActivity();
         LatLng testLatLng = new LatLng(1,1);
-        activity.setLatLng(testLatLng);
-        assertEquals(testLatLng,activity.getLatLng());
+        activity.setLastClickedMapLocation(testLatLng);
+        assertEquals(testLatLng,activity.getLastClickedMapLocation());
 
     }
 
