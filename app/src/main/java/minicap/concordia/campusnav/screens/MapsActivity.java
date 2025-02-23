@@ -5,8 +5,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import minicap.concordia.campusnav.R;
@@ -28,11 +31,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
+    private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
+    private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
+
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
 
     private double startingLat;
     private double startingLng;
+
+    private boolean showSGW;
+
+    private Marker campusMarker;
+
+    private Button campusSwitchBtn;
 
     private TextView campusTextView;
 
@@ -48,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
+            showSGW = bundle.getBoolean("SHOW_SGW");
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
@@ -55,6 +68,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         campusTextView = findViewById(R.id.ToCampus);
         campusTextView.setText(campusNotSelected);
+
+        campusSwitchBtn = findViewById(R.id.campusSwitch);
+        campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -67,6 +83,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // start map
             initializeMap();
         }
+    }
+
+    private void toggleCampus() {
+        // Flipping the building state
+        showSGW = !showSGW;
+        // Reloading MapsActivity with the new building coordinates
+        Intent i = new Intent(MapsActivity.this, MapsActivity.class);
+        i.putExtra(KEY_STARTING_LAT, getNewLatitude());
+        i.putExtra(KEY_STARTING_LNG, getNewLongitude());
+        i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, showSGW ? "SGW" : "LOY");
+        i.putExtra("SHOW_SGW", showSGW); // Maintaining the toggle state here
+        startActivity(i);
+        finish();
+    }
+
+    private double getNewLatitude() {
+        return showSGW ? 45.45863: 45.49701;
+    }
+    private double getNewLongitude() {
+        return showSGW ? -73.64188: -73.57877;
     }
 
     @Override
@@ -94,11 +130,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng concordia = new LatLng(startingLat, startingLng);
-        mMap.addMarker(new MarkerOptions().position(concordia).title("Marker at Concordia"));
+        LatLng campusLocation = new LatLng(startingLat, startingLng);
+
+        campusMarker = mMap.addMarker(new MarkerOptions().position(campusLocation).title("Current Campus"));
 
         float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campusLocation, defaultZoom));
 
         // track location layer
         enableMyLocation();

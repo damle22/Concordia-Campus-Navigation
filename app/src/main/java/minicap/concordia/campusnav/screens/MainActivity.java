@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                     i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
                     i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
+                    i.putExtra("SHOW_SGW", false);
                     startActivity(i);
                 }
             }
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                     i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
                     i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
+                    i.putExtra("SHOW_SGW", true);
                     startActivity(i);
                 }
             }
