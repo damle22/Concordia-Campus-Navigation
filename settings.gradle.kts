@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mini Capstone"
 include(":app")
+include(":delivery")
