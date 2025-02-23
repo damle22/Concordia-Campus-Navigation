@@ -21,7 +21,7 @@ public class SelectCoordinatesUnitTest {
      * Test if coordinates retrieved matches coordinates clicked
      */
     public void isValidCoordinatesRouted() {
-
+        //creates object of MapsActivity
         MapsActivity activity = new MapsActivity();
         LatLng testLatLng = new LatLng(1,1);
         activity.setLastClickedMapLocation(testLatLng);
