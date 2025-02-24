@@ -75,7 +75,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("1", new BuildingFloor("1", BuildingName.LOYOLA_CENTRAL_BUILDING, "none"))
                         )),
                         45.45863f,
-                        -7364066f)
+                        -73.64066f)
                 },
                 {
                     "BuildingVL", new Building(

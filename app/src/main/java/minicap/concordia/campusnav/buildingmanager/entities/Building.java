@@ -43,4 +43,12 @@ public class Building extends Location{
     public Collection<BuildingFloor> getFloors() {
         return floors.values();
     }
+
+    /**
+     * Gets the campus associated with this building
+     * @return The CampusName for the campus this building belongs to
+     */
+    public CampusName getAssociatedCampus(){
+        return associatedCampus;
+    }
 }

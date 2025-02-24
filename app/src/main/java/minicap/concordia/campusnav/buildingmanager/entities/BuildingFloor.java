@@ -71,4 +71,12 @@ public class BuildingFloor {
     public String getFloorPlanResource() {
         return floorPlanResource;
     }
+
+    /**
+     * Gets the building name associated with this floor
+     * @return The BuildingName this floor is associated with
+     */
+    public BuildingName getAssociatedBuilding() {
+        return associatedBuilding;
+    }
 }
