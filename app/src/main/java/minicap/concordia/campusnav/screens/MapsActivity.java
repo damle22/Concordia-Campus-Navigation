@@ -1,5 +1,6 @@
 package minicap.concordia.campusnav.screens;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -7,6 +8,8 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
@@ -44,6 +48,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
+        // Configure behavior
+        int peekHeightPx = (int) (200 * getResources().getDisplayMetrics().density);
+        bottomSheetBehavior.setPeekHeight(peekHeightPx);
+        bottomSheetBehavior.setHideable(false); // Prevent complete hiding
+        bottomSheetBehavior.setFitToContents(false); // Allows full expansion
+        int expandedOffsetPx = (int) (350 * getResources().getDisplayMetrics().density);
+        bottomSheetBehavior.setExpandedOffset(expandedOffsetPx);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        // Handle state changes
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                // Handle state changes if needed
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                // Handle sliding animation if needed
+            }
+        });
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

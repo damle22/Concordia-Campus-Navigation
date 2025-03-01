@@ -4,9 +4,14 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="coordResHelper_GetGoogleCoords_ShouldReturnCorrectLatLng()">
-        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-02-21T02:20:43.550720223Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/harun/.var/app/com.google.AndroidStudio/config/.android/avd/demo.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>
