@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -21,6 +22,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
+    public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private InternalGoogleMaps gMapController;
@@ -30,6 +32,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double startingLat;
     private double startingLng;
 
+    private TextView campusTextView;
+
+    private String campusNotSelected;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,10 +45,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bundle != null) {
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        campusTextView = findViewById(R.id.ToCampus);
+        campusTextView.setText(campusNotSelected);
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void subscribeButtons(Context appContext) {
+
         Button sgwCampusBtn = (Button)findViewById(R.id.viewSGWCampusButton);
 
         sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
@@ -45,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, MapsActivity.class);
                 i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                 i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
-                startActivity(i);
-            }
+                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
+                startActivity(i);            }
         });
 
         Button loyCampusBtn = (Button)findViewById(R.id.viewLoyCampusButton);
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, MapsActivity.class);
                 i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                 i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
                 startActivity(i);
             }
         });
