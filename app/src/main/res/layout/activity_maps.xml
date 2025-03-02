@@ -73,7 +73,7 @@
         android:layout_height="107dp"
         android:layout_marginTop="580dp"
         android:layout_marginEnd="16dp"
-        app:backgroundTint="@color/buttons"
+        app:backgroundTint="@color/light_burgundy"
         app:cornerRadius="100dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -94,7 +94,7 @@
         android:layout_height="77dp"
         android:layout_marginTop="476dp"
         android:layout_marginEnd="16dp"
-        app:backgroundTint="@color/buttons"
+        app:backgroundTint="@color/light_burgundy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
