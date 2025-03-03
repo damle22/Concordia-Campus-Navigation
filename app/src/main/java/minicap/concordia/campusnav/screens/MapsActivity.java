@@ -15,15 +15,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
-import java.util.List;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.beans.LoyolaBuildingCoordinates;
-import minicap.concordia.campusnav.beans.SGWBuildingCoordinates;
-import minicap.concordia.campusnav.beans.SGWBuildingCoordinates;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 
@@ -97,11 +93,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
 
         // create building shapes
-        for (PolygonOptions polygonOptions : SGWBuildingCoordinates.getBuildingCoordinates()){
+        for (PolygonOptions polygonOptions : CampusBuildingShapes.getSgwBuildingCoordinates()){
             mMap.addPolygon(polygonOptions);
         }
 
-        for (PolygonOptions polygonOptions : LoyolaBuildingCoordinates.getBuildingCoordinates()){
+        for (PolygonOptions polygonOptions : CampusBuildingShapes.getLoyolaBuildingCoordinates()){
             mMap.addPolygon(polygonOptions);
         }
 
