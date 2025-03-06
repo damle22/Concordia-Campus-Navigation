@@ -18,22 +18,19 @@
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_gravity="bottom"
+        android:layout_height="370dp"
         android:orientation="vertical"
-        android:background="@color/purple"
-        android:padding="16dp"
-        app:behavior_peekHeight="200dp"
+        android:background="@color/red"
+        android:padding="10dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
-            android:layout_width="40dp"
-            android:layout_height="4dp"
+            android:layout_width="100dp"
+            android:layout_height="2dp"
             android:background="@color/yellow"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="20dp"/>
 
-        <!-- Start Location Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,13 +51,17 @@
                     android:src="@drawable/ic_person"
                     app:tint="@color/black"/>
 
-                <TextView
+                <EditText
+                    android:id="@+id/yourLocationEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Your Location"
+                    android:hint="Your Location"
                     android:textColor="@color/black"
-                    android:layout_marginStart="8dp"/>
+                    android:textColorHint="@color/gray"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:inputType="text"/>
 
                 <ImageView
                     android:layout_width="24dp"
@@ -91,19 +92,18 @@
                     android:src="@drawable/ic_destination"
                     app:tint="@color/black"/>
 
-                <TextView
+                <!-- Replace TextView with EditText -->
+                <EditText
+                    android:id="@+id/destinationEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Destination"
+                    android:hint="Destination"
                     android:textColor="@color/black"
-                    android:layout_marginStart="8dp"/>
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_down"
-                    app:tint="@color/black"/>
+                    android:textColorHint="@color/gray"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:inputType="text"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -113,54 +113,85 @@
             android:layout_height="1dp"
             android:background="@color/yellow"
             android:layout_marginBottom="16dp"/>
-
-        <!-- Route Options -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Route Options:"
+            android:text="Route Options"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:layout_marginBottom="16dp"/>
+    </LinearLayout>
 
-        <!-- Transportation Icons -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginBottom="16dp">
 
-            <ImageView
+            <!-- Walk Button -->
+            <ImageButton
+                android:id="@+id/walkButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/ic_circle"
+                android:background="@drawable/button_selector"
                 android:src="@drawable/ic_walk"
-                android:padding="12dp"/>
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/wheelchairButton"
+                app:layout_constraintHorizontal_chainStyle="spread"/>
 
-            <ImageView
+            <!-- Wheelchair Button -->
+            <ImageButton
+                android:id="@+id/wheelchairButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/ic_circle"
+                android:background="@drawable/button_selector"
                 android:src="@drawable/ic_wheelchair"
-                android:padding="12dp"/>
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/walkButton"
+                app:layout_constraintEnd_toStartOf="@+id/carButton"/>
 
-            <ImageView
+            <!-- Car Button -->
+            <ImageButton
+                android:id="@+id/carButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/ic_circle"
+                android:background="@drawable/button_selector"
                 android:src="@drawable/ic_car"
-                android:padding="12dp"/>
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/wheelchairButton"
+                app:layout_constraintEnd_toStartOf="@+id/transitButton"/>
 
-            <ImageView
+            <!-- Transit Button -->
+            <ImageButton
+                android:id="@+id/transitButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@drawable/ic_circle"
+                android:background="@drawable/button_selector"
                 android:src="@drawable/ic_transit"
-                android:padding="12dp"/>
-        </LinearLayout>
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/carButton"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Time Estimate Card -->
         <androidx.cardview.widget.CardView

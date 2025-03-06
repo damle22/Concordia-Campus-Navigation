@@ -9,6 +9,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -52,27 +53,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
-        // Configure behavior
-        int peekHeightPx = (int) (200 * getResources().getDisplayMetrics().density);
-        bottomSheetBehavior.setPeekHeight(peekHeightPx);
+        int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
+        bottomSheetBehavior.setPeekHeight(peekHeightPx); // Set peek height
         bottomSheetBehavior.setHideable(false); // Prevent complete hiding
-        bottomSheetBehavior.setFitToContents(false); // Allows full expansion
-        int expandedOffsetPx = (int) (350 * getResources().getDisplayMetrics().density);
-        bottomSheetBehavior.setExpandedOffset(expandedOffsetPx);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-        // Handle state changes
-        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                // Handle state changes if needed
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                // Handle sliding animation if needed
-            }
-        });
+        bottomSheetBehavior.setFitToContents(true); // Lock to collapsed or expanded state
+        bottomSheetBehavior.setHalfExpandedRatio(0.01f); // Disable half-expanded state
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -85,6 +71,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // start map
             initializeMap();
         }
+
+        ImageButton walkButton = findViewById(R.id.walkButton);
+        ImageButton wheelchairButton = findViewById(R.id.wheelchairButton);
+        ImageButton carButton = findViewById(R.id.carButton);
+        ImageButton transitButton = findViewById(R.id.transitButton);
+
+        walkButton.setOnClickListener(v -> {
+            toggleButtonState(walkButton);
+            wheelchairButton.setSelected(false);
+            carButton.setSelected(false);
+            transitButton.setSelected(false);
+        });
+
+        wheelchairButton.setOnClickListener(v -> {
+            toggleButtonState(wheelchairButton);
+            walkButton.setSelected(false);
+            carButton.setSelected(false);
+            transitButton.setSelected(false);
+        });
+
+        carButton.setOnClickListener(v -> {
+            toggleButtonState(carButton);
+            walkButton.setSelected(false);
+            wheelchairButton.setSelected(false);
+            transitButton.setSelected(false);
+        });
+
+        transitButton.setOnClickListener(v -> {
+            toggleButtonState(transitButton);
+            walkButton.setSelected(false);
+            wheelchairButton.setSelected(false);
+            carButton.setSelected(false);
+        });
+    }
+
+    private void toggleButtonState(ImageButton button) {
+        button.setSelected(!button.isSelected());
     }
 
     @Override
