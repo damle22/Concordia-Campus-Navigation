@@ -7,33 +7,36 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
-
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
-import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
+    public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private GoogleMap mMap;
+    private InternalGoogleMaps gMapController;
+
     private ActivityMapsBinding binding;
 
     private double startingLat;
     private double startingLng;
+
+    private TextView campusTextView;
+
+    private String campusNotSelected;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +46,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bundle != null) {
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        campusTextView = findViewById(R.id.ToCampus);
+        campusTextView.setText(campusNotSelected);
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -75,6 +82,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Initializes google maps
+     */
     private void initializeMap() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -82,35 +92,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * Callback for when google maps has loaded
+     * @param googleMap The loaded google map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        gMapController = new InternalGoogleMaps(googleMap);
 
-        LatLng concordia = new LatLng(startingLat, startingLng);
-        mMap.addMarker(new MarkerOptions().position(concordia).title("Marker at Concordia"));
-
-        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
+        gMapController.centerOnCoordinates(startingLat, startingLng);
 
         // create building shapes
-        for (PolygonOptions polygonOptions : CampusBuildingShapes.getSgwBuildingCoordinates()){
-            mMap.addPolygon(polygonOptions);
-        }
-
-        for (PolygonOptions polygonOptions : CampusBuildingShapes.getLoyolaBuildingCoordinates()){
-            mMap.addPolygon(polygonOptions);
-        }
+        gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
+        gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
         // track location layer
         enableMyLocation();
     }
 
+    /**
+     * Enables location tracking on the map
+     */
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true); // layer
-            mMap.getUiSettings().setMyLocationButtonEnabled(true); // button
-        } else {
+        if (!gMapController.toggleLocationTracking(true)) {
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
     }
