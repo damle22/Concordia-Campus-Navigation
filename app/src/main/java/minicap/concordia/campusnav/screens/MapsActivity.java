@@ -11,17 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -32,7 +34,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private GoogleMap mMap;
+    private InternalGoogleMaps gMapController;
+
     private ActivityMapsBinding binding;
 
     private double startingLat;
@@ -91,16 +94,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng campus =  showSGW ? LOY_LOCATION : SGW_LOCATION;
 
         //moving the existing marker to the new campus location
-        if(campusMarker != null){
-            campusMarker.setPosition(campus);
-            campusMarker.setTitle(showSGW ? "Loyola Campus" : "SGW Campus");
-        }else{
-            campusMarker = mMap.addMarker(new MarkerOptions().position(campus).title(showSGW ? "Loyola Campus" : "SGW Campus"));
-        }
+        campusMarker = gMapController.updateCampusMarker(campusMarker, campus, showSGW);
 
         //moving the camera smoothly to the new campus location
         float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(campus,defaultZoom));
+        gMapController.animateCameraToLocation(campus, defaultZoom);
 
         //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
@@ -120,6 +118,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Initializes google maps
+     */
     private void initializeMap() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -127,27 +128,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * Callback for when google maps has loaded
+     * @param googleMap The loaded google map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        gMapController = new InternalGoogleMaps(googleMap);
+
+        gMapController.centerOnCoordinates(startingLat, startingLng);
+
+        // create building shapes
+        gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
+        gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
         LatLng campusLocation = new LatLng(startingLat, startingLng);
-
-        campusMarker = mMap.addMarker(new MarkerOptions().position(campusLocation).title("Current Campus"));
-
-        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campusLocation, defaultZoom));
 
         // track location layer
         enableMyLocation();
     }
 
+    /**
+     * Enables location tracking on the map
+     */
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true); // layer
-            mMap.getUiSettings().setMyLocationButtonEnabled(true); // button
-        } else {
+        if (!gMapController.toggleLocationTracking(true)) {
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
     }
