@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LatLng coords = null;
 
+
                 Campus loyolaCampus = buildingManager.getCampus(CampusName.LOYOLA);
                 float[] campusCoordinates = loyolaCampus.getLocation();
                 coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
