@@ -15,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
@@ -100,6 +101,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gMapController = new InternalGoogleMaps(googleMap);
 
         gMapController.centerOnCoordinates(startingLat, startingLng);
+
+        // create building shapes
+        gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
+        gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
         // track location layer
         enableMyLocation();

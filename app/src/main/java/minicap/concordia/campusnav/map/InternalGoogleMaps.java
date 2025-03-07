@@ -5,6 +5,9 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolygonOptions;
+
+import java.util.List;
 
 public class InternalGoogleMaps extends AbstractMap{
     private final float defaultZoom = 18;
@@ -29,6 +32,12 @@ public class InternalGoogleMaps extends AbstractMap{
     @Override
     public void switchToFloor(String floorName) {
         //Google maps does not have floors, so do nothing
+    }
+
+    public void addPolygons(List<PolygonOptions> options) {
+        for (PolygonOptions polygonOptions : options){
+            mMap.addPolygon(polygonOptions);
+        }
     }
 
     @Override
