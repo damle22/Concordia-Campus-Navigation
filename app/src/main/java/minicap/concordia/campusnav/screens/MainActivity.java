@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 LatLng coords = null;
+
 
                 Campus loyolaCampus = buildingManager.getCampus(CampusName.LOYOLA);
                 float[] campusCoordinates = loyolaCampus.getLocation();
