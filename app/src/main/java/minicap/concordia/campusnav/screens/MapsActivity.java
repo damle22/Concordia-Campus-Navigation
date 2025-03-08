@@ -1,5 +1,6 @@
 package minicap.concordia.campusnav.screens;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -7,6 +8,9 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +18,9 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -67,6 +74,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
+        int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
+        bottomSheetBehavior.setPeekHeight(peekHeightPx); // Set peek height
+        bottomSheetBehavior.setHideable(false); // Prevent complete hiding
+        bottomSheetBehavior.setFitToContents(true); // Lock to collapsed or expanded state
+        bottomSheetBehavior.setHalfExpandedRatio(0.01f); // Disable half-expanded state
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
         campusTextView = findViewById(R.id.ToCampus);
         campusTextView.setText(campusNotSelected);
         campusSwitchBtn = findViewById(R.id.campusSwitch);
@@ -84,6 +101,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // start map
             initializeMap();
         }
+
+        ImageButton walkButton = findViewById(R.id.walkButton);
+        ImageButton wheelchairButton = findViewById(R.id.wheelchairButton);
+        ImageButton carButton = findViewById(R.id.carButton);
+        ImageButton transitButton = findViewById(R.id.transitButton);
+
+        walkButton.setOnClickListener(v -> {
+            toggleButtonState(walkButton);
+            wheelchairButton.setSelected(false);
+            carButton.setSelected(false);
+            transitButton.setSelected(false);
+        });
+
+        wheelchairButton.setOnClickListener(v -> {
+            toggleButtonState(wheelchairButton);
+            walkButton.setSelected(false);
+            carButton.setSelected(false);
+            transitButton.setSelected(false);
+        });
+
+        carButton.setOnClickListener(v -> {
+            toggleButtonState(carButton);
+            walkButton.setSelected(false);
+            wheelchairButton.setSelected(false);
+            transitButton.setSelected(false);
+        });
+
+        transitButton.setOnClickListener(v -> {
+            toggleButtonState(transitButton);
+            walkButton.setSelected(false);
+            wheelchairButton.setSelected(false);
+            carButton.setSelected(false);
+        });
+    }
+
+    private void toggleButtonState(ImageButton button) {
+        button.setSelected(!button.isSelected());
     }
 
     private void toggleCampus(){
