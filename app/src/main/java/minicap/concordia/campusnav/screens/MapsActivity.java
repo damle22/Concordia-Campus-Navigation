@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +22,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
+import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -30,6 +37,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
+    private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
+    private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private InternalGoogleMaps gMapController;
@@ -38,6 +47,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private double startingLat;
     private double startingLng;
+
+    private boolean showSGW;
+
+    private Marker campusMarker;
+
+    private Button campusSwitchBtn;
 
     private TextView campusTextView;
 
@@ -53,6 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
+            showSGW = bundle.getBoolean("SHOW_SGW");
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
@@ -70,6 +86,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         campusTextView = findViewById(R.id.ToCampus);
         campusTextView.setText(campusNotSelected);
+        campusSwitchBtn = findViewById(R.id.campusSwitch);
+
+        campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -121,6 +140,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         button.setSelected(!button.isSelected());
     }
 
+    private void toggleCampus(){
+        //flipping the state
+        showSGW = !showSGW;
+
+        // getting the new campus location
+        LatLng campus =  showSGW ? LOY_LOCATION : SGW_LOCATION;
+
+        //moving the existing marker to the new campus location
+        campusMarker = gMapController.updateCampusMarker(campusMarker, campus, showSGW);
+
+        //moving the camera smoothly to the new campus location
+        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
+        gMapController.animateCameraToLocation(campus, defaultZoom);
+
+        //updating the button text
+        campusTextView.setText(showSGW ? "SGW" : "LOY");
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -154,6 +191,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gMapController = new InternalGoogleMaps(googleMap);
 
         gMapController.centerOnCoordinates(startingLat, startingLng);
+
+        // create building shapes
+        gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
+        gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
+
+        LatLng campusLocation = new LatLng(startingLat, startingLng);
 
         // track location layer
         enableMyLocation();
