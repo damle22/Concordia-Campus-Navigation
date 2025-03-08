@@ -125,9 +125,26 @@
         android:contentDescription="change_language"
         app:layout_constraintBottom_toTopOf="@+id/guidelineTOP"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.858"
+        app:layout_constraintHorizontal_bias="0.813"
         app:layout_constraintStart_toStartOf="@+id/guidelineVertMID"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/engbutton" />
+        app:layout_constraintVertical_bias="0.432"
+        app:srcCompat="@drawable/lang_button" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="44dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/english"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/viewLanguageButton"
+        app:layout_constraintEnd_toEndOf="@+id/viewLanguageButton"
+        app:layout_constraintStart_toStartOf="@+id/viewLanguageButton"
+        app:layout_constraintTop_toTopOf="@+id/viewLanguageButton"
+        tools:text="@string/english" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
