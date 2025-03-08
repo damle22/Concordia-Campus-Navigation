@@ -7,32 +7,50 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
+    public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
+    private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
+    private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private GoogleMap mMap;
+    private InternalGoogleMaps gMapController;
+
     private ActivityMapsBinding binding;
 
     private double startingLat;
     private double startingLng;
+
+    private boolean showSGW;
+
+    private Marker campusMarker;
+
+    private Button campusSwitchBtn;
+
+    private TextView campusTextView;
+
+    private String campusNotSelected;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +60,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bundle != null) {
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
+            showSGW = bundle.getBoolean("SHOW_SGW");
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        campusTextView = findViewById(R.id.ToCampus);
+        campusTextView.setText(campusNotSelected);
+        campusSwitchBtn = findViewById(R.id.campusSwitch);
+
+        campusSwitchBtn.setOnClickListener(v -> toggleCampus());
+
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // request permission
+            // request perm
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
@@ -58,6 +84,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // start map
             initializeMap();
         }
+    }
+
+    private void toggleCampus(){
+        //flipping the state
+        showSGW = !showSGW;
+
+        // getting the new campus location
+        LatLng campus =  showSGW ? LOY_LOCATION : SGW_LOCATION;
+
+        //moving the existing marker to the new campus location
+        campusMarker = gMapController.updateCampusMarker(campusMarker, campus, showSGW);
+
+        //moving the camera smoothly to the new campus location
+        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
+        gMapController.animateCameraToLocation(campus, defaultZoom);
+
+        //updating the button text
+        campusTextView.setText(showSGW ? "SGW" : "LOY");
     }
 
     @Override
@@ -68,61 +112,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // start map
                 initializeMap();
             } else {
-                // error if no permission
+                // error if no perm
                 Toast.makeText(this, "Location permission is required to show your location", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    /**
+     * Initializes google maps
+     */
     private void initializeMap() {
-        // Obtain the SupportMapFragment and get notified when the map is ready.
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        // NEW: Add the building selector overlay on top of the map.
-        addBuildingSelectorOverlay();
     }
 
+    /**
+     * Callback for when google maps has loaded
+     * @param googleMap The loaded google map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        gMapController = new InternalGoogleMaps(googleMap);
 
-        LatLng concordia = new LatLng(startingLat, startingLng);
-        mMap.addMarker(new MarkerOptions().position(concordia).title("Marker at Concordia"));
+        gMapController.centerOnCoordinates(startingLat, startingLng);
 
-        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
+        // create building shapes
+        gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
+        gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
-        // Enable the "my location" layer
+        LatLng campusLocation = new LatLng(startingLat, startingLng);
+
+        // track location layer
         enableMyLocation();
     }
 
+    /**
+     * Enables location tracking on the map
+     */
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true); // layer
-            mMap.getUiSettings().setMyLocationButtonEnabled(true); // button
-        } else {
+        if (!gMapController.toggleLocationTracking(true)) {
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    // NEW METHOD: Add the building selector overlay to the map's root view.
-    private void addBuildingSelectorOverlay() {
-        // Create a new FrameLayout to serve as the overlay container.
-        FrameLayout overlay = new FrameLayout(this);
-        overlay.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-        ));
-        // Assign an ID if needed (ensure this ID is defined in your resources)
-        overlay.setId(R.id.buildingSelectorOverlay);
-
-        // Add the overlay container to the root view.
-        ((ViewGroup) binding.getRoot()).addView(overlay);
-
-        // Inflate your fragment_building_selector.xml into the overlay.
-        getLayoutInflater().inflate(R.layout.fragment_building_selector, overlay, true);
     }
 }
