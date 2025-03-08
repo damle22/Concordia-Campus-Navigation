@@ -107,15 +107,20 @@
         android:id="@+id/switch_darkmode"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:backgroundTint="@color/white"
+        android:checked="false"
+        android:showText="false"
         android:switchPadding="8dp"
         android:text="@string/dark_mode"
         android:textAlignment="textEnd"
         android:textColor="@color/white"
         android:textStyle="bold"
+        android:thumbTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guidelineVertMID"
-        app:layout_constraintTop_toTopOf="@id/guidelineBOT" />
+        app:layout_constraintTop_toTopOf="@id/guidelineBOT"
+        tools:checked="false" />
 
     <ImageButton
         android:id="@+id/viewLanguageButton"
