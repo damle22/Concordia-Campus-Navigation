@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,16 +15,16 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
+// Note: Import BuildingSelectorFragment from its actual package:
+import minicap.concordia.ca.BuildingSelectorFragment;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -35,22 +36,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private InternalGoogleMaps gMapController;
-
     private ActivityMapsBinding binding;
 
     private double startingLat;
     private double startingLng;
-
     private boolean showSGW;
-
     private Marker campusMarker;
-
     private Button campusSwitchBtn;
-
     private TextView campusTextView;
-
     private String campusNotSelected;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,37 +64,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusTextView = findViewById(R.id.ToCampus);
         campusTextView.setText(campusNotSelected);
         campusSwitchBtn = findViewById(R.id.campusSwitch);
-
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
-        // check location permission
+        // Hook up the Buildings button to show the BuildingSelectorFragment.
+        binding.buildingView.setOnClickListener(v -> showBuildingSelectorFragment());
+
+        // Check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // request perm
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            // start map
             initializeMap();
         }
     }
 
-    private void toggleCampus(){
-        //flipping the state
+    private void toggleCampus() {
+        // Flip the state
         showSGW = !showSGW;
-
-        // getting the new campus location
-        LatLng campus =  showSGW ? LOY_LOCATION : SGW_LOCATION;
-
-        //moving the existing marker to the new campus location
+        LatLng campus = showSGW ? LOY_LOCATION : SGW_LOCATION;
         campusMarker = gMapController.updateCampusMarker(campusMarker, campus, showSGW);
-
-        //moving the camera smoothly to the new campus location
         float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
         gMapController.animateCameraToLocation(campus, defaultZoom);
-
-        //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
     }
 
@@ -109,17 +95,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // start map
                 initializeMap();
             } else {
-                // error if no perm
                 Toast.makeText(this, "Location permission is required to show your location", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     /**
-     * Initializes google maps
+     * Initializes Google Maps.
      */
     private void initializeMap() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -129,31 +113,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * Callback for when google maps has loaded
-     * @param googleMap The loaded google map
+     * Callback for when Google Maps has loaded.
+     * @param googleMap The loaded Google Map.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gMapController = new InternalGoogleMaps(googleMap);
-
         gMapController.centerOnCoordinates(startingLat, startingLng);
-
-        // create building shapes
+        // Create building shapes
         gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
-
-        LatLng campusLocation = new LatLng(startingLat, startingLng);
-
-        // track location layer
         enableMyLocation();
     }
 
     /**
-     * Enables location tracking on the map
+     * Enables location tracking on the map.
      */
     private void enableMyLocation() {
         if (!gMapController.toggleLocationTracking(true)) {
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Displays the BuildingSelectorFragment.
+     * This method makes the fragment container visible (if hidden) and replaces its contents with BuildingSelectorFragment.
+     */
+    private void showBuildingSelectorFragment() {
+        // Make sure the fragment container (with id buildingSelectorContainer) is visible.
+        binding.buildingSelectorContainer.setVisibility(View.VISIBLE);
+        // Replace the container with a new instance of BuildingSelectorFragment.
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.buildingSelectorContainer, new BuildingSelectorFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }

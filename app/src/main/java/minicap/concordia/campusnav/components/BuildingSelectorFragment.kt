@@ -8,24 +8,24 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.firebase.firestore.FirebaseFirestore
 import minicap.concordia.campusnav.R
-import minicap.concordia.campusnav.beans.Building
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager
+import minicap.concordia.campusnav.buildingmanager.entities.Building
+import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName
 import minicap.concordia.campusnav.components.BuildingAdapter
 import minicap.concordia.campusnav.databinding.FragmentBuildingSelectorBinding
 
 class BuildingSelectorFragment : Fragment() {
 
-    private var isExpanded = false // track whether the layout is “expanded” or “collapsed”
+    private var isExpanded = false // tracks whether the layout is expanded or collapsed
     private var _binding: FragmentBuildingSelectorBinding? = null
     private val binding get() = _binding!!
 
-    // RecyclerView adapters will be set once data is fetched
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentBuildingSelectorBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -33,7 +33,7 @@ class BuildingSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Animate the margin on the root view click
+        // Animate margin on click of the root view
         binding.buildingSelectorRoot.setOnClickListener {
             animateMargin(binding.buildingSelectorRoot)
         }
@@ -42,34 +42,23 @@ class BuildingSelectorFragment : Fragment() {
         binding.sgwRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.loyRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
-        // Fetch dynamic building data from Firestore and populate RecyclerViews
+        // Fetch building data and update RecyclerViews
         fetchBuildings()
     }
 
+    /**
+     * Fetches building data from ConcordiaBuildingManager by campus.
+     */
     private fun fetchBuildings() {
-        val db = FirebaseFirestore.getInstance()
-        db.collection("buildings")
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val sgwList = mutableListOf<Building>()
-                val loyList = mutableListOf<Building>()
+        val buildingManager = ConcordiaBuildingManager.getInstance()
 
-                for (doc in querySnapshot.documents) {
-                    val building = doc.toObject(Building::class.java)
-                    if (building != null) {
-                        if (building.campus.equals("SGW", ignoreCase = true)) {
-                            sgwList.add(building)
-                        } else if (building.campus.equals("Loyola", ignoreCase = true)) {
-                            loyList.add(building)
-                        }
-                    }
-                }
-                binding.sgwRecyclerView.adapter = BuildingAdapter(sgwList)
-                binding.loyRecyclerView.adapter = BuildingAdapter(loyList)
-            }
-            .addOnFailureListener { e ->
-                // Handle errors (e.g., show a Toast)
-            }
+        // Retrieve the list of buildings for each campus
+        val sgwBuildings: MutableList<Building> = buildingManager.getBuildingsForCampus(CampusName.SGW)
+        val loyBuildings: MutableList<Building> = buildingManager.getBuildingsForCampus(CampusName.LOYOLA)
+
+        // Update the RecyclerViews with the building lists
+        binding.sgwRecyclerView.adapter = BuildingAdapter(sgwBuildings)
+        binding.loyRecyclerView.adapter = BuildingAdapter(loyBuildings)
     }
 
     private fun animateMargin(rootView: View) {

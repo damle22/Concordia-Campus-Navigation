@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.beans.Building;
+// Change the import to use the correct Building class:
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
 
 public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.BuildingViewHolder> {
 
@@ -24,17 +25,17 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
     @NonNull
     @Override
     public BuildingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the item_building.xml layout
+        // Inflate the layout for each building item (ensure this matches your layout file)
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.item_building, parent, false);
         return new BuildingViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BuildingViewHolder holder, int position) {
-        Building b = buildingList.get(position);
-        // Set the building name on the TextView
-        holder.tvBuildingName.setText(b.getName());
+        Building building = buildingList.get(position);
+        // Use the proper getter for the building name – note that in Building.java it is getBuildingName()
+        holder.tvBuildingName.setText(building.getBuildingName());
     }
 
     @Override
@@ -52,7 +53,6 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
 
         public BuildingViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Make sure this ID matches the TextView in item_building.xml
             tvBuildingName = itemView.findViewById(R.id.tvBuildingName);
         }
     }
