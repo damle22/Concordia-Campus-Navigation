@@ -1,12 +1,9 @@
 package minicap.concordia.campusnav.map;
 
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.GoogleMap;
+
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -19,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,22 +43,55 @@ public class FetchPathTask {
     /**
      * Fetches the route given origin and destination.
      * Will invoke the listener for onRouteFetched with the route once complete
-     * @param origin LatLng
-     * @param destination LatLng
+     * @param originObj LatLng
+     * @param destinationObj LatLng
      */
-    public void fetchRoute(LatLng origin, LatLng destination) {
-        String apiKey = BuildConfig.MAPS_API_KEY;
-        //TODO Change hardcoded mode of transport when UI is available
-        String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin="
-                + origin.latitude + "," + origin.longitude
-                + "&destination=" + destination.latitude + "," + destination.longitude
-                + "&mode=car&key=" + apiKey;
+    public void fetchRoute(LatLng originObj, LatLng destinationObj) {
+        String urlString = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + BuildConfig.MAPS_API_KEY;
+
+        JSONObject requestBody = new JSONObject();
+        try {
+
+            JSONObject origin = new JSONObject();
+            JSONObject originLocation = new JSONObject();
+            JSONObject originLatLng = new JSONObject();
+            originLatLng.put("latitude", originObj.latitude);
+            originLatLng.put("longitude", originObj.longitude);
+            originLocation.put("latLng", originLatLng);
+            origin.put("location", originLocation);
+            requestBody.put("origin", origin);
+
+            JSONObject destination = new JSONObject();
+            JSONObject destinationLocation = new JSONObject();
+            JSONObject destinationLatLng = new JSONObject();
+            destinationLatLng.put("latitude", destinationObj.latitude);
+            destinationLatLng.put("longitude", destinationObj.longitude);
+            destinationLocation.put("latLng", destinationLatLng);
+            destination.put("location", destinationLocation);
+            requestBody.put("destination", destination);
+
+            JSONObject travelMode = new JSONObject();
+            //TODO change this from hardcoded when UI offers options. Possible options are (DRIVE, BICYCLE, WALK, TWO_WHEELER, TRANSIT)
+            travelMode.put("travelMode", "DRIVE");
+
+
+        } catch (JSONException e) {
+            Log.e("FetchRoute(): ", e.toString());
+        }
 
         executorService.execute(() -> {
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("X-Goog-FieldMask","*");
+                connection.setRequestProperty("X-Goog-Api-Key",BuildConfig.MAPS_API_KEY);
+                connection.setDoOutput(true);
+
+                OutputStream os = connection.getOutputStream();
+                byte[] input = requestBody.toString().getBytes("utf-8");
+                os.write(input, 0, input.length);
 
                 InputStream stream = connection.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -86,17 +117,17 @@ public class FetchPathTask {
         });
     }
 
+
     /**
      * Given a json response from google API, it will parse the Route
-     * @param json response from google APIchat
+     * @param json response from google API
      * @return List of LatLng points
      */
-    private List<LatLng> parseRoute(String json) {
+    public List<LatLng> parseRoute(String json) {
         List<LatLng> path = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray routes = jsonObject.getJSONArray("routes");
-
             if (routes.length() > 0) {
                 JSONObject route = routes.getJSONObject(0);
                 JSONArray legs = route.getJSONArray("legs");
@@ -105,14 +136,14 @@ public class FetchPathTask {
 
                 for (int i = 0; i < steps.length(); i++) {
                     JSONObject step = steps.getJSONObject(i);
-                    JSONObject start = step.getJSONObject("start_location");
-                    LatLng point = new LatLng(start.getDouble("lat"), start.getDouble("lng"));
-                    String encodedPolyline = step.getJSONObject("polyline").getString("points");
+                    JSONObject polyline = step.getJSONObject("polyline");
+                    String encodedPolyline = polyline.getString("encodedPolyline");
+
                     path.addAll(PolyUtil.decode(encodedPolyline));
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("ParseRoute(): ", e.toString());
         }
         return path;
     }
