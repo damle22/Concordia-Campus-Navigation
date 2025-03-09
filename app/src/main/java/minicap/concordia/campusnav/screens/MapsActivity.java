@@ -6,11 +6,15 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -18,14 +22,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.List;
+
+import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener{
 
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
@@ -51,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String campusNotSelected;
 
+    private FusedLocationProviderClient fusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +154,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng campusLocation = new LatLng(startingLat, startingLng);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //TODO This call routes the building to the User Location. It should be removed later and made OnClick when building is selected
+        getUserLocation();
+
         // track location layer
         enableMyLocation();
     }
@@ -156,4 +170,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
     }
+
+    /**
+     * Gets the User Location and invokes drawPath
+     */
+    private void getUserLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            //TODO userLocation is currently hardcoded for VM purposes. Uncomment this line to reflect current user location
+                            //LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            LatLng userLocation= new LatLng(45.489682435037835, -73.58808030276997);
+                            //TODO Destination Temporarily hardcoded until UI allows to choose building
+                            drawPath(userLocation, SGW_LOCATION);
+                        }
+                    });
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    /**
+     * This Method generates the GoogleAPI URL and invokes FetchPathTask
+     * @param origin LatLng
+     * @param destination LatLng
+     */
+    private void drawPath(LatLng origin, LatLng destination) {
+        String apiKey = BuildConfig.MAPS_API_KEY;
+        //TODO Change hardcoded mode of transport when UI is available
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="
+                + origin.latitude + "," + origin.longitude
+                + "&destination=" + destination.latitude + "," + destination.longitude
+                + "&mode=car&key=" + apiKey;
+
+        new FetchPathTask(this).fetchRoute(url);
+    }
+
+    /**
+     * Will add the route to the Map
+     * Invoked when the route is fetched by the Google API
+     * @param route List<LatLng>
+     */
+    @Override
+    public void onRouteFetched(List<LatLng> route) {
+        //Handles Route not fetched
+        if (route == null || route.isEmpty()) {
+            Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Draw polyline on the map
+        gMapController.addPolyline(new PolylineOptions()
+                .addAll(route)
+                .width(10)
+                .color(Color.BLUE));
+    }
+
 }

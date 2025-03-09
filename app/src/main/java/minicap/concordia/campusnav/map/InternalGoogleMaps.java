@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
 
@@ -40,6 +41,14 @@ public class InternalGoogleMaps extends AbstractMap{
         for (PolygonOptions polygonOptions : options){
             mMap.addPolygon(polygonOptions);
         }
+    }
+
+    /**
+     * Adds PolyLine to the googleMaps
+     * @param options PolylineOptions
+     */
+    public void addPolyline(PolylineOptions options){
+        mMap.addPolyline(options);
     }
 
     public void animateCameraToLocation(LatLng location, float zoom) {
