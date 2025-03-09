@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import minicap.concordia.campusnav.BuildConfig;
+
 // Callback Interface
 public class FetchPathTask {
     private final OnRouteFetchedListener listener;
@@ -41,11 +43,19 @@ public class FetchPathTask {
     }
 
     /**
-     * Fetches the route given the google api url.
+     * Fetches the route given origin and destination.
      * Will invoke the listener for onRouteFetched with the route once complete
-     * @param urlString GoogleAPI String
+     * @param origin LatLng
+     * @param destination LatLng
      */
-    public void fetchRoute(String urlString) {
+    public void fetchRoute(LatLng origin, LatLng destination) {
+        String apiKey = BuildConfig.MAPS_API_KEY;
+        //TODO Change hardcoded mode of transport when UI is available
+        String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin="
+                + origin.latitude + "," + origin.longitude
+                + "&destination=" + destination.latitude + "," + destination.longitude
+                + "&mode=car&key=" + apiKey;
+
         executorService.execute(() -> {
             try {
                 URL url = new URL(urlString);
@@ -78,7 +88,7 @@ public class FetchPathTask {
 
     /**
      * Given a json response from google API, it will parse the Route
-     * @param json response from google API
+     * @param json response from google APIchat
      * @return List of LatLng points
      */
     private List<LatLng> parseRoute(String json) {
