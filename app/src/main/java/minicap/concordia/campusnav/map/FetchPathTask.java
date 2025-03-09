@@ -71,7 +71,7 @@ public class FetchPathTask {
                 });
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("FetchRoute(): ", e.toString());
             }
         });
     }
