@@ -1,5 +1,7 @@
 package minicap.concordia.campusnav.screens;
 
+import android.location.Address;
+import android.location.Geocoder;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -9,6 +11,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.widget.EditText;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -30,7 +34,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
@@ -66,7 +72,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String campusNotSelected;
 
+    private EditText yourLocationEditText;
+
     private FusedLocationProviderClient fusedLocationClient;
+
+    private String travelMode = "DRIVE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,37 +126,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageButton carButton = findViewById(R.id.carButton);
         ImageButton transitButton = findViewById(R.id.transitButton);
 
+        //Default mode
+        carButton.setSelected(true);
+
         walkButton.setOnClickListener(v -> {
-            toggleButtonState(walkButton);
+            walkButton.setSelected(true);
             wheelchairButton.setSelected(false);
             carButton.setSelected(false);
             transitButton.setSelected(false);
+            travelMode = "WALK";
         });
 
         wheelchairButton.setOnClickListener(v -> {
-            toggleButtonState(wheelchairButton);
+            wheelchairButton.setSelected(true);
             walkButton.setSelected(false);
             carButton.setSelected(false);
             transitButton.setSelected(false);
+            //TODO google maps does not support so for now, travelMode is the same as walking
+            travelMode = "WALK";
         });
 
         carButton.setOnClickListener(v -> {
-            toggleButtonState(carButton);
+            carButton.setSelected(true);
             walkButton.setSelected(false);
             wheelchairButton.setSelected(false);
             transitButton.setSelected(false);
+            travelMode = "DRIVE";
         });
 
         transitButton.setOnClickListener(v -> {
-            toggleButtonState(transitButton);
+            transitButton.setSelected(true);
             walkButton.setSelected(false);
             wheelchairButton.setSelected(false);
             carButton.setSelected(false);
+            travelMode = "TRANSIT";
         });
-    }
 
-    private void toggleButtonState(ImageButton button) {
-        button.setSelected(!button.isSelected());
+        yourLocationEditText = findViewById(R.id.yourLocationEditText);
     }
 
     private void toggleCampus(){
@@ -235,6 +251,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (location != null) {
                             //TODO userLocation is currently hardcoded for VM purposes. Uncomment this line to reflect current user location
                             //LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            String address = getAddressFromLocation(45.489682435037835, -73.58808030276997);
+                            yourLocationEditText.setText(address);
                             LatLng userLocation= new LatLng(45.489682435037835, -73.58808030276997);
                             //TODO Destination Temporarily hardcoded until UI allows to choose building
                             drawPath(userLocation, SGW_LOCATION);
@@ -246,13 +264,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private String getAddressFromLocation(double latitude, double longitude) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        List<Address> addresses;
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                return address.getAddressLine(0);  // Return the first address line
+            } else {
+                return "Address not found";
+            }
+        } catch (IOException e) {
+            Log.e("getAddressFromLocation()", e.getMessage());
+            return "Unable to fetch address";
+        }
+    }
+
     /**
      * This Method generates the GoogleAPI URL and invokes FetchPathTask
      * @param origin LatLng
      * @param destination LatLng
      */
     private void drawPath(LatLng origin, LatLng destination) {
-        new FetchPathTask(this).fetchRoute(origin, destination);
+        new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
     }
 
     /**

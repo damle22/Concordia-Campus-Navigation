@@ -221,8 +221,11 @@
                     android:textColor="@color/black"
                     android:textColorHint="@color/gray"
                     android:layout_marginStart="8dp"
-                    android:background="@null"
-                    android:inputType="text"/>
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:inputType="none"
+                    android:background="@null" />
 
                 <ImageView
                     android:layout_width="24dp"

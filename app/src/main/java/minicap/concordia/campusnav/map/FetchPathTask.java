@@ -46,7 +46,7 @@ public class FetchPathTask {
      * @param originObj LatLng
      * @param destinationObj LatLng
      */
-    public void fetchRoute(LatLng originObj, LatLng destinationObj) {
+    public void fetchRoute(LatLng originObj, LatLng destinationObj, String travelModeStr) {
         String urlString = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + BuildConfig.MAPS_API_KEY;
 
         JSONObject requestBody = new JSONObject();
@@ -71,8 +71,7 @@ public class FetchPathTask {
             requestBody.put("destination", destination);
 
             JSONObject travelMode = new JSONObject();
-            //TODO change this from hardcoded when UI offers options. Possible options are (DRIVE, BICYCLE, WALK, TWO_WHEELER, TRANSIT)
-            travelMode.put("travelMode", "DRIVE");
+            travelMode.put("travelMode", travelModeStr);
 
 
         } catch (JSONException e) {
