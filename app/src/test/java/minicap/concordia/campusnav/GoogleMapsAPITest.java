@@ -2,9 +2,11 @@ package minicap.concordia.campusnav;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonObject;
+import com.google.maps.android.PolyUtil;
 
 import minicap.concordia.campusnav.map.FetchPathTask;
 
+import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -12,6 +14,7 @@ import org.robolectric.RobolectricTestRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -83,39 +86,44 @@ public class GoogleMapsAPITest {
 
     @Test
     public void testParseRoute_withValidJson() {
-        String jsonResponse = "{\n" +
-                "   \"routes\": [\n" +
-                "      {\n" +
-                "         \"legs\": [\n" +
-                "            {\n" +
-                "               \"steps\": [\n" +
-                "                  {\n" +
-                "                     \"polyline\": {\n" +
-                "                        \"encodedPolyline\": \"austGztc`MHIJ?Zj@H^TZJLPDB?LI\\\\{@JQJ@bAbA[`AgA`Dq@xBcCuCsB}B{BcCu@{@QUc@s@eAyAg@}@w@{Aa@y@IOe@_AcBeDOYYe@Ua@KKMM][m@i@aBwA}AsAAA}@s@gA}@e@a@e@a@_@Y_Au@_AaAMMQSYYuAqAcAcAs@s@[[}AyAGEUUt@mB~BkG|@x@`A|@bBvA\"\n" +
-                "                     }\n" +
-                "                  }\n" +
-                "               ]\n" +
-                "            }\n" +
-                "         ]\n" +
-                "      }\n" +
-                "   ]\n" +
-                "}";
+        try{
+            String jsonResponse = "{\n" +
+                    "   \"routes\": [\n" +
+                    "      {\n" +
+                    "         \"legs\": [\n" +
+                    "            {\n" +
+                    "               \"steps\": [\n" +
+                    "                  {\n" +
+                    "                     \"polyline\": {\n" +
+                    "                        \"encodedPolyline\": \"austGztc`MHIJ?Zj@H^TZJLPDB?LI\\\\{@JQJ@bAbA[`AgA`Dq@xBcCuCsB}B{BcCu@{@QUc@s@eAyAg@}@w@{Aa@y@IOe@_AcBeDOYYe@Ua@KKMM][m@i@aBwA}AsAAA}@s@gA}@e@a@e@a@_@Y_Au@_AaAMMQSYYuAqAcAcAs@s@[[}AyAGEUUt@mB~BkG|@x@`A|@bBvA\"\n" +
+                    "                     }\n" +
+                    "                  }\n" +
+                    "               ]\n" +
+                    "            }\n" +
+                    "         ]\n" +
+                    "      }\n" +
+                    "   ]\n" +
+                    "}";
 
-        FetchPathTask fetchPathTask = new FetchPathTask(null);
-        List<LatLng> path = fetchPathTask.parseRoute(jsonResponse);
-        assertNotNull("The path should not be null", path);
-        assertFalse("The path should not be empty", path.isEmpty());
-        LatLng firstPoint = path.get(0);
-        assertEquals("Latitude should match", 45.4896, firstPoint.latitude, 0.0001);
-        assertEquals("Longitude should match", -73.5881, firstPoint.longitude, 0.0001);
+            FetchPathTask fetchPathTask = new FetchPathTask(null);
+            JSONArray steps = fetchPathTask.parseRoute(jsonResponse);
+            assertNotNull("The steps should not be null", steps);
+            String encodedPolyline = steps.getJSONObject(0).getJSONObject("polyline").getString("encodedPolyline");
+            List<LatLng> decodedPoints = PolyUtil.decode(encodedPolyline);
+            assertEquals("Latitude should match", 45.4896, decodedPoints.get(0).latitude, 0.0001);
+            assertEquals("Longitude should match", -73.5881, decodedPoints.get(0).longitude, 0.0001);
+        }catch(Exception e){
+            e.printStackTrace();
+            assert false : "API connection failed: " + e.getMessage();
+        }
+
     }
 
     @Test
     public void testParseRoute_withInvalidJson() {
         String invalidJson = "{ invalid json response }";
         FetchPathTask fetchPathTask = new FetchPathTask(null);
-        List<LatLng> path = fetchPathTask.parseRoute(invalidJson);
-        assertNotNull("The path should not be null", path);
-        assertTrue("The path should be empty", path.isEmpty());
+        JSONArray steps = fetchPathTask.parseRoute(invalidJson);
+        assertNull("The path should be null", steps);
     }
 }

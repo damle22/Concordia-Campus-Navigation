@@ -24,17 +24,28 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.widget.EditText;
+
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -287,27 +298,87 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param destination LatLng
      */
     private void drawPath(LatLng origin, LatLng destination) {
+        gMapController.addMarker(new MarkerOptions()
+                .position(origin)
+                .title("Current Location")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+        gMapController.addMarker(new MarkerOptions()
+                .position(destination)
+                .title("Destination"));
+
+        gMapController.centerOnCoordinates(origin.latitude,origin.longitude);
+
         new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
     }
 
     /**
      * Will add the route to the Map
      * Invoked when the route is fetched by the Google API
-     * @param route List<LatLng>
+     * @param steps JSONArray
      */
     @Override
-    public void onRouteFetched(List<LatLng> route) {
-        //Handles Route not fetched
-        if (route == null || route.isEmpty()) {
+    public void onRouteFetched(JSONArray steps) {
+        // Handles Route not fetched
+        if (steps == null ) {
             Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
             return;
         }
+        // Looping trough steps to display on UI
+        for (int i = 0; i < steps.length(); i++) {
+            try {
+                JSONObject step = steps.getJSONObject(i);
+                String travelMode = step.getString("travelMode");
+                JSONObject polylineObject = step.getJSONObject("polyline");
+                String encodedPolyline = polylineObject.getString("encodedPolyline");
+                List<LatLng> stepPoints = PolyUtil.decode(encodedPolyline);
 
-        // Draw polyline on the map
-        gMapController.addPolyline(new PolylineOptions()
-                .addAll(route)
-                .width(10)
-                .color(Color.BLUE));
+                PolylineOptions polylineOptions = new PolylineOptions()
+                        .addAll(stepPoints)
+                        .width(10);
+
+                //Case where Walking
+                if ("WALK".equals(travelMode)) {
+                    polylineOptions.color(Color.BLUE)
+                            .pattern(Arrays.asList(new Dot(), new Gap(10)));
+                //Case where Transit
+                } else if ("TRANSIT".equals(travelMode)) {
+                    JSONObject transitDetails = step.getJSONObject("transitDetails");
+                    String vehicleType = transitDetails.getJSONObject("transitLine")
+                            .getJSONObject("vehicle")
+                            .getString("type");
+                    String transitLineName = transitDetails.getJSONObject("transitLine").getString("name");
+
+                    // Set color based on vehicle type
+                    if ("BUS".equalsIgnoreCase(vehicleType)) {
+                        polylineOptions.color(Color.parseColor("#000000"));
+                    } else if ("SUBWAY".equalsIgnoreCase(vehicleType) || "METRO".equalsIgnoreCase(vehicleType)) {
+                        switch (transitLineName) {
+                            case "Ligne Verte":
+                                polylineOptions.color(Color.parseColor("#008000"));
+                                break;
+                            case "Ligne Orange":
+                                polylineOptions.color(Color.parseColor("#FFA500"));
+                                break;
+                            case "Ligne Jaune":
+                                polylineOptions.color(Color.parseColor("#FFD700"));
+                                break;
+                            case "Ligne Bleu":
+                                polylineOptions.color(Color.parseColor("#0000FF"));
+                            default:
+                                polylineOptions.color(Color.GRAY); // Default in case the name changes
+                                break;
+                        }
+                    }
+                }
+
+                gMapController.addPolyline(polylineOptions);
+
+            } catch (JSONException e) {
+                Log.e("Route Parsing Error", e.toString());
+            }
+        }
     }
+
 
 }

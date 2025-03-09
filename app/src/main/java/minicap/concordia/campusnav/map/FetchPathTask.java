@@ -70,8 +70,7 @@ public class FetchPathTask {
             destination.put("location", destinationLocation);
             requestBody.put("destination", destination);
 
-            JSONObject travelMode = new JSONObject();
-            travelMode.put("travelMode", travelModeStr);
+            requestBody.put("travelMode", travelModeStr);
 
 
         } catch (JSONException e) {
@@ -102,7 +101,7 @@ public class FetchPathTask {
                 reader.close();
                 stream.close();
 
-                List<LatLng> route = parseRoute(response.toString());
+               JSONArray route = parseRoute(response.toString());
 
                 mainThreadHandler.post(() -> {
                     if (listener != null) {
@@ -122,7 +121,7 @@ public class FetchPathTask {
      * @param json response from google API
      * @return List of LatLng points
      */
-    public List<LatLng> parseRoute(String json) {
+    public JSONArray parseRoute(String json) {
         List<LatLng> path = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -131,26 +130,20 @@ public class FetchPathTask {
                 JSONObject route = routes.getJSONObject(0);
                 JSONArray legs = route.getJSONArray("legs");
                 JSONObject leg = legs.getJSONObject(0);
-                JSONArray steps = leg.getJSONArray("steps");
+                return leg.getJSONArray("steps");
 
-                for (int i = 0; i < steps.length(); i++) {
-                    JSONObject step = steps.getJSONObject(i);
-                    JSONObject polyline = step.getJSONObject("polyline");
-                    String encodedPolyline = polyline.getString("encodedPolyline");
 
-                    path.addAll(PolyUtil.decode(encodedPolyline));
-                }
             }
         } catch (JSONException e) {
             Log.e("ParseRoute(): ", e.toString());
         }
-        return path;
+        return null;
     }
 
     /**
      * Listener for Google Api
      */
     public interface OnRouteFetchedListener {
-        void onRouteFetched(List<LatLng> route);
+        void onRouteFetched(JSONArray steps);
     }
 }

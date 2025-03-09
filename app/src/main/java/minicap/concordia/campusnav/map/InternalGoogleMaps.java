@@ -44,6 +44,13 @@ public class InternalGoogleMaps extends AbstractMap{
     }
 
     /**
+     * Adds marker to the googleMaps
+     * @param markerOptions MarkerOptions
+     */
+    public void addMarker(MarkerOptions markerOptions){
+        mMap.addMarker(markerOptions);
+    }
+    /**
      * Adds PolyLine to the googleMaps
      * @param options PolylineOptions
      */
