@@ -6,9 +6,16 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Button;
@@ -25,11 +32,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.textfield.TextInputEditText;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
+import minicap.concordia.campusnav.helpers.LocationSearchHelper;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -54,6 +63,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Button campusSwitchBtn;
 
+    private TextInputEditText searchInput;
+
+    private LinearLayout startAndDestinationLayout;
+
     private TextView campusTextView;
 
     private String campusNotSelected;
@@ -74,8 +87,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        startAndDestinationLayout = findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(startAndDestinationLayout);
 
         int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
         bottomSheetBehavior.setPeekHeight(peekHeightPx); // Set peek height
@@ -133,6 +146,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             walkButton.setSelected(false);
             wheelchairButton.setSelected(false);
             carButton.setSelected(false);
+        });
+
+        searchInput = (TextInputEditText) findViewById(R.id.searchInput);
+
+        searchInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().contains("\n")){
+                    s.delete(s.toString().length() - 3, s.toString().length() - 1);
+                }
+            }
         });
     }
 
@@ -200,6 +242,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // track location layer
         enableMyLocation();
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event){
+        if(keyCode == KeyEvent.KEYCODE_ENTER) {
+            try {
+                String searchText = searchInput.getText().toString();
+
+                if(searchText.isEmpty() || searchText.isBlank()){
+                    return super.onKeyUp(keyCode, event);
+                }
+                else {
+                    //Perform the search
+                    BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(startAndDestinationLayout);
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    EditText destinationField = (EditText)findViewById(R.id.destinationEditText);
+
+                    destinationField.setText(searchText);
+
+                    return true;
+                }
+            }
+            catch (NullPointerException e) {
+                Log.d("MAPS", "Null found when getting text");
+                return super.onKeyUp(keyCode, event);
+            }
+        }
+        else {
+            return super.onKeyUp(keyCode, event);
+        }
     }
 
     /**

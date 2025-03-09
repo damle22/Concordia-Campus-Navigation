@@ -160,6 +160,7 @@
                 android:src="@drawable/search_button" />
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/searchInput"
                 android:layout_width="213dp"
                 android:layout_height="45dp"
                 android:hint="      Search Area..."
