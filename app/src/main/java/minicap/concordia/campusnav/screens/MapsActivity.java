@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -253,14 +252,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param destination LatLng
      */
     private void drawPath(LatLng origin, LatLng destination) {
-        String apiKey = BuildConfig.MAPS_API_KEY;
-        //TODO Change hardcoded mode of transport when UI is available
-        String url = "https://maps.googleapis.com/maps/api/directions/json?origin="
-                + origin.latitude + "," + origin.longitude
-                + "&destination=" + destination.latitude + "," + destination.longitude
-                + "&mode=car&key=" + apiKey;
-
-        new FetchPathTask(this).fetchRoute(url);
+        new FetchPathTask(this).fetchRoute(origin, destination);
     }
 
     /**
