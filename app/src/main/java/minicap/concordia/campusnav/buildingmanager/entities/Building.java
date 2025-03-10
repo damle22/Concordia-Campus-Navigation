@@ -51,4 +51,9 @@ public class Building extends Location{
     public CampusName getAssociatedCampus(){
         return associatedCampus;
     }
+
+    @Override
+    public String toString(){
+        return this.buildingName;
+    }
 }
