@@ -1,11 +1,17 @@
 package minicap.concordia.campusnav.screens;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,19 +20,30 @@ import java.util.List;
 
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
+import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 
-import minicap.concordia.campusnav.helpers.LocationSearchHelper;
-
 public class LocationSearchActivity extends AppCompatActivity {
+
+    public static final String KEY_PREVIOUS_INPUT_STRING = "previous_input";
+    public static final String KEY_IS_STARTING_LOCATION = "is_starting_location";
+
+    public static final String KEY_RETURN_CHOSEN_LOCATION = "return_chosen_location";
+    public static final String KEY_RETURN_BOOL_CURRENT_LOCATION = "return_current_location";
+
+    public static final String KEY_RETURN_BOOL_IS_DESTINATION = "return_is_destination";
     private EditText searchInput;
-    private Button searchButton;
     private RecyclerView resultsRecyclerView;
     private LocationAdapter adapter;
-    private List<String> locationResults = new ArrayList<>();
+
+    private List<String> allLocations = new ArrayList<>();
+    private List<String> locations = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -34,41 +51,96 @@ public class LocationSearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_search);
 
-        searchInput = findViewById(R.id.search_input);
-        searchButton = findViewById(R.id.search_button);
+        boolean isStartLocation = false;
+        String previousLocation = "";
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            previousLocation = bundle.getString(KEY_PREVIOUS_INPUT_STRING);
+            isStartLocation = bundle.getBoolean(KEY_IS_STARTING_LOCATION);
+        }
+
+        searchInput = findViewById(R.id.locationSearch);
+
+        if(isStartLocation) {
+            Button currentLocationButton = findViewById(R.id.useCurrentLocationButton);
+            currentLocationButton.setVisibility(VISIBLE);
+            currentLocationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent returnData = new Intent();
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, "");
+                    returnData.putExtra(KEY_RETURN_BOOL_CURRENT_LOCATION, true);
+                    returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, false);
+                    setResult(RESULT_OK, returnData);
+                    finish();
+                }
+            });
+
+            searchInput.setHint(R.string.starting_point_search_hint);
+        }
+        else {
+            //It would be pointless to set the current location as the destination
+            Button currentLocationButton = findViewById(R.id.useCurrentLocationButton);
+            currentLocationButton.setVisibility(GONE);
+
+            searchInput.setHint(R.string.destination_search_hint);
+        }
+
+        if(previousLocation != null && !previousLocation.isEmpty() && !previousLocation.isBlank()) {
+            searchInput.setText(previousLocation);
+        }
+
         resultsRecyclerView = findViewById(R.id.results_recycler_view);
 
-        adapter = new LocationAdapter(locationResults);
+        adapter = new LocationAdapter(locations);
         resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         resultsRecyclerView.setAdapter(adapter);
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        setDefaultLocationList();
+
+        searchInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
-                performSearch();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // We use length here because the isEmpty() call requires min API 35 (we are currently 24)
+                if(s.length() == 0) {
+                    return;
+                }
+
+                //may be unnecessary
+                if(s.toString().contains("\n")) {
+                    int start = s.length() - 3;
+                    int end = s.length() - 2;
+                    s.delete(s.length() - 3, s.length() - 1);
+                }
             }
         });
     }
 
-    private void performSearch() {
-        String query = searchInput.getText().toString().trim();
-        if (query.isEmpty()) {
-            Toast.makeText(this, "Enter a location", Toast.LENGTH_SHORT).show();
-            return;
+
+    private void setDefaultLocationList() {
+        ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
+
+        ArrayList<Building> allBuildings = new ArrayList<>();
+
+        allBuildings.addAll(manager.getBuildingsForCampus(CampusName.SGW));
+        allBuildings.addAll(manager.getBuildingsForCampus(CampusName.LOYOLA));
+
+        for(Building building: allBuildings) {
+            allLocations.add(building.getBuildingName());
+            locations.add(building.getBuildingName());
         }
 
-        new Thread(() -> {
-            try {
-                List<String> results = LocationSearchHelper.searchLocation(query);
-                runOnUiThread(() -> {
-                    locationResults.clear();
-                    locationResults.addAll(results);
-                    adapter.notifyDataSetChanged();
-                });
-            } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "Error fetching results", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
+        adapter.notifyItemRangeInserted(0, locations.size());
     }
 }
 

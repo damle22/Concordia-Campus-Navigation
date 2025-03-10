@@ -1,7 +1,14 @@
 package minicap.concordia.campusnav.screens;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -42,6 +49,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -72,6 +80,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
+
+    public static final String KEY_SHOW_SGW = "show_sgw";
     private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
     private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -103,6 +113,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng destination;
 
+    private ActivityResultLauncher<Intent> searchLocationLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
-            showSGW = bundle.getBoolean("SHOW_SGW");
+            showSGW = bundle.getBoolean(KEY_SHOW_SGW);
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
@@ -201,6 +213,66 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
+
+        TextInputEditText searchText = findViewById(R.id.genericSearchField);
+
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                launchSearchActivity("", false);
+            }
+        });
+
+        searchLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if(result.getResultCode() == LocationSearchActivity.RESULT_OK) {
+                            Intent intent = result.getData();
+                            if(intent == null) {
+                                Log.e("MapsActivity", "Error while reading results from search, no intent returned");
+                                return;
+                            }
+                            Bundle returnData = intent.getExtras();
+                            if(returnData == null) {
+                                Log.e("MapsActivity", "Error while reading results from search, no data was returned");
+                                return;
+                            }
+
+                            boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
+                            if(isDestination) {
+                                String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
+                                setDestination(returnedLocation);
+                            }
+                            else {
+                                boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
+                                if(useCurrentLocation) {
+                                    setStartingPoint(true, "");
+                                }
+                                else {
+                                    String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
+                                    setStartingPoint(false, returnedLocation);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void launchSearchActivity(String previousInput, boolean isStartingLocation) {
+        Intent i = new Intent(MapsActivity.this, LocationSearchActivity.class);
+        i.putExtra(LocationSearchActivity.KEY_IS_STARTING_LOCATION, isStartingLocation);
+        i.putExtra(LocationSearchActivity.KEY_PREVIOUS_INPUT_STRING, previousInput);
+
+        searchLocationLauncher.launch(i);
+    }
+
+    private void setStartingPoint(boolean useCurrentLocation, String locationString) {
+        Toast.makeText(this, "Setting the starting location to: " + locationString + ", Use current location: " + useCurrentLocation, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setDestination(String locationString) {
+        Toast.makeText(this, "Setting the destination to: " + locationString, Toast.LENGTH_SHORT).show();
     }
 
     private void toggleCampus(){

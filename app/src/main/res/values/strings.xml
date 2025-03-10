@@ -7,4 +7,7 @@
     <string name="go_to">Go To</string>
     <string name="english">ENG</string>
     <string name="estimated_time">Estimated time: %1$s</string>
+    <string name="current_location">Current Location</string>
+    <string name="destination_search_hint">Choose destination</string>
+    <string name="starting_point_search_hint">Choose starting point</string>
 </resources>

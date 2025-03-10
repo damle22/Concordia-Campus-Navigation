@@ -7,7 +7,7 @@
 
     <!-- Search Input -->
     <EditText
-        android:id="@+id/search_input"
+        android:id="@+id/locationSearch"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:background="@android:drawable/editbox_background"
@@ -16,14 +16,14 @@
         android:padding="10dp" />
 
     <!-- Search Button -->
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Search" />
 
     <!-- RecyclerView for results -->
+    <Button
+        android:id="@+id/useCurrentLocationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/current_location" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/results_recycler_view"
         android:layout_width="match_parent"
