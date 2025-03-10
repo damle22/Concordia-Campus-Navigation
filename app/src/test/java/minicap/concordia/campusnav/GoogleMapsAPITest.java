@@ -92,6 +92,7 @@ public class GoogleMapsAPITest {
                     "      {\n" +
                     "         \"legs\": [\n" +
                     "            {\n" +
+                    "               \"duration\": \"503s\",\n" +
                     "               \"steps\": [\n" +
                     "                  {\n" +
                     "                     \"polyline\": {\n" +
@@ -106,7 +107,7 @@ public class GoogleMapsAPITest {
                     "}";
 
             FetchPathTask fetchPathTask = new FetchPathTask(null);
-            JSONArray steps = fetchPathTask.parseRoute(jsonResponse);
+            JSONArray steps = fetchPathTask.parseRoute(jsonResponse).getJSONArray(0);
             assertNotNull("The steps should not be null", steps);
             String encodedPolyline = steps.getJSONObject(0).getJSONObject("polyline").getString("encodedPolyline");
             List<LatLng> decodedPoints = PolyUtil.decode(encodedPolyline);
