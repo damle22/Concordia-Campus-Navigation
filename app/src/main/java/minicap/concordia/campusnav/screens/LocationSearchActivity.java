@@ -42,8 +42,7 @@ public class LocationSearchActivity extends AppCompatActivity {
     private RecyclerView resultsRecyclerView;
     private LocationAdapter adapter;
 
-    private List<String> allLocations = new ArrayList<>();
-    private List<String> locations = new ArrayList<>();
+    private List<Building> locations = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -90,12 +89,6 @@ public class LocationSearchActivity extends AppCompatActivity {
             searchInput.setText(previousLocation);
         }
 
-        resultsRecyclerView = findViewById(R.id.results_recycler_view);
-
-        adapter = new LocationAdapter(locations);
-        resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        resultsRecyclerView.setAdapter(adapter);
-
         setDefaultLocationList();
 
         searchInput.addTextChangedListener(new TextWatcher() {
@@ -113,6 +106,7 @@ public class LocationSearchActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 // We use length here because the isEmpty() call requires min API 35 (we are currently 24)
                 if(s.length() == 0) {
+                    adapter.filter("");
                     return;
                 }
 
@@ -122,6 +116,7 @@ public class LocationSearchActivity extends AppCompatActivity {
                     int end = s.length() - 2;
                     s.delete(s.length() - 3, s.length() - 1);
                 }
+                adapter.filter(s.toString());
             }
         });
     }
@@ -130,26 +125,26 @@ public class LocationSearchActivity extends AppCompatActivity {
     private void setDefaultLocationList() {
         ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
 
-        ArrayList<Building> allBuildings = new ArrayList<>();
+        locations.addAll(manager.getBuildingsForCampus(CampusName.SGW));
+        locations.addAll(manager.getBuildingsForCampus(CampusName.LOYOLA));
 
-        allBuildings.addAll(manager.getBuildingsForCampus(CampusName.SGW));
-        allBuildings.addAll(manager.getBuildingsForCampus(CampusName.LOYOLA));
+        resultsRecyclerView = findViewById(R.id.results_recycler_view);
 
-        for(Building building: allBuildings) {
-            allLocations.add(building.getBuildingName());
-            locations.add(building.getBuildingName());
-        }
-
-        adapter.notifyItemRangeInserted(0, locations.size());
+        adapter = new LocationAdapter(locations);
+        resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        resultsRecyclerView.setAdapter(adapter);
     }
 }
 
 
 class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
-    private final List<String> locations;
+    private final List<Building> locations = new ArrayList<>();
 
-    public LocationAdapter(List<String> locations) {
-        this.locations = locations;
+    private List<Building> filteredLocations = new ArrayList<>();
+
+    public LocationAdapter(List<Building> locations) {
+        this.locations.addAll(locations);
+        this.filteredLocations.addAll(locations);
     }
 
     @NonNull
@@ -161,12 +156,28 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.locationText.setText(locations.get(position));
+        holder.locationText.setText(filteredLocations.get(position).getBuildingName());
     }
 
     @Override
     public int getItemCount() {
-        return locations.size();
+        return filteredLocations.size();
+    }
+
+    public void filter(String filterText) {
+        filteredLocations.clear();
+        if(filterText.isBlank() || filterText.isEmpty()) {
+            filteredLocations = locations;
+        }
+        else {
+            String lowerFilterText = filterText.toLowerCase();
+            for(Building building: locations) {
+                if(building.getBuildingName().toLowerCase().contains(lowerFilterText)) {
+                    filteredLocations.add(building);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
