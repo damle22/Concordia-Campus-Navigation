@@ -12,13 +12,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,7 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.widget.EditText;
 
-import com.google.android.gms.maps.model.PatternItem;
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -45,17 +49,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
+import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
+import android.widget.Spinner;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener{
 
@@ -89,6 +99,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String travelMode = "DRIVE";
 
+    private Spinner buildingSpinner;
+
+    private LatLng destination;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +133,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusSwitchBtn = findViewById(R.id.campusSwitch);
 
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
+        CampusName campusName = null;
+
+        //fill buildings
+        if(!showSGW){
+            campusName = CampusName.SGW;
+        }else{
+            campusName = CampusName.LOYOLA;
+        }
+        populateBuildingsList(campusName);
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -146,6 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             carButton.setSelected(false);
             transitButton.setSelected(false);
             travelMode = "WALK";
+            getUserLocationPath();
         });
 
         wheelchairButton.setOnClickListener(v -> {
@@ -155,6 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             transitButton.setSelected(false);
             //TODO google maps does not support so for now, travelMode is the same as walking
             travelMode = "WALK";
+            getUserLocationPath();
         });
 
         carButton.setOnClickListener(v -> {
@@ -163,6 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             wheelchairButton.setSelected(false);
             transitButton.setSelected(false);
             travelMode = "DRIVE";
+            getUserLocationPath();
         });
 
         transitButton.setOnClickListener(v -> {
@@ -171,6 +197,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             wheelchairButton.setSelected(false);
             carButton.setSelected(false);
             travelMode = "TRANSIT";
+            getUserLocationPath();
         });
 
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
@@ -192,8 +219,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
+
+        CampusName campusName = null;
+
+        //fill buildings
+        if(!showSGW){
+            campusName = CampusName.SGW;
+        }else{
+            campusName = CampusName.LOYOLA;
+        }
+
+        populateBuildingsList(campusName);
     }
 
+    /**
+     * Populates the list of buildings from the ConcordiaBuildingManager
+     * @param campusName CampusName
+     */
+    private void populateBuildingsList(CampusName campusName){
+        ArrayList<Building> buildingsForCampus = ConcordiaBuildingManager.getInstance().getBuildingsForCampus(campusName);
+
+
+        buildingSpinner = findViewById(R.id.building_spinner);
+        if (buildingSpinner == null) {
+            Log.e("Error", "Spinner is not initialized properly.");
+        }
+
+        ArrayAdapter<Building> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, buildingsForCampus);
+        buildingSpinner.setAdapter(adapter);
+
+        buildingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                Building selectedBuilding = (Building) parentView.getItemAtPosition(position);
+                if (selectedBuilding != null) {
+                    destination = new LatLng(selectedBuilding.getLocation()[0], selectedBuilding.getLocation()[1]);
+                    getUserLocationPath();
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+        });
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -235,8 +302,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng campusLocation = new LatLng(startingLat, startingLng);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //TODO This call routes the building to the User Location. It should be removed later and made OnClick when building is selected
-        getUserLocation();
 
         // track location layer
         enableMyLocation();
@@ -254,7 +319,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Gets the User Location and invokes drawPath
      */
-    private void getUserLocation() {
+    private void getUserLocationPath() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation()
@@ -265,8 +330,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             String address = getAddressFromLocation(45.489682435037835, -73.58808030276997);
                             yourLocationEditText.setText(address);
                             LatLng userLocation= new LatLng(45.489682435037835, -73.58808030276997);
-                            //TODO Destination Temporarily hardcoded until UI allows to choose building
-                            drawPath(userLocation, SGW_LOCATION);
+                            drawPath(userLocation, destination);
                         }
                     });
         } else {
@@ -275,6 +339,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Gets the address as a String given coordinates
+     * @param latitude double
+     * @param longitude double
+     * @return String
+     */
     private String getAddressFromLocation(double latitude, double longitude) {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses;
@@ -298,6 +368,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param destination LatLng
      */
     private void drawPath(LatLng origin, LatLng destination) {
+        gMapController.clearPolyLines();
         gMapController.addMarker(new MarkerOptions()
                 .position(origin)
                 .title("Current Location")
@@ -315,18 +386,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Will add the route to the Map
      * Invoked when the route is fetched by the Google API
-     * @param steps JSONArray
+     * @param info JSONArray
      */
     @Override
-    public void onRouteFetched(JSONArray steps) {
-        // Handles Route not fetched
-        if (steps == null ) {
-            Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        // Looping trough steps to display on UI
-        for (int i = 0; i < steps.length(); i++) {
-            try {
+    public void onRouteFetched(JSONArray info) {
+        try {
+            JSONArray steps = info.getJSONArray(0);
+            TextView estimatedTime = findViewById(R.id.estimatedTime);
+            String estimatedTimeValue = info.getString(1);
+            estimatedTime.setText(getString(R.string.estimated_time, estimatedTimeValue));
+
+            // Handles Route not fetched
+            if (steps == null) {
+                Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Looping trough steps to display on UI
+            for (int i = 0; i < steps.length(); i++) {
+
                 JSONObject step = steps.getJSONObject(i);
                 String travelMode = step.getString("travelMode");
                 JSONObject polylineObject = step.getJSONObject("polyline");
@@ -341,7 +418,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if ("WALK".equals(travelMode)) {
                     polylineOptions.color(Color.BLUE)
                             .pattern(Arrays.asList(new Dot(), new Gap(10)));
-                //Case where Transit
+                    //Case where Transit
                 } else if ("TRANSIT".equals(travelMode)) {
                     JSONObject transitDetails = step.getJSONObject("transitDetails");
                     String vehicleType = transitDetails.getJSONObject("transitLine")
@@ -374,11 +451,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 gMapController.addPolyline(polylineOptions);
 
-            } catch (JSONException e) {
-                Log.e("Route Parsing Error", e.toString());
             }
+        } catch (JSONException e) {
+            Log.e("Route Parsing Error", e.toString());
         }
     }
-
-
 }
+
+
+

@@ -117,7 +117,8 @@ public class FetchPathTask {
 
 
     /**
-     * Given a json response from google API, it will parse the Route
+     * Given a json response from google API, it will parse the Route and return it
+     * with the estimated route time
      * @param json response from google API
      * @return List of LatLng points
      */
@@ -130,9 +131,11 @@ public class FetchPathTask {
                 JSONObject route = routes.getJSONObject(0);
                 JSONArray legs = route.getJSONArray("legs");
                 JSONObject leg = legs.getJSONObject(0);
-                return leg.getJSONArray("steps");
-
-
+                String duration = leg.getString("duration");
+                JSONArray info = new JSONArray();
+                info.put(leg.getJSONArray("steps"));
+                info.put(convertSecondsToTime(duration));
+                return info;
             }
         } catch (JSONException e) {
             Log.e("ParseRoute(): ", e.toString());
@@ -140,6 +143,18 @@ public class FetchPathTask {
         return null;
     }
 
+    private String convertSecondsToTime(String secondsStr) {
+        long seconds = Long.parseLong(secondsStr.replace("s", ""));
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        minutes = minutes % 60;
+
+        if (hours > 0) {
+            return String.format("%dh%dmin", hours, minutes);
+        } else {
+            return String.format("%dmin", minutes);
+        }
+    }
     /**
      * Listener for Google Api
      */

@@ -8,13 +8,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class InternalGoogleMaps extends AbstractMap{
     private final float defaultZoom = 18;
     private final GoogleMap mMap;
+    private List<Polyline> polylines = new ArrayList<>();
 
     public InternalGoogleMaps(GoogleMap map){
         mMap = map;
@@ -55,9 +59,19 @@ public class InternalGoogleMaps extends AbstractMap{
      * @param options PolylineOptions
      */
     public void addPolyline(PolylineOptions options){
-        mMap.addPolyline(options);
+        polylines.add(mMap.addPolyline(options));
     }
 
+    /**
+     * Removes All polylines
+     */
+    public void clearPolyLines(){
+        for (Iterator<Polyline> it = polylines.iterator(); it.hasNext();) {
+            Polyline polyline = it.next();
+            polyline.remove();
+            it.remove();
+        }
+    }
     public void animateCameraToLocation(LatLng location, float zoom) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
     }
