@@ -282,7 +282,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         showSGW = !showSGW;
 
         // getting the new campus location
-        CampusName wantedCampus = showSGW ? CampusName.LOYOLA : CampusName.SGW;
+        CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
         Campus curCampus = buildingManager.getCampus(wantedCampus);
         LatLng campusCoords = new LatLng(curCampus.getLocation()[0], curCampus.getLocation()[1]);
 
