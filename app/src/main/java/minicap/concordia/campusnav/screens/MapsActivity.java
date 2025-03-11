@@ -94,6 +94,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageButton carButton;
     private ImageButton transitButton;
 
+    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
+
     private FusedLocationProviderClient fusedLocationClient;
 
     private String travelMode = "DRIVE";
@@ -123,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(binding.getRoot());
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
         bottomSheetBehavior.setPeekHeight(peekHeightPx); // Set peek height
@@ -238,6 +240,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             searchText.clearFocus();
                             destinationEditText.clearFocus();
                             yourLocationEditText.clearFocus();
+
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         });
                     }
                 });
