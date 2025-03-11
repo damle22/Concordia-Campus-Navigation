@@ -31,7 +31,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import android.widget.EditText;
 
 
@@ -82,6 +81,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private boolean showSGW;
 
+    private boolean hasUserLocationBeenSet;
+
     private Button campusSwitchBtn;
 
     private TextView campusTextView;
@@ -114,6 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
         isDestinationSet = false;
+        hasUserLocationBeenSet = false;
         buildingManager = ConcordiaBuildingManager.getInstance();
 
         Bundle bundle = getIntent().getExtras();
@@ -247,8 +249,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
 
+        getUserLocationPath();
     }
 
+    /**
+     * Launches the search activity and sets the extra parameters
+     * @param previousInput The previous location that was selected if there was one
+     * @param isStartingLocation Flag to indicate if this is a search for starting location or destination
+     */
     private void launchSearchActivity(String previousInput, boolean isStartingLocation) {
         Intent i = new Intent(MapsActivity.this, LocationSearchActivity.class);
         i.putExtra(LocationSearchActivity.KEY_IS_STARTING_LOCATION, isStartingLocation);
@@ -257,14 +265,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchLocationLauncher.launch(i);
     }
 
+    /**
+     * Sets the starting point used for navigation
+     * @param useCurrentLocation Flag indicating whether to use the current location of the user
+     * @param locationString The name of the location
+     * @param lat The latitude of the location
+     * @param lng The longitude of the location
+     */
     private void setStartingPoint(boolean useCurrentLocation, String locationString, float lat, float lng) {
         Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
 
+        if(useCurrentLocation && !hasUserLocationBeenSet) {
+            //getUserLocationPath will set the starting point and then call this again
+            getUserLocationPath();
+            return;
+        }
+
         if(useCurrentLocation) {
-            startingPoint = getUserLocationPath();
             yourLocationEditText.setText(R.string.your_location);
         }
         else {
+            //Reset this flag in case the user wants to use their own location in the future
+            hasUserLocationBeenSet = false;
             startingPoint = new LatLng(lat, lng);
             yourLocationEditText.setText(locationString);
         }
@@ -272,6 +294,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         drawPath(startingPoint, destination);
     }
 
+    /**
+     * Sets the destination used for navigation
+     * @param locationString The name of the location
+     * @param lat The location's latitude
+     * @param lng The location's longitude
+     */
     private void setDestination(String locationString, float lat, float lng) {
         Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
 
@@ -282,6 +310,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         drawPath(startingPoint, destination);
     }
 
+    /**
+     * Toggles the map to either the SGW campus or the Loyola campus based on which was already focused
+     */
     private void toggleCampus(){
         //flipping the state
         showSGW = !showSGW;
@@ -292,10 +323,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng campusCoords = new LatLng(curCampus.getLocation()[0], curCampus.getLocation()[1]);
 
         //moving the existing marker to the new campus location
-        gMapController.addMarker(new MarkerOptions()
-                .position(campusCoords)
-                .title(curCampus.getCampusName()),
-                true);
+        gMapController.addMarker(campusCoords, curCampus.getCampusName(), true);
 
         //moving the camera smoothly to the new campus location
         gMapController.centerOnCoordinates(campusCoords.latitude, campusCoords.longitude);
@@ -304,6 +332,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusTextView.setText(showSGW ? "SGW" : "LOY");
     }
 
+    /**
+     * Switches the desired travel method and re-draws the route line
+     * @param selectedButton The travel method button that was clicked
+     * @param newTravelMode The new travel mode to be used
+     */
     private void changeSelectedTravelMethod(ImageButton selectedButton, String newTravelMode) {
         walkButton.setSelected(false);
         wheelchairButton.setSelected(false);
@@ -358,15 +391,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(@NonNull LatLng latLng) {
                 String address = getAddressFromLocation(latLng.latitude, latLng.longitude);
-                gMapController.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title("Clicked location"));
+                gMapController.addMarker(latLng, "Clicked location", true);
                 setDestination(address, (float)latLng.latitude, (float)latLng.longitude);
             }
         });
 
         //Default starting point is user location
-        startingPoint = getUserLocationPath();
+        getUserLocationPath();
 
         // track location layer
         enableMyLocation();
@@ -384,9 +415,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Gets the User Location and invokes drawPath
      */
-    private LatLng getUserLocationPath() {
-        LatLng userLocation = defaultUserLocation;
-
+    private void getUserLocationPath() {
         if(fusedLocationClient == null) {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         }
@@ -396,16 +425,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, location -> {
                         if (location != null) {
-                            //TODO userLocation is currently hardcoded for VM purposes. Uncomment this line to reflect current user location
-                            //LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            yourLocationEditText.setText(R.string.your_location);
+                            //If you are emulating and need to change your current location, use the emulator controls.
+                            startingPoint = new LatLng(location.getLatitude(), location.getLongitude());
+                            hasUserLocationBeenSet = true;
+                            setStartingPoint(true, "", 0f, 0f);
                         }
                     });
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         }
-        return userLocation;
     }
 
     /**
@@ -444,14 +473,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         gMapController.clearPolyLines();
-        gMapController.addMarker(new MarkerOptions()
-                .position(origin)
-                .title("Current Location")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        gMapController.clearAllMarkers();
+        gMapController.addMarker(origin, "Current location", BitmapDescriptorFactory.HUE_AZURE);
 
-        gMapController.addMarker(new MarkerOptions()
-                .position(destination)
-                .title("Destination"));
+        gMapController.addMarker(destination, "Destination");
 
         gMapController.centerOnCoordinates(origin.latitude,origin.longitude);
 
