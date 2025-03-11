@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +29,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Dot;
-import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.widget.EditText;
@@ -39,27 +36,23 @@ import android.widget.EditText;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Campus;
+import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
-import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
-import android.widget.Spinner;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener{
 
@@ -68,8 +61,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
 
     public static final String KEY_SHOW_SGW = "show_sgw";
-    private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
-    private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private final LatLng defaultUserLocation = new LatLng(45.489682435037835, -73.58808030276997);
@@ -78,14 +69,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ActivityMapsBinding binding;
 
-    private double startingLat;
-    private double startingLng;
+    private ConcordiaBuildingManager buildingManager;
 
-    private boolean showSGW;
+    private double startingLat;
+
+    private double startingLng;
 
     private boolean isDestinationSet;
 
-    private Marker campusMarker;
+    private boolean showSGW;
 
     private Button campusSwitchBtn;
 
@@ -96,6 +88,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private EditText yourLocationEditText;
 
     private EditText destinationEditText;
+
+    private ImageButton walkButton;
+    private ImageButton wheelchairButton;
+    private ImageButton carButton;
+    private ImageButton transitButton;
 
     private FusedLocationProviderClient fusedLocationClient;
 
@@ -112,6 +109,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
         isDestinationSet = false;
+        buildingManager = ConcordiaBuildingManager.getInstance();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -152,50 +150,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             initializeMap();
         }
 
-        ImageButton walkButton = findViewById(R.id.walkButton);
-        ImageButton wheelchairButton = findViewById(R.id.wheelchairButton);
-        ImageButton carButton = findViewById(R.id.carButton);
-        ImageButton transitButton = findViewById(R.id.transitButton);
+        walkButton = findViewById(R.id.walkButton);
+        wheelchairButton = findViewById(R.id.wheelchairButton);
+        carButton = findViewById(R.id.carButton);
+        transitButton = findViewById(R.id.transitButton);
 
         //Default mode
         carButton.setSelected(true);
 
-        walkButton.setOnClickListener(v -> {
-            walkButton.setSelected(true);
-            wheelchairButton.setSelected(false);
-            carButton.setSelected(false);
-            transitButton.setSelected(false);
-            travelMode = "WALK";
-            getUserLocationPath();
-        });
+        walkButton.setOnClickListener(v -> changeSelectedTravelMethod(walkButton, "WALK"));
 
-        wheelchairButton.setOnClickListener(v -> {
-            wheelchairButton.setSelected(true);
-            walkButton.setSelected(false);
-            carButton.setSelected(false);
-            transitButton.setSelected(false);
-            //TODO google maps does not support so for now, travelMode is the same as walking
-            travelMode = "WALK";
-            getUserLocationPath();
-        });
+        //google maps does not support "wheelchair" for now, travelMode is the same as walking
+        wheelchairButton.setOnClickListener(v -> changeSelectedTravelMethod(wheelchairButton, "WALK"));
 
-        carButton.setOnClickListener(v -> {
-            carButton.setSelected(true);
-            walkButton.setSelected(false);
-            wheelchairButton.setSelected(false);
-            transitButton.setSelected(false);
-            travelMode = "DRIVE";
-            getUserLocationPath();
-        });
+        carButton.setOnClickListener(v -> changeSelectedTravelMethod(carButton, "DRIVE"));
 
-        transitButton.setOnClickListener(v -> {
-            transitButton.setSelected(true);
-            walkButton.setSelected(false);
-            wheelchairButton.setSelected(false);
-            carButton.setSelected(false);
-            travelMode = "TRANSIT";
-            getUserLocationPath();
-        });
+        transitButton.setOnClickListener(v -> changeSelectedTravelMethod(transitButton, "TRANSIT"));
 
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
 
@@ -312,17 +282,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         showSGW = !showSGW;
 
         // getting the new campus location
-        LatLng campus =  showSGW ? LOY_LOCATION : SGW_LOCATION;
+        CampusName wantedCampus = showSGW ? CampusName.LOYOLA : CampusName.SGW;
+        Campus curCampus = buildingManager.getCampus(wantedCampus);
+        LatLng campusCoords = new LatLng(curCampus.getLocation()[0], curCampus.getLocation()[1]);
 
         //moving the existing marker to the new campus location
-        campusMarker = gMapController.updateCampusMarker(campusMarker, campus, showSGW);
+        gMapController.addMarker(new MarkerOptions()
+                .position(campusCoords)
+                .title(curCampus.getCampusName()),
+                true);
 
         //moving the camera smoothly to the new campus location
-        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        gMapController.animateCameraToLocation(campus, defaultZoom);
+        gMapController.centerOnCoordinates(campusCoords.latitude, campusCoords.longitude);
 
         //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
+    }
+
+    private void changeSelectedTravelMethod(ImageButton selectedButton, String newTravelMode) {
+        walkButton.setSelected(false);
+        wheelchairButton.setSelected(false);
+        carButton.setSelected(false);
+        transitButton.setSelected(false);
+
+        selectedButton.setSelected(true);
+        travelMode = newTravelMode;
+
+        drawPath(startingPoint, destination);
     }
 
     @Override
@@ -429,12 +415,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    //TODO: It would be best if this was handled by the map class
     /**
      * This Method generates the GoogleAPI URL and invokes FetchPathTask
      * @param origin LatLng
      * @param destination LatLng
      */
     private void drawPath(LatLng origin, LatLng destination) {
+        //In case someone changes their starting location before their destination
+        if(!isDestinationSet) {
+            return;
+        }
+
         gMapController.clearPolyLines();
         gMapController.addMarker(new MarkerOptions()
                 .position(origin)
@@ -450,6 +442,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
     }
 
+    //TODO: It would be best if this is handled by the map class
     /**
      * Will add the route to the Map
      * Invoked when the route is fetched by the Google API
@@ -468,57 +461,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Looping trough steps to display on UI
-            for (int i = 0; i < steps.length(); i++) {
 
-                JSONObject step = steps.getJSONObject(i);
-                String travelMode = step.getString("travelMode");
-                JSONObject polylineObject = step.getJSONObject("polyline");
-                String encodedPolyline = polylineObject.getString("encodedPolyline");
-                List<LatLng> stepPoints = PolyUtil.decode(encodedPolyline);
-
-                PolylineOptions polylineOptions = new PolylineOptions()
-                        .addAll(stepPoints)
-                        .width(10);
-
-                //Case where Walking
-                if ("WALK".equals(travelMode)) {
-                    polylineOptions.color(Color.BLUE)
-                            .pattern(Arrays.asList(new Dot(), new Gap(10)));
-                    //Case where Transit
-                } else if ("TRANSIT".equals(travelMode)) {
-                    JSONObject transitDetails = step.getJSONObject("transitDetails");
-                    String vehicleType = transitDetails.getJSONObject("transitLine")
-                            .getJSONObject("vehicle")
-                            .getString("type");
-                    String transitLineName = transitDetails.getJSONObject("transitLine").getString("name");
-
-                    // Set color based on vehicle type
-                    if ("BUS".equalsIgnoreCase(vehicleType)) {
-                        polylineOptions.color(Color.parseColor("#000000"));
-                    } else if ("SUBWAY".equalsIgnoreCase(vehicleType) || "METRO".equalsIgnoreCase(vehicleType)) {
-                        switch (transitLineName) {
-                            case "Ligne Verte":
-                                polylineOptions.color(Color.parseColor("#008000"));
-                                break;
-                            case "Ligne Orange":
-                                polylineOptions.color(Color.parseColor("#FFA500"));
-                                break;
-                            case "Ligne Jaune":
-                                polylineOptions.color(Color.parseColor("#FFD700"));
-                                break;
-                            case "Ligne Bleu":
-                                polylineOptions.color(Color.parseColor("#0000FF"));
-                            default:
-                                polylineOptions.color(Color.GRAY); // Default in case the name changes
-                                break;
-                        }
-                    }
-                }
-
-                gMapController.addPolyline(polylineOptions);
-
-            }
+            gMapController.parseRoutePolylineAndDisplay(steps);
         } catch (JSONException e) {
             Log.e("Route Parsing Error", e.toString());
         }
