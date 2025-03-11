@@ -7,9 +7,7 @@ import android.location.Geocoder;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -19,17 +17,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,9 +39,7 @@ import android.widget.EditText;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.maps.android.PolyUtil;
@@ -57,17 +49,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
-import minicap.concordia.campusnav.buildingmanager.entities.Building;
-import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
-import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.CoordinateResHelper;
@@ -86,6 +72,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
+    private final LatLng defaultUserLocation = new LatLng(45.489682435037835, -73.58808030276997);
+
     private InternalGoogleMaps gMapController;
 
     private ActivityMapsBinding binding;
@@ -94,6 +82,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double startingLng;
 
     private boolean showSGW;
+
+    private boolean isDestinationSet;
 
     private Marker campusMarker;
 
@@ -105,19 +95,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EditText yourLocationEditText;
 
+    private EditText destinationEditText;
+
     private FusedLocationProviderClient fusedLocationClient;
 
     private String travelMode = "DRIVE";
 
-    private Spinner buildingSpinner;
-
     private LatLng destination;
+
+    private LatLng startingPoint;
 
     private ActivityResultLauncher<Intent> searchLocationLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        isDestinationSet = false;
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -145,15 +139,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusSwitchBtn = findViewById(R.id.campusSwitch);
 
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
-        CampusName campusName = null;
-
-        //fill buildings
-        if(!showSGW){
-            campusName = CampusName.SGW;
-        }else{
-            campusName = CampusName.LOYOLA;
-        }
-        populateBuildingsList(campusName);
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -225,6 +210,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        yourLocationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity(yourLocationEditText.getText().toString(), true);
+                }
+            }
+        });
+
+        destinationEditText = findViewById(R.id.destinationText);
+
+        destinationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity(destinationEditText.getText().toString(), false);
+                }
+            }
+        });
+
         searchLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
@@ -261,9 +266,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         runOnUiThread(() -> {
                             searchText.clearFocus();
+                            destinationEditText.clearFocus();
+                            yourLocationEditText.clearFocus();
                         });
                     }
                 });
+
     }
 
     private void launchSearchActivity(String previousInput, boolean isStartingLocation) {
@@ -276,10 +284,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void setStartingPoint(boolean useCurrentLocation, String locationString, float lat, float lng) {
         Log.d("MapsActivity", "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
+
+        if(useCurrentLocation) {
+            startingPoint = getUserLocationPath();
+            yourLocationEditText.setText(R.string.your_location);
+        }
+        else {
+            startingPoint = new LatLng(lat, lng);
+            yourLocationEditText.setText(locationString);
+        }
+
+        drawPath(startingPoint, destination);
     }
 
     private void setDestination(String locationString, float lat, float lng) {
         Log.d("MapsActivity", "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
+
+        destination = new LatLng(lat, lng);
+        destinationEditText.setText(locationString);
+        isDestinationSet = true;
+
+        drawPath(startingPoint, destination);
     }
 
     private void toggleCampus(){
@@ -298,48 +323,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
-
-        CampusName campusName = null;
-
-        //fill buildings
-        if(!showSGW){
-            campusName = CampusName.SGW;
-        }else{
-            campusName = CampusName.LOYOLA;
-        }
-
-        populateBuildingsList(campusName);
     }
 
-    /**
-     * Populates the list of buildings from the ConcordiaBuildingManager
-     * @param campusName CampusName
-     */
-    private void populateBuildingsList(CampusName campusName){
-        ArrayList<Building> buildingsForCampus = ConcordiaBuildingManager.getInstance().getBuildingsForCampus(campusName);
-
-
-        buildingSpinner = findViewById(R.id.building_spinner);
-        if (buildingSpinner == null) {
-            Log.e("Error", "Spinner is not initialized properly.");
-        }
-
-        ArrayAdapter<Building> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, buildingsForCampus);
-        buildingSpinner.setAdapter(adapter);
-
-        buildingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Building selectedBuilding = (Building) parentView.getItemAtPosition(position);
-                if (selectedBuilding != null) {
-                    destination = new LatLng(selectedBuilding.getLocation()[0], selectedBuilding.getLocation()[1]);
-                    getUserLocationPath();
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
-        });
-    }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -378,9 +363,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
-        LatLng campusLocation = new LatLng(startingLat, startingLng);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //Default starting point is user location
+        startingPoint = getUserLocationPath();
 
         // track location layer
         enableMyLocation();
@@ -398,7 +382,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Gets the User Location and invokes drawPath
      */
-    private void getUserLocationPath() {
+    private LatLng getUserLocationPath() {
+        LatLng userLocation = defaultUserLocation;
+
+        if(fusedLocationClient == null) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        }
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation()
@@ -406,16 +396,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (location != null) {
                             //TODO userLocation is currently hardcoded for VM purposes. Uncomment this line to reflect current user location
                             //LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            String address = getAddressFromLocation(45.489682435037835, -73.58808030276997);
-                            yourLocationEditText.setText(address);
-                            LatLng userLocation= new LatLng(45.489682435037835, -73.58808030276997);
-                            drawPath(userLocation, destination);
+                            yourLocationEditText.setText(R.string.your_location);
                         }
                     });
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         }
+        return userLocation;
     }
 
     /**
