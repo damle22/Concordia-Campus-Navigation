@@ -57,6 +57,8 @@ import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener{
 
+    private final String MAPS_ACTIVITY_TAG = "MapsActivity";
+
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
@@ -210,12 +212,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if(result.getResultCode() == LocationSearchActivity.RESULT_OK) {
                             Intent intent = result.getData();
                             if(intent == null) {
-                                Log.e("MapsActivity", "Error while reading results from search, no intent returned");
+                                Log.e(MAPS_ACTIVITY_TAG, "Error while reading results from search, no intent returned");
                                 return;
                             }
                             Bundle returnData = intent.getExtras();
                             if(returnData == null) {
-                                Log.e("MapsActivity", "Error while reading results from search, no data was returned");
+                                Log.e(MAPS_ACTIVITY_TAG, "Error while reading results from search, no data was returned");
                                 return;
                             }
 
@@ -256,7 +258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setStartingPoint(boolean useCurrentLocation, String locationString, float lat, float lng) {
-        Log.d("MapsActivity", "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
+        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
 
         if(useCurrentLocation) {
             startingPoint = getUserLocationPath();
@@ -271,7 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setDestination(String locationString, float lat, float lng) {
-        Log.d("MapsActivity", "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
+        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
 
         destination = new LatLng(lat, lng);
         destinationEditText.setText(locationString);
@@ -429,9 +431,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    //TODO: It would be best if this was handled by the map class
+    //Note: It would be best if this was handled by the map class
     /**
-     * This Method generates the GoogleAPI URL and invokes FetchPathTask
+     * This handles the calls to the map to create the route
      * @param origin LatLng
      * @param destination LatLng
      */
@@ -458,7 +460,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    //TODO: It would be best if this is handled by the map class
+    //Note: It would be best if this is handled by the map class
     /**
      * Will add the route to the Map
      * Invoked when the route is fetched by the Google API

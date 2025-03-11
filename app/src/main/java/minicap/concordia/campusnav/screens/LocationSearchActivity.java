@@ -102,12 +102,12 @@ public class LocationSearchActivity extends AppCompatActivity {
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                //Not needed
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                //Not needed
             }
 
             @Override
@@ -120,8 +120,6 @@ public class LocationSearchActivity extends AppCompatActivity {
 
                 //may be unnecessary
                 if(s.toString().contains("\n")) {
-                    int start = s.length() - 3;
-                    int end = s.length() - 2;
                     s.delete(s.length() - 3, s.length() - 1);
                 }
                 adapter.filter(s.toString());

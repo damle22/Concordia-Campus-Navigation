@@ -147,6 +147,7 @@ public class InternalGoogleMaps extends AbstractMap{
                             break;
                         case "Ligne Bleu":
                             polylineOptions.color(Color.parseColor("#0000FF"));
+                            break;
                         default:
                             polylineOptions.color(Color.GRAY); // Default in case the name changes
                             break;
