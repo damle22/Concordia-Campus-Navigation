@@ -7,13 +7,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.buildingmanager.BuildingInfoBottomSheetFragment;
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
+import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
@@ -55,12 +54,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Open Bottom Sheet for Testing
-                BuildingInfoBottomSheetFragment bottomSheet = BuildingInfoBottomSheetFragment.newInstance(
-                        "Hall Building",
-                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
-                        "This is one of the main Concordia buildings.",
-                        R.drawable.ic_launcher_background // Replace with an actual image
-                );
+                BuildingInfoBottomSheetFragment bottomSheet = BuildingInfoBottomSheetFragment.newInstance("BuildingHall");
                 bottomSheet.show(getSupportFragmentManager(), "BuildingInfoBottomSheet");
             }
         });
