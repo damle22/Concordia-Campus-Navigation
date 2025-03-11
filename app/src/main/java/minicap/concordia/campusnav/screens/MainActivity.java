@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.BuildingInfoBottomSheetFragment;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
@@ -35,20 +36,33 @@ public class MainActivity extends AppCompatActivity {
 
         Button sgwCampusBtn = (Button)findViewById(R.id.viewSGWCampusButton);
 
+//        sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                LatLng coords = null;
+//
+//                Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
+//                float[] campusCoordinates = sgwCampus.getLocation();
+//                coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
+//
+//                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+//                i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
+//                i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+//                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
+//                startActivity(i);            }
+//        });
         sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LatLng coords = null;
-
-                Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-                float[] campusCoordinates = sgwCampus.getLocation();
-                coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
-
-                Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
-                i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
-                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-                startActivity(i);            }
+                // Open Bottom Sheet for Testing
+                BuildingInfoBottomSheetFragment bottomSheet = BuildingInfoBottomSheetFragment.newInstance(
+                        "Hall Building",
+                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
+                        "This is one of the main Concordia buildings.",
+                        R.drawable.ic_launcher_background // Replace with an actual image
+                );
+                bottomSheet.show(getSupportFragmentManager(), "BuildingInfoBottomSheet");
+            }
         });
 
         Button loyCampusBtn = (Button)findViewById(R.id.viewLoyCampusButton);
