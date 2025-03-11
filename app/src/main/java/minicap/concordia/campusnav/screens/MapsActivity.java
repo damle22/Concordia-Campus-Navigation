@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -240,8 +241,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             searchText.clearFocus();
                             destinationEditText.clearFocus();
                             yourLocationEditText.clearFocus();
-
-                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         });
                     }
                 });
@@ -353,6 +352,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
+        gMapController.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+                String address = getAddressFromLocation(latLng.latitude, latLng.longitude);
+                gMapController.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title("Clicked location"));
+                setDestination(address, (float)latLng.latitude, (float)latLng.longitude);
+            }
+        });
+
         //Default starting point is user location
         startingPoint = getUserLocationPath();
 
@@ -444,6 +454,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gMapController.centerOnCoordinates(origin.latitude,origin.longitude);
 
         new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     //TODO: It would be best if this is handled by the map class

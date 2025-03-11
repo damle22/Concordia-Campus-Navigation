@@ -101,6 +101,10 @@ public class InternalGoogleMaps extends AbstractMap{
         }
     }
 
+    public void setOnMapClickListener(GoogleMap.OnMapClickListener listener) {
+        mMap.setOnMapClickListener(listener);
+    }
+
     public void parseRoutePolylineAndDisplay(JSONArray steps) throws JSONException {
         // Looping trough steps to display on UI
         for (int i = 0; i < steps.length(); i++) {
