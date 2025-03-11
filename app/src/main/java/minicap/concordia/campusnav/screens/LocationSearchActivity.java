@@ -27,6 +27,8 @@ import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 public class LocationSearchActivity extends AppCompatActivity {
@@ -36,11 +38,15 @@ public class LocationSearchActivity extends AppCompatActivity {
 
     public static final String KEY_RETURN_CHOSEN_LOCATION = "return_chosen_location";
     public static final String KEY_RETURN_BOOL_CURRENT_LOCATION = "return_current_location";
-
     public static final String KEY_RETURN_BOOL_IS_DESTINATION = "return_is_destination";
+
+    public static final String KEY_RETURN_CHOSEN_LAT = "return_chosen_latitude";
+    public static final String KEY_RETURN_CHOSEN_LNG = "return_chosen_longitude";
     private EditText searchInput;
     private RecyclerView resultsRecyclerView;
     private LocationAdapter adapter;
+
+    private boolean isStartLocation = false;
 
     private List<Building> locations = new ArrayList<>();
 
@@ -50,7 +56,6 @@ public class LocationSearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_search);
 
-        boolean isStartLocation = false;
         String previousLocation = "";
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) {
@@ -70,6 +75,8 @@ public class LocationSearchActivity extends AppCompatActivity {
                     returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, "");
                     returnData.putExtra(KEY_RETURN_BOOL_CURRENT_LOCATION, true);
                     returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, false);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LAT, 0f);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LNG, 0f);
                     setResult(RESULT_OK, returnData);
                     finish();
                 }
@@ -133,6 +140,22 @@ public class LocationSearchActivity extends AppCompatActivity {
         adapter = new LocationAdapter(locations);
         resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         resultsRecyclerView.setAdapter(adapter);
+
+        adapter.setOnClickListener(new LocationAdapter.OnItemClickedListener() {
+            @Override
+            public void onClick(String buildingName, float latitude, float longitude) {
+                runOnUiThread(() -> {
+                    Intent returnData = new Intent();
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, buildingName);
+                    returnData.putExtra(KEY_RETURN_BOOL_CURRENT_LOCATION, false);
+                    returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, !isStartLocation);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LAT, latitude);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LNG, longitude);
+                    setResult(RESULT_OK, returnData);
+                    finish();
+                });
+            }
+        });
     }
 }
 
@@ -142,9 +165,15 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
 
     private List<Building> filteredLocations = new ArrayList<>();
 
+    private OnItemClickedListener onClickListener;
+
     public LocationAdapter(List<Building> locations) {
         this.locations.addAll(locations);
         this.filteredLocations.addAll(locations);
+    }
+
+    public void setOnClickListener(OnItemClickedListener onClickListener) {
+        this.onClickListener = onClickListener;
     }
 
     @NonNull
@@ -156,7 +185,13 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.locationText.setText(filteredLocations.get(position).getBuildingName());
+        Building cur = filteredLocations.get(position);
+        holder.locationText.setText(cur.getBuildingName());
+        holder.itemView.setOnClickListener(v -> {
+            if(onClickListener != null) {
+                onClickListener.onClick(cur.getBuildingName(), cur.getLocation()[0], cur.getLocation()[1]);
+            }
+        });
     }
 
     @Override
@@ -167,7 +202,7 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     public void filter(String filterText) {
         filteredLocations.clear();
         if(filterText.isBlank() || filterText.isEmpty()) {
-            filteredLocations = locations;
+            filteredLocations.addAll(locations);
         }
         else {
             String lowerFilterText = filterText.toLowerCase();
@@ -187,5 +222,9 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
             super(itemView);
             locationText = itemView.findViewById(android.R.id.text1);
         }
+    }
+
+    public interface OnItemClickedListener {
+        void onClick(String buildingName, float latitude, float longitude);
     }
 }

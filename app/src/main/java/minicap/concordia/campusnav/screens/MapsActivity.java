@@ -219,7 +219,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                launchSearchActivity("", false);
+                if(hasFocus) {
+                    launchSearchActivity("", false);
+                }
             }
         });
 
@@ -240,21 +242,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
 
                             boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
+                            float lat = returnData.getFloat(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
+                            float lng = returnData.getFloat(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
                             if(isDestination) {
                                 String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
-                                setDestination(returnedLocation);
+                                setDestination(returnedLocation, lat, lng);
                             }
                             else {
                                 boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
                                 if(useCurrentLocation) {
-                                    setStartingPoint(true, "");
+                                    setStartingPoint(true, "", lat, lng);
                                 }
                                 else {
                                     String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
-                                    setStartingPoint(false, returnedLocation);
+                                    setStartingPoint(false, returnedLocation, lat, lng);
                                 }
                             }
                         }
+                        runOnUiThread(() -> {
+                            searchText.clearFocus();
+                        });
                     }
                 });
     }
@@ -267,12 +274,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchLocationLauncher.launch(i);
     }
 
-    private void setStartingPoint(boolean useCurrentLocation, String locationString) {
-        Toast.makeText(this, "Setting the starting location to: " + locationString + ", Use current location: " + useCurrentLocation, Toast.LENGTH_SHORT).show();
+    private void setStartingPoint(boolean useCurrentLocation, String locationString, float lat, float lng) {
+        Log.d("MapsActivity", "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
     }
 
-    private void setDestination(String locationString) {
-        Toast.makeText(this, "Setting the destination to: " + locationString, Toast.LENGTH_SHORT).show();
+    private void setDestination(String locationString, float lat, float lng) {
+        Log.d("MapsActivity", "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
     }
 
     private void toggleCampus(){
