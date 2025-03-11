@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -187,6 +188,7 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Building cur = filteredLocations.get(position);
         holder.locationText.setText(cur.getBuildingName());
+        holder.locationText.setTextColor(Color.parseColor("#FFFFFF"));
         holder.itemView.setOnClickListener(v -> {
             if(onClickListener != null) {
                 onClickListener.onClick(cur.getBuildingName(), cur.getLocation()[0], cur.getLocation()[1]);
