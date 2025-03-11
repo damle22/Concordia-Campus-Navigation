@@ -36,6 +36,10 @@ public class InternalGoogleMaps extends AbstractMap{
         mMap = map;
     }
 
+    public List<Polyline> getPolylines() {
+        return polylines;
+    }
+
     @Override
     public void centerOnCoordinates(float latitude, float longitude) {
         centerOnCoordinates((double)latitude, (double)longitude);
