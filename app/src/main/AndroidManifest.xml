@@ -39,6 +39,10 @@
             android:exported="false"
             android:label="@string/title_activity_maps" />
         <activity
+            android:name=".screens.LocationSearchActivity"
+            android:exported="false"
+            android:label="LocationSearch" />
+        <activity
             android:name=".screens.MainActivity"
             android:exported="true">
             <intent-filter>

@@ -2,6 +2,7 @@ package minicap.concordia.campusnav.buildingmanager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
@@ -83,6 +84,24 @@ public class ConcordiaBuildingManager {
         }
 
         return finalBuildings;
+    }
+
+    /**
+     * Returns a list of buildings that match (partially or otherwise) the provided name
+     * @param buildingName The name of the building you are looking for
+     * @return List of buildings that match or partially match the searched string
+     */
+    public List<Building> searchBuildingsByName(String buildingName) {
+        ArrayList<Building> foundBuildings = new ArrayList<>();
+        String searchName = buildingName.toLowerCase();
+
+        for(Building building: buildings.values()) {
+            if(building.getBuildingName().toLowerCase().contains(searchName)) {
+                foundBuildings.add(building);
+            }
+        }
+
+        return foundBuildings;
     }
 
     /**

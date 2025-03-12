@@ -160,6 +160,7 @@
                 android:src="@drawable/search_button" />
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/genericSearchField"
                 android:layout_width="213dp"
                 android:layout_height="45dp"
                 android:hint="      Search Area..."
@@ -214,18 +215,12 @@
 
                 <EditText
                     android:id="@+id/yourLocationEditText"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Your Location"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/gray"
-                    android:layout_marginStart="8dp"
-                    android:focusable="false"
-                    android:clickable="false"
-                    android:cursorVisible="false"
-                    android:inputType="none"
-                    android:background="@null" />
+                    android:ems="10"
+                    android:hint="@string/your_location"
+                    android:inputType="text" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -256,10 +251,15 @@
                     android:src="@drawable/ic_destination"
                     app:tint="@color/black"/>
 
-                <Spinner
-                    android:id="@+id/building_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/destinationText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/your_destination"
+                    android:inputType="text" />
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
