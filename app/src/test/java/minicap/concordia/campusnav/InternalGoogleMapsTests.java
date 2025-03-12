@@ -1,7 +1,12 @@
 package minicap.concordia.campusnav;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
@@ -12,6 +17,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -22,6 +28,89 @@ import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InternalGoogleMapsTests {
+
+    @Test
+    public void testCenterOnCoordinates() {
+        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+        LatLng updatedCoors = new LatLng(1,1);
+        float defaultZoom = 18;
+
+        CameraUpdate mockUpdate = Mockito.mock(CameraUpdate.class);
+
+        try (MockedStatic<CameraUpdateFactory> staticMock = Mockito.mockStatic(CameraUpdateFactory.class)) {
+            staticMock.when(() -> CameraUpdateFactory.newLatLngZoom(updatedCoors, defaultZoom))
+                    .thenReturn(mockUpdate);
+
+            InternalGoogleMaps igm = new InternalGoogleMaps(mapMock);
+
+            igm.centerOnCoordinates(updatedCoors.latitude, updatedCoors.longitude);
+
+            Mockito.verify(mapMock).animateCamera(mockUpdate);
+        } catch (Exception e) {
+            Assert.assertEquals("Unable to mock the static instance", 0, 1);
+        }
+    }
+
+    @Test
+    public void testAddPolygons() {
+        LatLng firstPoint = new LatLng(-1, -1);
+        LatLng secondPoint = new LatLng(-1, 1);
+        LatLng thirdPoint = new LatLng(1, -1);
+        LatLng fourthPoint = new LatLng(1, 1);
+
+        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+        List<PolygonOptions> expectedPolygons = new ArrayList<>();
+
+        PolygonOptions firstPolygon = new PolygonOptions()
+                .add(firstPoint)
+                .add(secondPoint)
+                .add(thirdPoint)
+                .add(fourthPoint);
+
+        expectedPolygons.add(firstPolygon);
+
+        InternalGoogleMaps igm = new InternalGoogleMaps(mapMock);
+        igm.addPolygons(expectedPolygons);
+
+        Mockito.verify(mapMock).addPolygon(firstPolygon);
+    }
+
+    @Test
+    public void testToggleLocationTrackingWithPermission() {
+        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+
+        InternalGoogleMaps igm = new InternalGoogleMaps(mapMock);
+        boolean res = igm.toggleLocationTracking(true);
+
+        Assert.assertTrue(res);
+    }
+
+    @Test
+    public void testToggleLocationTrackingWithoutPermission() {
+        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+
+        InternalGoogleMaps igm = new InternalGoogleMaps(mapMock);
+        Mockito.doThrow(new SecurityException()).when(mapMock).setMyLocationEnabled(true);
+        boolean res = igm.toggleLocationTracking(true);
+
+        Assert.assertFalse(res);
+    }
+
+    @Test
+    public void testSetOnMapClickListener() {
+        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+        GoogleMap.OnMapClickListener listener = new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+                return;
+            }
+        };
+
+        InternalGoogleMaps igm = new InternalGoogleMaps(mapMock);
+        igm.setOnMapClickListener(listener);
+
+        Mockito.verify(mapMock).setOnMapClickListener(listener);
+    }
 
     @Test
     public void testAddPolyline() {
