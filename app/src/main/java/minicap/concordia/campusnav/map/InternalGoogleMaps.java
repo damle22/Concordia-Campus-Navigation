@@ -200,20 +200,16 @@ public class InternalGoogleMaps extends AbstractMap{
                     polylineOptions.color(Color.parseColor("#000000"));
                 } else if ("SUBWAY".equalsIgnoreCase(vehicleType) || "METRO".equalsIgnoreCase(vehicleType)) {
                     switch (transitLineName) {
-                        case "Ligne Verte":
-                        case "Verte":
+                        case "Ligne Verte", "Verte":
                             polylineOptions.color(Color.parseColor("#008000"));
                             break;
-                        case "Ligne Orange":
-                        case "Orange":
+                        case "Ligne Orange", "Orange":
                             polylineOptions.color(Color.parseColor("#FFA500"));
                             break;
-                        case "Ligne Jaune":
-                        case "Jaune":
+                        case "Ligne Jaune", "Jaune":
                             polylineOptions.color(Color.parseColor("#FFD700"));
                             break;
-                        case "Ligne Bleu":
-                        case "Blue":
+                        case "Ligne Bleu", "Bleu":
                             polylineOptions.color(Color.parseColor("#0000FF"));
                             break;
                         default:

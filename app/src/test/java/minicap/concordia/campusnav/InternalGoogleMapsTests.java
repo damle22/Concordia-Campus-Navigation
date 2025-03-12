@@ -47,7 +47,7 @@ public class InternalGoogleMapsTests {
 
             Mockito.verify(mapMock).animateCamera(mockUpdate);
         } catch (Exception e) {
-            Assert.assertEquals("Unable to mock the static instance", 0, 1);
+            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
         }
     }
 
@@ -252,7 +252,7 @@ public class InternalGoogleMapsTests {
         }
         catch(JSONException e) {
             //Purposefully fail if there is a parsing exception
-            Assert.assertEquals("Exception while parsing the JSON: " + e.getMessage(), 0,1);
+            Assert.fail("Exception while parsing the JSON: " + e.getMessage());
         }
     }
 
@@ -303,7 +303,7 @@ public class InternalGoogleMapsTests {
         }
         catch(JSONException e) {
             //Purposefully fail if there is a parsing exception
-            Assert.assertEquals("Exception while parsing the JSON: " + e.getMessage(), 0,1);
+            Assert.fail("Exception while parsing the JSON: " + e.getMessage());
         }
     }
 }
