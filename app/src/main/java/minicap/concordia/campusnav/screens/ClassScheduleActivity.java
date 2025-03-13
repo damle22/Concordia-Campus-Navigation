@@ -14,9 +14,10 @@ public class ClassScheduleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        // Menu button to handle back or other navigation
+        //Waiting For Karim's Part
+        // Menu button will open the menu (Maps, Directions, or class schedule)
         ImageButton menuButton = findViewById(R.id.button_menu);
-        menuButton.setOnClickListener(v -> finish()); // or open a menu
+        menuButton.setOnClickListener(v -> finish()); // for now it will close the activity
 
         // Import button to handle Google Calendar import
         Button importButton = findViewById(R.id.button_import_calendar);
