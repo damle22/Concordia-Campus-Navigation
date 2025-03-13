@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
         buildingManager = ConcordiaBuildingManager.getInstance();
 
+        Intent intent = new Intent(this, ClassScheduleActivity.class);
+        startActivity(intent);
+
         subscribeButtons(this);
     }
 
