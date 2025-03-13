@@ -15,7 +15,7 @@
             android:id="@+id/imageView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="-20dp"
+            android:layout_marginStart="-10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/main_menu" />
@@ -40,20 +40,80 @@
             android:fontFamily="@font/inter"
             android:text="Main Menu"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/imageButton2"
             app:layout_constraintTop_toTopOf="@+id/imageButton2" />
 
         <ImageButton
             android:id="@+id/imageButton3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_width="272dp"
+            android:layout_height="73dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="260dp"
             android:background="@color/light_burgundy"
+            android:scaleType="centerInside"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/campus_map"
-            tools:layout_editor_absoluteY="263dp" />
+            app:layout_constraintTop_toTopOf="@+id/imageView3"
+            app:srcCompat="@drawable/campus_map" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="272dp"
+            android:layout_height="73dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="324dp"
+            android:background="@color/light_burgundy"
+            android:scaleType="centerInside"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView3"
+            app:srcCompat="@drawable/directions" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="272dp"
+            android:layout_height="73dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="388dp"
+            android:background="@color/light_burgundy"
+            android:scaleType="centerInside"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView3"
+            app:srcCompat="@drawable/class_schedule" />
+
+        <ImageButton
+            android:id="@+id/viewLanguageButton"
+            android:layout_width="119dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="724dp"
+            android:layout_marginEnd="188dp"
+            android:background="@color/light_burgundy"
+            android:contentDescription="change_language"
+            app:layout_constraintBottom_toTopOf="@+id/guidelineTOP"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.813"
+            app:layout_constraintStart_toStartOf="@+id/guidelineVertMID"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.432"
+            app:srcCompat="@drawable/lang_button" />
+
+        <TextView
+            android:id="@+id/tv_selectedLanguage"
+            android:layout_width="44dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/english"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@+id/viewLanguageButton"
+            app:layout_constraintEnd_toEndOf="@+id/viewLanguageButton"
+            app:layout_constraintHorizontal_bias="0.487"
+            app:layout_constraintStart_toStartOf="@+id/viewLanguageButton"
+            app:layout_constraintTop_toTopOf="@+id/viewLanguageButton"
+            app:layout_constraintVertical_bias="0.538"
+            tools:text="@string/english" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
