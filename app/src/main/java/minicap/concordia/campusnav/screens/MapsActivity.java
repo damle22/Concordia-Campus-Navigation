@@ -1,7 +1,13 @@
 package minicap.concordia.campusnav.screens;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -9,83 +15,73 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Dot;
-import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import android.widget.EditText;
 
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
-import minicap.concordia.campusnav.buildingmanager.entities.Building;
-import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
+import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
-import minicap.concordia.campusnav.helpers.CoordinateResHelper;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
-import android.widget.Spinner;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener{
+
+    private final String MAPS_ACTIVITY_TAG = "MapsActivity";
 
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
-    private final LatLng SGW_LOCATION = new LatLng(45.49701, -73.57877);
-    private final LatLng LOY_LOCATION = new LatLng(45.45863, -73.64188);
+
+    public static final String KEY_SHOW_SGW = "show_sgw";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+
+    private final LatLng defaultUserLocation = new LatLng(45.489682435037835, -73.58808030276997);
 
     private InternalGoogleMaps gMapController;
 
     private ActivityMapsBinding binding;
 
+    private ConcordiaBuildingManager buildingManager;
+
     private double startingLat;
+
     private double startingLng;
+
+    private boolean isDestinationSet;
 
     private boolean showSGW;
 
-    private Marker campusMarker;
+    private boolean hasUserLocationBeenSet;
 
     private Button campusSwitchBtn;
 
@@ -95,31 +91,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EditText yourLocationEditText;
 
+    private EditText destinationEditText;
+
+    private ImageButton walkButton;
+    private ImageButton wheelchairButton;
+    private ImageButton carButton;
+    private ImageButton transitButton;
+
+    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
+
     private FusedLocationProviderClient fusedLocationClient;
 
     private String travelMode = "DRIVE";
 
-    private Spinner buildingSpinner;
-
     private LatLng destination;
+
+    private LatLng startingPoint;
+
+    private ActivityResultLauncher<Intent> searchLocationLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        isDestinationSet = false;
+        hasUserLocationBeenSet = false;
+        buildingManager = ConcordiaBuildingManager.getInstance();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             startingLat = bundle.getDouble(KEY_STARTING_LAT);
             startingLng = bundle.getDouble(KEY_STARTING_LNG);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
-            showSGW = bundle.getBoolean("SHOW_SGW");
+            showSGW = bundle.getBoolean(KEY_SHOW_SGW);
         }
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
         bottomSheetBehavior.setPeekHeight(peekHeightPx); // Set peek height
@@ -133,15 +144,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         campusSwitchBtn = findViewById(R.id.campusSwitch);
 
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
-        CampusName campusName = null;
-
-        //fill buildings
-        if(!showSGW){
-            campusName = CampusName.SGW;
-        }else{
-            campusName = CampusName.LOYOLA;
-        }
-        populateBuildingsList(campusName);
 
         // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -155,112 +157,198 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             initializeMap();
         }
 
-        ImageButton walkButton = findViewById(R.id.walkButton);
-        ImageButton wheelchairButton = findViewById(R.id.wheelchairButton);
-        ImageButton carButton = findViewById(R.id.carButton);
-        ImageButton transitButton = findViewById(R.id.transitButton);
+        walkButton = findViewById(R.id.walkButton);
+        wheelchairButton = findViewById(R.id.wheelchairButton);
+        carButton = findViewById(R.id.carButton);
+        transitButton = findViewById(R.id.transitButton);
 
         //Default mode
         carButton.setSelected(true);
 
-        walkButton.setOnClickListener(v -> {
-            walkButton.setSelected(true);
-            wheelchairButton.setSelected(false);
-            carButton.setSelected(false);
-            transitButton.setSelected(false);
-            travelMode = "WALK";
-            getUserLocationPath();
-        });
+        walkButton.setOnClickListener(v -> changeSelectedTravelMethod(walkButton, "WALK"));
 
-        wheelchairButton.setOnClickListener(v -> {
-            wheelchairButton.setSelected(true);
-            walkButton.setSelected(false);
-            carButton.setSelected(false);
-            transitButton.setSelected(false);
-            //TODO google maps does not support so for now, travelMode is the same as walking
-            travelMode = "WALK";
-            getUserLocationPath();
-        });
+        //google maps does not support "wheelchair" for now, travelMode is the same as walking
+        wheelchairButton.setOnClickListener(v -> changeSelectedTravelMethod(wheelchairButton, "WALK"));
 
-        carButton.setOnClickListener(v -> {
-            carButton.setSelected(true);
-            walkButton.setSelected(false);
-            wheelchairButton.setSelected(false);
-            transitButton.setSelected(false);
-            travelMode = "DRIVE";
-            getUserLocationPath();
-        });
+        carButton.setOnClickListener(v -> changeSelectedTravelMethod(carButton, "DRIVE"));
 
-        transitButton.setOnClickListener(v -> {
-            transitButton.setSelected(true);
-            walkButton.setSelected(false);
-            wheelchairButton.setSelected(false);
-            carButton.setSelected(false);
-            travelMode = "TRANSIT";
-            getUserLocationPath();
-        });
+        transitButton.setOnClickListener(v -> changeSelectedTravelMethod(transitButton, "TRANSIT"));
 
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
+
+        TextInputEditText searchText = findViewById(R.id.genericSearchField);
+
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity("", false);
+                }
+            }
+        });
+
+        yourLocationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity(yourLocationEditText.getText().toString(), true);
+                }
+            }
+        });
+
+        destinationEditText = findViewById(R.id.destinationText);
+
+        destinationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity(destinationEditText.getText().toString(), false);
+                }
+            }
+        });
+
+        searchLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if(result.getResultCode() == LocationSearchActivity.RESULT_OK) {
+                            Intent intent = result.getData();
+                            if(intent == null) {
+                                Log.e(MAPS_ACTIVITY_TAG, "Error while reading results from search, no intent returned");
+                                return;
+                            }
+                            Bundle returnData = intent.getExtras();
+                            if(returnData == null) {
+                                Log.e(MAPS_ACTIVITY_TAG, "Error while reading results from search, no data was returned");
+                                return;
+                            }
+
+                            boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
+                            float lat = returnData.getFloat(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
+                            float lng = returnData.getFloat(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
+                            if(isDestination) {
+                                String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
+                                setDestination(returnedLocation, lat, lng);
+                            }
+                            else {
+                                boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
+                                if(useCurrentLocation) {
+                                    setStartingPoint(true, "", lat, lng);
+                                }
+                                else {
+                                    String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
+                                    setStartingPoint(false, returnedLocation, lat, lng);
+                                }
+                            }
+                        }
+                        runOnUiThread(() -> {
+                            searchText.clearFocus();
+                            destinationEditText.clearFocus();
+                            yourLocationEditText.clearFocus();
+                        });
+                    }
+                });
+
+        getUserLocationPath();
     }
 
+    /**
+     * Launches the search activity and sets the extra parameters
+     * @param previousInput The previous location that was selected if there was one
+     * @param isStartingLocation Flag to indicate if this is a search for starting location or destination
+     */
+    private void launchSearchActivity(String previousInput, boolean isStartingLocation) {
+        Intent i = new Intent(MapsActivity.this, LocationSearchActivity.class);
+        i.putExtra(LocationSearchActivity.KEY_IS_STARTING_LOCATION, isStartingLocation);
+        i.putExtra(LocationSearchActivity.KEY_PREVIOUS_INPUT_STRING, previousInput);
+
+        searchLocationLauncher.launch(i);
+    }
+
+    /**
+     * Sets the starting point used for navigation
+     * @param useCurrentLocation Flag indicating whether to use the current location of the user
+     * @param locationString The name of the location
+     * @param lat The latitude of the location
+     * @param lng The longitude of the location
+     */
+    private void setStartingPoint(boolean useCurrentLocation, String locationString, float lat, float lng) {
+        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
+
+        if(useCurrentLocation && !hasUserLocationBeenSet) {
+            //getUserLocationPath will set the starting point and then call this again
+            getUserLocationPath();
+            return;
+        }
+
+        if(useCurrentLocation) {
+            yourLocationEditText.setText(R.string.your_location);
+        }
+        else {
+            //Reset this flag in case the user wants to use their own location in the future
+            hasUserLocationBeenSet = false;
+            startingPoint = new LatLng(lat, lng);
+            yourLocationEditText.setText(locationString);
+        }
+
+        drawPath(startingPoint, destination);
+    }
+
+    /**
+     * Sets the destination used for navigation
+     * @param locationString The name of the location
+     * @param lat The location's latitude
+     * @param lng The location's longitude
+     */
+    private void setDestination(String locationString, float lat, float lng) {
+        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
+
+        destination = new LatLng(lat, lng);
+        destinationEditText.setText(locationString);
+        isDestinationSet = true;
+
+        drawPath(startingPoint, destination);
+    }
+
+    /**
+     * Toggles the map to either the SGW campus or the Loyola campus based on which was already focused
+     */
     private void toggleCampus(){
         //flipping the state
         showSGW = !showSGW;
 
         // getting the new campus location
-        LatLng campus =  showSGW ? LOY_LOCATION : SGW_LOCATION;
+        CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
+        Campus curCampus = buildingManager.getCampus(wantedCampus);
+        LatLng campusCoords = new LatLng(curCampus.getLocation()[0], curCampus.getLocation()[1]);
 
         //moving the existing marker to the new campus location
-        campusMarker = gMapController.updateCampusMarker(campusMarker, campus, showSGW);
+        gMapController.addMarker(campusCoords, curCampus.getCampusName(), true);
 
         //moving the camera smoothly to the new campus location
-        float defaultZoom = CoordinateResHelper.getFloat(this, R.dimen.default_map_zoom);
-        gMapController.animateCameraToLocation(campus, defaultZoom);
+        gMapController.centerOnCoordinates(campusCoords.latitude, campusCoords.longitude);
 
         //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
-
-        CampusName campusName = null;
-
-        //fill buildings
-        if(!showSGW){
-            campusName = CampusName.SGW;
-        }else{
-            campusName = CampusName.LOYOLA;
-        }
-
-        populateBuildingsList(campusName);
     }
 
     /**
-     * Populates the list of buildings from the ConcordiaBuildingManager
-     * @param campusName CampusName
+     * Switches the desired travel method and re-draws the route line
+     * @param selectedButton The travel method button that was clicked
+     * @param newTravelMode The new travel mode to be used
      */
-    private void populateBuildingsList(CampusName campusName){
-        ArrayList<Building> buildingsForCampus = ConcordiaBuildingManager.getInstance().getBuildingsForCampus(campusName);
+    private void changeSelectedTravelMethod(ImageButton selectedButton, String newTravelMode) {
+        walkButton.setSelected(false);
+        wheelchairButton.setSelected(false);
+        carButton.setSelected(false);
+        transitButton.setSelected(false);
 
+        selectedButton.setSelected(true);
+        travelMode = newTravelMode;
 
-        buildingSpinner = findViewById(R.id.building_spinner);
-        if (buildingSpinner == null) {
-            Log.e("Error", "Spinner is not initialized properly.");
-        }
-
-        ArrayAdapter<Building> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, buildingsForCampus);
-        buildingSpinner.setAdapter(adapter);
-
-        buildingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Building selectedBuilding = (Building) parentView.getItemAtPosition(position);
-                if (selectedBuilding != null) {
-                    destination = new LatLng(selectedBuilding.getLocation()[0], selectedBuilding.getLocation()[1]);
-                    getUserLocationPath();
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
-        });
+        drawPath(startingPoint, destination);
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -299,9 +387,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
-        LatLng campusLocation = new LatLng(startingLat, startingLng);
+        gMapController.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+                String address = getAddressFromLocation(latLng.latitude, latLng.longitude);
+                gMapController.addMarker(latLng, "Clicked location", true);
+                setDestination(address, (float)latLng.latitude, (float)latLng.longitude);
+            }
+        });
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //Default starting point is user location
+        getUserLocationPath();
 
         // track location layer
         enableMyLocation();
@@ -320,17 +416,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Gets the User Location and invokes drawPath
      */
     private void getUserLocationPath() {
+        if(fusedLocationClient == null) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        }
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, location -> {
                         if (location != null) {
-                            //TODO userLocation is currently hardcoded for VM purposes. Uncomment this line to reflect current user location
-                            //LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            String address = getAddressFromLocation(45.489682435037835, -73.58808030276997);
-                            yourLocationEditText.setText(address);
-                            LatLng userLocation= new LatLng(45.489682435037835, -73.58808030276997);
-                            drawPath(userLocation, destination);
+                            //If you are emulating and need to change your current location, use the emulator controls.
+                            startingPoint = new LatLng(location.getLatitude(), location.getLongitude());
+                            hasUserLocationBeenSet = true;
+                            setStartingPoint(true, "", 0f, 0f);
                         }
                     });
         } else {
@@ -362,27 +460,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    //Note: It would be best if this was handled by the map class
     /**
-     * This Method generates the GoogleAPI URL and invokes FetchPathTask
+     * This handles the calls to the map to create the route
      * @param origin LatLng
      * @param destination LatLng
      */
     private void drawPath(LatLng origin, LatLng destination) {
-        gMapController.clearPolyLines();
-        gMapController.addMarker(new MarkerOptions()
-                .position(origin)
-                .title("Current Location")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        //In case someone changes their starting location before their destination
+        if(!isDestinationSet) {
+            return;
+        }
 
-        gMapController.addMarker(new MarkerOptions()
-                .position(destination)
-                .title("Destination"));
+        gMapController.clearPolyLines();
+        gMapController.clearAllMarkers();
+        gMapController.addMarker(origin, "Current location", BitmapDescriptorFactory.HUE_AZURE);
+
+        gMapController.addMarker(destination, "Destination");
 
         gMapController.centerOnCoordinates(origin.latitude,origin.longitude);
 
         new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    //Note: It would be best if this is handled by the map class
     /**
      * Will add the route to the Map
      * Invoked when the route is fetched by the Google API
@@ -401,57 +504,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Looping trough steps to display on UI
-            for (int i = 0; i < steps.length(); i++) {
 
-                JSONObject step = steps.getJSONObject(i);
-                String travelMode = step.getString("travelMode");
-                JSONObject polylineObject = step.getJSONObject("polyline");
-                String encodedPolyline = polylineObject.getString("encodedPolyline");
-                List<LatLng> stepPoints = PolyUtil.decode(encodedPolyline);
-
-                PolylineOptions polylineOptions = new PolylineOptions()
-                        .addAll(stepPoints)
-                        .width(10);
-
-                //Case where Walking
-                if ("WALK".equals(travelMode)) {
-                    polylineOptions.color(Color.BLUE)
-                            .pattern(Arrays.asList(new Dot(), new Gap(10)));
-                    //Case where Transit
-                } else if ("TRANSIT".equals(travelMode)) {
-                    JSONObject transitDetails = step.getJSONObject("transitDetails");
-                    String vehicleType = transitDetails.getJSONObject("transitLine")
-                            .getJSONObject("vehicle")
-                            .getString("type");
-                    String transitLineName = transitDetails.getJSONObject("transitLine").getString("name");
-
-                    // Set color based on vehicle type
-                    if ("BUS".equalsIgnoreCase(vehicleType)) {
-                        polylineOptions.color(Color.parseColor("#000000"));
-                    } else if ("SUBWAY".equalsIgnoreCase(vehicleType) || "METRO".equalsIgnoreCase(vehicleType)) {
-                        switch (transitLineName) {
-                            case "Ligne Verte":
-                                polylineOptions.color(Color.parseColor("#008000"));
-                                break;
-                            case "Ligne Orange":
-                                polylineOptions.color(Color.parseColor("#FFA500"));
-                                break;
-                            case "Ligne Jaune":
-                                polylineOptions.color(Color.parseColor("#FFD700"));
-                                break;
-                            case "Ligne Bleu":
-                                polylineOptions.color(Color.parseColor("#0000FF"));
-                            default:
-                                polylineOptions.color(Color.GRAY); // Default in case the name changes
-                                break;
-                        }
-                    }
-                }
-
-                gMapController.addPolyline(polylineOptions);
-
-            }
+            gMapController.parseRoutePolylineAndDisplay(steps);
         } catch (JSONException e) {
             Log.e("Route Parsing Error", e.toString());
         }

@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = "minicap.concordia.campusnav"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -38,6 +38,10 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    testOptions{
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -58,4 +62,6 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.10")
     testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
     testImplementation("com.google.code.gson:gson:2.10.1")
+    testImplementation("org.mockito:mockito-core:5.16.0")
+    testImplementation("org.json:json:20250107")
 }
