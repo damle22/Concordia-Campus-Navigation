@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Open Bottom Sheet for Testing
-                BuildingInfoBottomSheetFragment bottomSheet = BuildingInfoBottomSheetFragment.newInstance("BuildingHall");
+                BuildingInfoBottomSheetFragment bottomSheet = BuildingInfoBottomSheetFragment.newInstance(BuildingName.HALL);
                 bottomSheet.show(getSupportFragmentManager(), "BuildingInfoBottomSheet");
             }
         });

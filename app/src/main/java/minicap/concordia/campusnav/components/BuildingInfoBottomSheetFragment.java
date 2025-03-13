@@ -15,15 +15,14 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 
 public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
 
-    private static final String ARG_BUILDING_IDENTIFIER = "building_identifier";
+    private static final String ARG_BUILDING_NAME = "building_name";
     private static final String TAG = "BuildingInfoBottomSheet";
 
     private TextView buildingNameText, buildingAddress, buildingDetails;
@@ -31,12 +30,12 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
     private ImageButton directionsButton;
 
     /**
-     * Factory method to create a new instance of the Bottom Sheet with a given building identifier.
+     * Factory method to create a new instance of the Bottom Sheet with a given building name.
      */
-    public static BuildingInfoBottomSheetFragment newInstance(String buildingIdentifier) {
+    public static BuildingInfoBottomSheetFragment newInstance(BuildingName buildingName) {
         BuildingInfoBottomSheetFragment fragment = new BuildingInfoBottomSheetFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_BUILDING_IDENTIFIER, buildingIdentifier);
+        args.putSerializable(ARG_BUILDING_NAME, buildingName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,28 +71,20 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        String buildingIdentifier = getArguments().getString(ARG_BUILDING_IDENTIFIER);
-        if (buildingIdentifier == null || buildingIdentifier.isEmpty()) {
-            Log.e(TAG, "Invalid building identifier provided.");
+        BuildingName buildingName = (BuildingName) getArguments().getSerializable(ARG_BUILDING_NAME);
+        if (buildingName == null) {
+            Log.e(TAG, "Invalid building name provided.");
             return;
         }
 
-        Log.d(TAG, "Fetching Building Info for: " + buildingIdentifier);
+        Log.d(TAG, "Fetching Building Info for: " + buildingName);
 
-        try {
-            ResourceBundle bundle = ResourceBundle.getBundle(
-                    "minicap.concordia.campusnav.buildingmanager.resources.BuildingResource_en_CA",
-                    Locale.CANADA
-            );
-
-            Object obj = bundle.getObject(buildingIdentifier);
-            if (obj instanceof Building) {
-                populateBuildingData((Building) obj);
-            } else {
-                Log.e(TAG, "Building not found in resource bundle!");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading building from bundle", e);
+        // Get the building from the manager
+        Building building = ConcordiaBuildingManager.getInstance().getBuilding(buildingName);
+        if (building != null) {
+            populateBuildingData(building);
+        } else {
+            Log.e(TAG, "Building not found in ConcordiaBuildingManager!");
         }
     }
 
@@ -114,7 +105,7 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     /**
-     * Displays a popup showing the building's latitude and longitude.
+     * Displays a popup showing the building's latitude and longitude. Will be replaced with GoogleMaps implementation.
      */
     private void showLocationPopup(Building building) {
         float[] location = building.getLocation();
