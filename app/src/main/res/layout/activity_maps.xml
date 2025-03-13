@@ -1,177 +1,394 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".screens.MapsActivity">
 
+    <!-- Map Fragment -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="394dp"
-        android:layout_height="809dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/campusSwitch"
-        android:layout_width="216dp"
-        android:layout_height="74dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginStart="-50dp"
-        android:layout_marginTop="608dp"
-        android:backgroundTint="#9F3353"
-        app:cornerRadius="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/goTo"
-        android:layout_width="51dp"
-        android:layout_height="29dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="100dp"
-        android:text="@string/go_to"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
-        app:layout_constraintTop_toTopOf="@+id/campusSwitch" />
-
-    <TextView
-        android:id="@+id/ToCampus"
-        android:layout_width="60dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="16dp"
-        android:fontFamily="@font/inter"
-        android:text="NAN"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
-        app:layout_constraintTop_toTopOf="@+id/campusSwitch" />
-
-    <ImageView
-        android:id="@+id/arrow"
-        android:layout_width="63dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="88dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/down_arrow"
-        app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
-        app:layout_constraintTop_toTopOf="@+id/goTo" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buildingView"
-        android:layout_width="100dp"
-        android:layout_height="107dp"
-        android:layout_marginTop="580dp"
-        android:layout_marginEnd="16dp"
-        app:backgroundTint="@color/light_burgundy"
-        app:cornerRadius="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/campusIcon"
-        android:layout_width="47dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="28dp"
-        android:src="@drawable/university"
-        app:layout_constraintEnd_toEndOf="@+id/buildingView"
-        app:layout_constraintTop_toTopOf="@+id/buildingView" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/locationTracker"
-        android:layout_width="70dp"
-        android:layout_height="77dp"
-        android:layout_marginTop="476dp"
-        android:layout_marginEnd="16dp"
-        app:backgroundTint="@color/light_burgundy"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/nav"
-        android:layout_width="63dp"
-        android:layout_height="61dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/navigation"
-        app:layout_constraintEnd_toEndOf="@+id/locationTracker"
-        app:layout_constraintTop_toTopOf="@+id/locationTracker" />
-
-    <ImageView
-        android:id="@+id/menuBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/rectangle_37"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.487"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/searchArea"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="16dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/rectangle_32"
-        app:layout_constraintStart_toStartOf="@+id/menuBar"
-        app:layout_constraintTop_toTopOf="@+id/menuBar" />
-
-    <ImageButton
-        android:id="@+id/menuButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="#009F3353"
-        app:layout_constraintStart_toStartOf="@+id/menuBar"
-        app:layout_constraintTop_toTopOf="@+id/menuBar"
-        android:src="@drawable/menu" />
-
-    <ImageButton
-        android:id="@+id/searchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#00FFFFFF"
-        app:layout_constraintEnd_toEndOf="@+id/menuBar"
-        app:layout_constraintTop_toTopOf="@+id/menuBar"
-        android:src="@drawable/search_button" />
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:layout_width="213dp"
-        android:layout_height="45dp"
-        android:hint="      Search Area..."
-        android:singleLine="false"
-        android:textAlignment="viewStart"
-        android:textSize="14sp"
-        android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="@+id/searchArea"
-        app:layout_constraintEnd_toEndOf="@+id/searchArea"
-        app:layout_constraintStart_toStartOf="@+id/searchArea"
-        app:layout_constraintTop_toTopOf="@+id/searchArea" />
-
-    <FrameLayout
-        android:id="@+id/buildingSelectorContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
+    <!-- Main Content Container from the main branch -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/campusSwitch"
+                android:layout_width="216dp"
+                android:layout_height="74dp"
+                android:layout_marginStart="-50dp"
+                android:layout_marginTop="588dp"
+                android:backgroundTint="#9F3353"
+                app:cornerRadius="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/goTo"
+                android:layout_width="51dp"
+                android:layout_height="29dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="100dp"
+                android:text="@string/go_to"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
+                app:layout_constraintTop_toTopOf="@+id/campusSwitch" />
+
+            <TextView
+                android:id="@+id/ToCampus"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/inter"
+                android:text="NAN"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
+                app:layout_constraintTop_toTopOf="@+id/campusSwitch" />
+
+            <ImageView
+                android:id="@+id/arrow"
+                android:layout_width="63dp"
+                android:layout_height="56dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="88dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/down_arrow"
+                app:layout_constraintEnd_toEndOf="@+id/campusSwitch"
+                app:layout_constraintTop_toTopOf="@+id/goTo" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buildingView"
+                android:layout_width="100dp"
+                android:layout_height="107dp"
+                android:layout_marginTop="560dp"
+                android:layout_marginEnd="16dp"
+                app:backgroundTint="@color/light_burgundy"
+                app:cornerRadius="100dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/campusIcon"
+                android:layout_width="47dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="28dp"
+                android:src="@drawable/university"
+                app:layout_constraintEnd_toEndOf="@+id/buildingView"
+                app:layout_constraintTop_toTopOf="@+id/buildingView" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/locationTracker"
+                android:layout_width="70dp"
+                android:layout_height="77dp"
+                android:layout_marginTop="456dp"
+                android:layout_marginEnd="16dp"
+                app:backgroundTint="@color/light_burgundy"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/nav"
+                android:layout_width="63dp"
+                android:layout_height="61dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/navigation"
+                app:layout_constraintEnd_toEndOf="@+id/locationTracker"
+                app:layout_constraintTop_toTopOf="@+id/locationTracker" />
+
+            <ImageView
+                android:id="@+id/menuBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/rectangle_37"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.487"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/searchArea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="16dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/rectangle_32"
+                app:layout_constraintStart_toStartOf="@+id/menuBar"
+                app:layout_constraintTop_toTopOf="@+id/menuBar" />
+
+            <ImageButton
+                android:id="@+id/menuButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#009F3353"
+                app:layout_constraintStart_toStartOf="@+id/menuBar"
+                app:layout_constraintTop_toTopOf="@+id/menuBar"
+                android:src="@drawable/menu" />
+
+            <ImageButton
+                android:id="@+id/searchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#00FFFFFF"
+                app:layout_constraintEnd_toEndOf="@+id/menuBar"
+                app:layout_constraintTop_toTopOf="@+id/menuBar"
+                android:src="@drawable/search_button" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/genericSearchField"
+                android:layout_width="213dp"
+                android:layout_height="45dp"
+                android:hint="      Search Area..."
+                android:singleLine="false"
+                android:textAlignment="viewStart"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toBottomOf="@+id/searchArea"
+                app:layout_constraintEnd_toEndOf="@+id/searchArea"
+                app:layout_constraintStart_toStartOf="@+id/searchArea"
+                app:layout_constraintTop_toTopOf="@+id/searchArea" />
+
+            <!-- Added from your branch: a container for the Building Selector Fragment -->
+            <FrameLayout
+                android:id="@+id/buildingSelectorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+    <!-- Bottom Sheet from the main branch -->
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
+        android:orientation="vertical"
+        android:background="@color/light_burgundy"
+        android:padding="10dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <!-- Bottom Sheet Content -->
+        <View
+            android:layout_width="100dp"
+            android:layout_height="2dp"
+            android:background="@color/yellow"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/black"/>
+
+                <EditText
+                    android:id="@+id/yourLocationEditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/your_location"
+                    android:inputType="text" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_down"
+                    app:tint="@color/black"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- End Location Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_destination"
+                    app:tint="@color/black"/>
+
+                <EditText
+                    android:id="@+id/destinationText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/your_destination"
+                    android:inputType="text" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Separator -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/yellow"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Route Options -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Route Options"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp"/>
+        </LinearLayout>
+
+        <!-- Route Buttons -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <!-- Walk Button -->
+            <ImageButton
+                android:id="@+id/walkButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/button_selector"
+                android:src="@drawable/ic_walk"
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/wheelchairButton"
+                app:layout_constraintHorizontal_chainStyle="spread"/>
+
+            <!-- Wheelchair Button -->
+            <ImageButton
+                android:id="@+id/wheelchairButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/button_selector"
+                android:src="@drawable/ic_wheelchair"
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/walkButton"
+                app:layout_constraintEnd_toStartOf="@+id/carButton"/>
+
+            <!-- Car Button -->
+            <ImageButton
+                android:id="@+id/carButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/button_selector"
+                android:src="@drawable/ic_car"
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/wheelchairButton"
+                app:layout_constraintEnd_toStartOf="@+id/transitButton"/>
+
+            <!-- Transit Button -->
+            <ImageButton
+                android:id="@+id/transitButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/button_selector"
+                android:src="@drawable/ic_transit"
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/carButton"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Time Estimate Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_clock"
+                    app:tint="@color/black"/>
+
+                <TextView
+                    android:id="@+id/estimatedTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estimated time: 3 minutes"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

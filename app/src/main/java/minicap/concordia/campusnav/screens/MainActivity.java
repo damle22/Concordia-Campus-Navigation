@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                 i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
                 i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-                startActivity(i);            }
+                i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
+                startActivity(i);
+            }
         });
 
         Button loyCampusBtn = (Button)findViewById(R.id.viewLoyCampusButton);
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
                 i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
                 i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
+                i.putExtra(MapsActivity.KEY_SHOW_SGW, false);
                 startActivity(i);
             }
         });
