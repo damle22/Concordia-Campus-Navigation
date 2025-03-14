@@ -419,10 +419,7 @@ public class MapsActivity extends FragmentActivity
 
     // Show building selector fragment
     private void showBuildingSelectorFragment() {
-        binding.buildingSelectorContainer.setVisibility(View.VISIBLE);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.buildingSelectorContainer, new BuildingSelectorFragment())
-                .addToBackStack(null)
-                .commit();
+        BuildingSelectorFragment fragment = new BuildingSelectorFragment();
+        fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
     }
 }
