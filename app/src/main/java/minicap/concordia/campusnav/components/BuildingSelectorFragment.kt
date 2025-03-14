@@ -1,5 +1,6 @@
 package minicap.concordia.ca
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,14 +31,14 @@ class BuildingSelectorFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get the bottom sheet behavior and set it to expanded
+        // Get the bottom sheet behavior and set it to half-expanded
         val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         bottomSheet?.let {
             val behavior = BottomSheetBehavior.from(it)
             behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             behavior.isHideable = true
-
         }
+
         // Set up RecyclerViews with GridLayoutManager (2 columns)
         binding.sgwRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.loyRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -47,7 +48,7 @@ class BuildingSelectorFragment : BottomSheetDialogFragment() {
     }
 
     /**
-     * Fetches building data from ConcordiaBuildingManager by campus.
+     * Fetches building data from ConcordiaBuildingManager by campus and attaches click listeners.
      */
     private fun fetchBuildings() {
         val buildingManager = ConcordiaBuildingManager.getInstance()
@@ -56,9 +57,36 @@ class BuildingSelectorFragment : BottomSheetDialogFragment() {
         val sgwBuildings: MutableList<Building> = buildingManager.getBuildingsForCampus(CampusName.SGW)
         val loyBuildings: MutableList<Building> = buildingManager.getBuildingsForCampus(CampusName.LOYOLA)
 
-        // Update the RecyclerViews with the building lists
-        binding.sgwRecyclerView.adapter = BuildingAdapter(sgwBuildings)
-        binding.loyRecyclerView.adapter = BuildingAdapter(loyBuildings)
+        // Create adapter for SGW buildings and set its click listener
+        val sgwAdapter = BuildingAdapter(sgwBuildings)
+        sgwAdapter.setOnBuildingClickListener { building ->
+            showBuildingPopup(building)
+        }
+        binding.sgwRecyclerView.adapter = sgwAdapter
+
+        // Create adapter for Loyola buildings and set its click listener
+        val loyAdapter = BuildingAdapter(loyBuildings)
+        loyAdapter.setOnBuildingClickListener { building ->
+            showBuildingPopup(building)
+        }
+        binding.loyRecyclerView.adapter = loyAdapter
+    }
+
+    /**
+     * Shows an alert dialog with the building details.
+     */
+    private fun showBuildingPopup(building: Building) {
+        val message = "Building: ${building.getBuildingName()}\n" +
+                "Description: ${building.getDescription()}\n" +
+                "Campus: ${building.getAssociatedCampus()}"
+        AlertDialog.Builder(requireContext())
+            .setTitle("Building Details")
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     override fun onDestroyView() {
