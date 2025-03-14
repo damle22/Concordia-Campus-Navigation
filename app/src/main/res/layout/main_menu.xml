@@ -10,6 +10,8 @@
 
         <ImageView
             android:id="@+id/imageView3"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="388dp"
             android:layout_height="779dp"
             android:layout_marginStart="-50dp"
