@@ -97,8 +97,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageButton wheelchairButton;
     private ImageButton carButton;
     private ImageButton transitButton;
-    private ImageButton openMenuButton;
-    private ImageButton closeMenuButton;
 
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
 
@@ -163,8 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         wheelchairButton = findViewById(R.id.wheelchairButton);
         carButton = findViewById(R.id.carButton);
         transitButton = findViewById(R.id.transitButton);
-        openMenuButton = findViewById(R.id.menuButton);
-        closeMenuButton = findViewById(R.id.closeMenu);
 
         //Default mode
         carButton.setSelected(true);
@@ -182,38 +178,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         TextInputEditText searchText = findViewById(R.id.genericSearchField);
 
+        //Add main menu functionality to page
         View slidingMenu = findViewById(R.id.sliding_menu);
-
-        openMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                slidingMenu.animate()
-                        .translationX(0)
-                        .setDuration(300)
-                        .start();
-            }
-        });
-
-        closeMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                slidingMenu.animate()
-                        .translationX(-slidingMenu.getWidth())
-                        .setDuration(300)
-                        .start();
-            }
-        });
-
-        //make menu closed on startup
-        slidingMenu.post(new Runnable() {
-            @Override
-            public void run() {
-                slidingMenu.animate()
-                        .translationX(-slidingMenu.getWidth())
-                        .setDuration(0)
-                        .start();
-            }
-        });
+        ImageButton openMenuButton = findViewById(R.id.menuButton);
+        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
+        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
+        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
+        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
+        MainMenuController menu = new MainMenuController(slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
 
 
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
