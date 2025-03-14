@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "minicap.concordia.campusnav"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "minicap.concordia.campusnav"
