@@ -1,6 +1,7 @@
 package minicap.concordia.campusnav.screens;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 
@@ -44,6 +45,7 @@ import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.map.AbstractMap;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
+import minicap.concordia.campusnav.map.InternalMappedIn;
 
 public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener {
 
@@ -366,7 +368,9 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
      * Initializes the desired map (for now, google only)
      */
     private void initializeMap() {
-        map = new InternalGoogleMaps(this);
+        map = new InternalMappedIn(this);
+
+//        map = new InternalGoogleMaps(this);
         Fragment mapFragment = map.initialize();
 
         getSupportFragmentManager().beginTransaction()
@@ -432,7 +436,6 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         }
     }
 
-    //Note: It would be best if this was handled by the map class
     /**
      * This handles the calls to the map to create the route
      */

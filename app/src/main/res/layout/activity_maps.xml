@@ -171,6 +171,15 @@
                 app:layout_constraintEnd_toEndOf="@+id/searchArea"
                 app:layout_constraintStart_toStartOf="@+id/searchArea"
                 app:layout_constraintTop_toTopOf="@+id/searchArea" />
+
+            <Button
+                android:id="@+id/switchMapButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/menuBar" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 
