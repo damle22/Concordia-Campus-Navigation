@@ -39,10 +39,10 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        // Set listener only if the activity implements BuildingInfoListener
         if (context instanceof BuildingInfoListener) {
             listener = (BuildingInfoListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement BuildingInfoListener");
         }
     }
 
@@ -137,5 +137,10 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
         listener = null;
+    }
+
+    // for testing
+    public void setBuildingInfoListener(BuildingInfoListener listener) {
+        this.listener = listener;
     }
 }

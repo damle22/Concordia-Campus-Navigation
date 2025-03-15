@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -98,4 +99,51 @@ public class BuildingInfoBottomSheetFragmentTest {
             });
         }
     }
+
+    @Test
+    public void testDirectionsButtonClick() {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(activity -> {
+                // Create and show the fragment
+                BuildingInfoBottomSheetFragment fragment = BuildingInfoBottomSheetFragment.newInstance(testBuilding);
+                activity.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(android.R.id.content, fragment)
+                        .commitNow();
+
+                assertNotNull(fragment.getView());
+
+                // Get UI elements
+                ImageButton directionsButton = fragment.getView().findViewById(R.id.btn_directions);
+                assertNotNull("Directions button not found", directionsButton);
+
+                // Fetch expected data from BuildingManager
+                Building expectedBuilding = ConcordiaBuildingManager.getInstance().getBuilding(testBuilding);
+                assertNotNull(expectedBuilding);
+
+                //  Mock listener for testing
+                final boolean[] wasCalled = {false};
+                BuildingInfoBottomSheetFragment.BuildingInfoListener testListener = new BuildingInfoBottomSheetFragment.BuildingInfoListener() {
+                    @Override
+                    public void directionButtonOnClick(Building building) {
+                        wasCalled[0] = true;
+                        assertEquals("Latitude mismatch", expectedBuilding.getLocation()[0], building.getLocation()[0], 0.0001);
+                        assertEquals("Longitude mismatch", expectedBuilding.getLocation()[1], building.getLocation()[1], 0.0001);
+                    }
+                };
+
+                // Set listener using the new method
+                fragment.setBuildingInfoListener(testListener);
+
+                // Perform click on directions button
+                directionsButton.performClick();
+
+                // Verify that the listener was triggered
+                assertTrue("directionButtonOnClick() was not called", wasCalled[0]);
+            });
+        }
+    }
+
+
+
 }
