@@ -4,15 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <!-- Optionally declare variables or imports here if needed -->
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/buildingSelectorRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="450dp"
         android:alpha="0.95"
         android:background="@color/light_burgundy"
         tools:context=".components.BuildingSelectorFragment">
@@ -22,12 +17,12 @@
             android:id="@+id/search_bar_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/rectangle_32"
-            android:padding="8dp"
             android:layout_margin="26dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:background="@drawable/rectangle_32"
+            android:orientation="horizontal"
+            android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
 
@@ -37,21 +32,21 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:hint="Search campus facility..."
                 android:inputType="text"
+                android:padding="4dp"
                 android:textColor="@color/black"
-                android:textColorHint="@color/black"
-                android:background="@android:color/transparent"
-                android:padding="4dp" />
+                android:textColorHint="@color/black" />
 
             <!-- Optional: Search Icon -->
             <ImageView
                 android:id="@+id/iv_search_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/search_button"
+                android:layout_gravity="center_vertical"
                 android:contentDescription="Search icon"
-                android:layout_gravity="center_vertical" />
+                android:src="@drawable/search_button" />
         </LinearLayout>
 
         <!-- Thin yellow line below the search bar -->
@@ -60,11 +55,11 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
             android:background="@color/yellow"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_bar_container" />
 
         <!-- SGW Title -->
@@ -72,12 +67,12 @@
             android:id="@+id/tv_sgw_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:text="SGW Buildings:"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/line_searchbar_sgw" />
 
@@ -88,8 +83,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:padding="8dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_sgw_title" />
 
         <!-- Yellow line between SGW and Loyola -->
@@ -98,11 +93,11 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
             android:background="@color/yellow"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/sgwRecyclerView" />
 
         <!-- Loyola Title -->
@@ -110,12 +105,12 @@
             android:id="@+id/tv_loyola_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:text="Loyola Buildings:"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/line_sgw_loyola" />
 
@@ -126,10 +121,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:padding="8dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_loyola_title"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_loyola_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

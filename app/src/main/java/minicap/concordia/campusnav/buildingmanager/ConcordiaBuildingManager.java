@@ -2,6 +2,7 @@ package minicap.concordia.campusnav.buildingmanager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
@@ -27,8 +28,8 @@ public class ConcordiaBuildingManager {
     }
 
     /**
-     * Gets the singleton instance of ConcordiaBuildingManager.
-     * @return The current instance of ConcordiaBuildingManager.
+     * Gets the instance of ConcordiaBuildingManager
+     * @return The current instance of ConcordiaBuildingManager
      */
     public static ConcordiaBuildingManager getInstance() {
         if (mInstance == null) {
@@ -38,102 +39,129 @@ public class ConcordiaBuildingManager {
     }
 
     /**
-     * Gets a Building object based on the given BuildingName enum.
-     * @param name The enum representing the desired building.
-     * @return The Building if found, otherwise null.
+     * Gets a Building object based on the given name
+     * @param name The name of the desired building
+     * @return The Building if found, null if not
      */
     public Building getBuilding(BuildingName name) {
         return buildings.get(name);
     }
 
     /**
-     * Gets a Campus object based on the given CampusName enum.
-     * @param name The enum for the desired campus.
-     * @return The Campus object if found, otherwise null.
+     * Gets a Campus based on the given name
+     * @param name The desired campus
+     * @return The Campus object for the given name, null if not found
      */
-    public Campus getCampus(CampusName name) {
+    public Campus getCampus(CampusName name){
         return campuses.get(name);
     }
 
     /**
-     * Gets all buildings associated with a specific campus.
-     * @param name The campus enum for which buildings are returned.
-     * @return An ArrayList of Buildings for the given campus.
+     * Gets all buildings associated to a given campus
+     * @param name The campus for which the buildings are returned
+     * @return An ArrayList of Buildings that are related to the given campus
      */
-    public ArrayList<Building> getBuildingsForCampus(CampusName name) {
-        Campus campus = campuses.get(name);
+    public ArrayList<Building> getBuildingsForCampus(CampusName name){
+        Campus campus = null;
         ArrayList<BuildingName> buildingNames = new ArrayList<>();
         ArrayList<Building> finalBuildings = new ArrayList<>();
 
-        if (campus != null) {
+        campus = campuses.get(name);
+
+        if(campus != null){
             buildingNames = campus.getAssociatedBuildings();
         }
 
-        if (!buildingNames.isEmpty()) {
-            for (BuildingName buildingName : buildingNames) {
+        if(!buildingNames.isEmpty()){
+            for(BuildingName buildingName:buildingNames){
                 Building newBuilding = buildings.get(buildingName);
-                if (newBuilding != null) {
+                if(newBuilding != null){
                     finalBuildings.add(newBuilding);
                 }
             }
         }
+
         return finalBuildings;
     }
 
     /**
-     * Returns all OutdoorPOI objects.
-     * @return ArrayList of all OutdoorPOI.
+     * Returns a list of buildings that match (partially or otherwise) the provided name
+     * @param buildingName The name of the building you are looking for
+     * @return List of buildings that match or partially match the searched string
      */
-    public ArrayList<OutdoorPOI> getAllOutdoorPOIs() {
+    public List<Building> searchBuildingsByName(String buildingName) {
+        ArrayList<Building> foundBuildings = new ArrayList<>();
+        String searchName = buildingName.toLowerCase();
+
+        for(Building building: buildings.values()) {
+            if(building.getBuildingName().toLowerCase().contains(searchName)) {
+                foundBuildings.add(building);
+            }
+        }
+
+        return foundBuildings;
+    }
+
+    /**
+     * Returns all outdoor points of interest
+     * @return ArrayList of all OutdoorPOI
+     */
+    public ArrayList<OutdoorPOI> getAllOutdoorPOIs(){
         return outdoorPOIs;
     }
 
     /**
-     * Returns all OutdoorPOI objects that match a specified POIType.
-     * @param type The type of POI desired.
-     * @return An ArrayList of matching OutdoorPOI objects.
+     * Returns an ArrayList of OutdoorPOI that match the specified type
+     * @param type The type of POI that is desired
+     * @return ArrayList with all OutdoorPOI that match the specified type
      */
     public ArrayList<OutdoorPOI> getAllOutdoorPOIsOfType(POIType type) {
         ArrayList<OutdoorPOI> finalPOIs = new ArrayList<>();
-        for (OutdoorPOI poi : outdoorPOIs) {
-            if (poi.getPOIType() == type) {
+
+        for(OutdoorPOI poi:outdoorPOIs){
+            if(poi.getPOIType() == type){
                 finalPOIs.add(poi);
             }
         }
+
         return finalPOIs;
     }
 
     /**
-     * Returns all OutdoorPOI objects that have the accessibility flag, regardless of POIType.
-     * @return ArrayList of OutdoorPOIs with the accessibility flag.
+     * Returns an ArrayList of all OutdoorPOIs that have the accessibility flag regardless of type.
+     * @return ArrayList of OutdoorPOIs with accessibility flag
      */
-    public ArrayList<OutdoorPOI> getOutdoorAccessibilityPOIs() {
+    public ArrayList<OutdoorPOI> getOutdoorAccessibilityPOIs(){
         ArrayList<OutdoorPOI> finalPOIs = new ArrayList<>();
-        for (OutdoorPOI poi : outdoorPOIs) {
-            if (poi.getIsAccessibilityFeature()) {
+
+        for(OutdoorPOI poi:outdoorPOIs){
+            if(poi.getIsAccessibilityFeature()){
                 finalPOIs.add(poi);
             }
         }
+
         return finalPOIs;
     }
 
     /**
-     * Returns all OutdoorPOI objects that have the accessibility flag and match the specified POIType.
-     * @param type The POI type to filter by.
-     * @return ArrayList of OutdoorPOI that match the type and have the accessibility flag.
+     * Gets all outdoor POIs that have the accessibility flag and the desired type
+     * @param type The POI type that is being searched for
+     * @return ArrayList of OutdoorPOI that match the given type and have the accessibility flag
      */
-    public ArrayList<OutdoorPOI> getOutdoorAccessibilityPOIs(POIType type) {
+    public ArrayList<OutdoorPOI> getOutdoorAccessibilityPOIs(POIType type){
         ArrayList<OutdoorPOI> finalPOIs = new ArrayList<>();
-        for (OutdoorPOI poi : outdoorPOIs) {
-            if (poi.getIsAccessibilityFeature() && poi.getPOIType() == type) {
+
+        for(OutdoorPOI poi:outdoorPOIs) {
+            if(poi.getIsAccessibilityFeature() && poi.getPOIType() == type){
                 finalPOIs.add(poi);
             }
         }
+
         return finalPOIs;
     }
 
     /**
-     * Initializes all known campuses, buildings, and outdoor POIs by calling the helper methods.
+     * This method instantiates all the known campuses, buildings and outdoor POIs
      */
     private void initialize() {
         campuses = BuildingManagerInitializationHelper.createCampuses();

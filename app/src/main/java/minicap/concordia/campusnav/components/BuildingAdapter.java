@@ -11,15 +11,34 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import minicap.concordia.campusnav.R;
-// Change the import to use the correct Building class:
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 
 public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.BuildingViewHolder> {
 
     private List<Building> buildingList;
 
+    /**
+     * Callback interface for building item clicks.
+     */
+    public interface OnBuildingClickListener {
+        void onBuildingClick(Building building);
+    }
+
+    /**
+     * Provide a listener that can be set from outside.
+     * The fragment or activity sets this to get notified of clicks.
+     */
+    private OnBuildingClickListener onBuildingClickListener;
+
     public BuildingAdapter(List<Building> buildingList) {
         this.buildingList = buildingList;
+    }
+
+    /**
+     * Allows external code (e.g., a fragment) to set the click listener.
+     */
+    public void setOnBuildingClickListener(OnBuildingClickListener listener) {
+        this.onBuildingClickListener = listener;
     }
 
     @NonNull
@@ -34,8 +53,14 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
     @Override
     public void onBindViewHolder(@NonNull BuildingViewHolder holder, int position) {
         Building building = buildingList.get(position);
-        // Use the proper getter for the building name – note that in Building.java it is getBuildingName()
         holder.tvBuildingName.setText(building.getBuildingName());
+
+        // Attach a click listener to the entire row
+        holder.itemView.setOnClickListener(v -> {
+            if (onBuildingClickListener != null) {
+                onBuildingClickListener.onBuildingClick(building);
+            }
+        });
     }
 
     @Override
@@ -48,8 +73,8 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
         notifyDataSetChanged();
     }
 
-    static class BuildingViewHolder extends RecyclerView.ViewHolder {
-        TextView tvBuildingName;
+    public static class BuildingViewHolder extends RecyclerView.ViewHolder {
+        public TextView tvBuildingName;
 
         public BuildingViewHolder(@NonNull View itemView) {
             super(itemView);

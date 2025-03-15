@@ -1,23 +1,21 @@
 package minicap.concordia.ca
 
-import android.animation.ValueAnimator
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import minicap.concordia.campusnav.R
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager
 import minicap.concordia.campusnav.buildingmanager.entities.Building
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName
 import minicap.concordia.campusnav.components.BuildingAdapter
 import minicap.concordia.campusnav.databinding.FragmentBuildingSelectorBinding
 
-class BuildingSelectorFragment : Fragment() {
+class BuildingSelectorFragment : BottomSheetDialogFragment() {
 
-    private var isExpanded = false // tracks whether the layout is expanded or collapsed
     private var _binding: FragmentBuildingSelectorBinding? = null
     private val binding get() = _binding!!
 
@@ -33,9 +31,12 @@ class BuildingSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Animate margin on click of the root view
-        binding.buildingSelectorRoot.setOnClickListener {
-            animateMargin(binding.buildingSelectorRoot)
+        // Get the bottom sheet behavior and set it to half-expanded
+        val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            behavior.isHideable = true
         }
 
         // Set up RecyclerViews with GridLayoutManager (2 columns)
@@ -47,7 +48,7 @@ class BuildingSelectorFragment : Fragment() {
     }
 
     /**
-     * Fetches building data from ConcordiaBuildingManager by campus.
+     * Fetches building data from ConcordiaBuildingManager by campus and attaches click listeners.
      */
     private fun fetchBuildings() {
         val buildingManager = ConcordiaBuildingManager.getInstance()
@@ -56,34 +57,36 @@ class BuildingSelectorFragment : Fragment() {
         val sgwBuildings: MutableList<Building> = buildingManager.getBuildingsForCampus(CampusName.SGW)
         val loyBuildings: MutableList<Building> = buildingManager.getBuildingsForCampus(CampusName.LOYOLA)
 
-        // Update the RecyclerViews with the building lists
-        binding.sgwRecyclerView.adapter = BuildingAdapter(sgwBuildings)
-        binding.loyRecyclerView.adapter = BuildingAdapter(loyBuildings)
-    }
-
-    private fun animateMargin(rootView: View) {
-        val currentMarginPx = getTopMargin(rootView)
-        val targetMarginPx = if (!isExpanded) dpToPx(100) else dpToPx(450)
-        isExpanded = !isExpanded
-
-        val animator = ValueAnimator.ofInt(currentMarginPx, targetMarginPx)
-        animator.duration = 400
-        animator.addUpdateListener { valueAnimator ->
-            val animatedValue = valueAnimator.animatedValue as Int
-            val params = rootView.layoutParams as MarginLayoutParams
-            params.topMargin = animatedValue
-            rootView.layoutParams = params
+        // Create adapter for SGW buildings and set its click listener
+        val sgwAdapter = BuildingAdapter(sgwBuildings)
+        sgwAdapter.setOnBuildingClickListener { building ->
+            showBuildingPopup(building)
         }
-        animator.start()
+        binding.sgwRecyclerView.adapter = sgwAdapter
+
+        // Create adapter for Loyola buildings and set its click listener
+        val loyAdapter = BuildingAdapter(loyBuildings)
+        loyAdapter.setOnBuildingClickListener { building ->
+            showBuildingPopup(building)
+        }
+        binding.loyRecyclerView.adapter = loyAdapter
     }
 
-    private fun getTopMargin(view: View): Int {
-        val params = view.layoutParams as MarginLayoutParams
-        return params.topMargin
-    }
-
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
+    /**
+     * Shows an alert dialog with the building details.
+     */
+    private fun showBuildingPopup(building: Building) {
+        val message = "Building: ${building.getBuildingName()}\n" +
+                "Description: ${building.getDescription()}\n" +
+                "Campus: ${building.getAssociatedCampus()}"
+        AlertDialog.Builder(requireContext())
+            .setTitle("Building Details")
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     override fun onDestroyView() {
