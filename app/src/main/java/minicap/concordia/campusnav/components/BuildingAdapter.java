@@ -73,8 +73,8 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
         notifyDataSetChanged();
     }
 
-    static class BuildingViewHolder extends RecyclerView.ViewHolder {
-        TextView tvBuildingName;
+    public static class BuildingViewHolder extends RecyclerView.ViewHolder {
+        public TextView tvBuildingName;
 
         public BuildingViewHolder(@NonNull View itemView) {
             super(itemView);

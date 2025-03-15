@@ -75,6 +75,13 @@ dependencies {
     testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.mockito:mockito-core:5.16.0")
     testImplementation("org.json:json:20250107")
+
+    androidTestImplementation( "androidx.test.espresso:espresso-contrib:3.6.1")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.fragment:fragment-testing:1.5.7")
+
+
 }
 
 
