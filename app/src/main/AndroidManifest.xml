@@ -54,7 +54,7 @@
 
         <activity
             android:name=".screens.ClassScheduleActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="Class Schedule" />
 
     </application>
