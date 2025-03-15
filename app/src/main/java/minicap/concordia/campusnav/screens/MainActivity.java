@@ -28,10 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         buildingManager = ConcordiaBuildingManager.getInstance();
 
-        //to be removed once sorted out
-        Intent intent = new Intent(this, ClassScheduleActivity.class);
-        startActivity(intent);
-
         subscribeButtons(this);
     }
 

@@ -7,7 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/concordia_red"
-    tools:context=".screens.ClassScheduleActivity">
+    tools:context=".screens.ClassScheduleActivity"
+    >
 
     <!--Will open the menu (Maps, Directions, or class schedule)-->
     <ImageButton
