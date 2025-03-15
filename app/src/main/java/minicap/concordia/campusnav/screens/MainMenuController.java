@@ -60,7 +60,7 @@ public class MainMenuController {
             });
     }
 
-    private void openClassSchedule() {
+    public void openClassSchedule() {
         Intent intent = new Intent(context, ClassScheduleActivity.class);
         context.startActivity(intent);
     }
