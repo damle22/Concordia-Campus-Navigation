@@ -142,7 +142,7 @@ public class LocationSearchActivity extends AppCompatActivity {
 
         adapter.setOnClickListener(new LocationAdapter.OnItemClickedListener() {
             @Override
-            public void onClick(String buildingName, float latitude, float longitude) {
+            public void onClick(String buildingName, double latitude, double longitude) {
                 runOnUiThread(() -> {
                     Intent returnData = new Intent();
                     returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, buildingName);
@@ -225,6 +225,6 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     }
 
     public interface OnItemClickedListener {
-        void onClick(String buildingName, float latitude, float longitude);
+        void onClick(String buildingName, double latitude, double longitude);
     }
 }

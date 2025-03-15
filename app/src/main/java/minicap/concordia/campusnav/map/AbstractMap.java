@@ -1,13 +1,39 @@
 package minicap.concordia.campusnav.map;
 
+import android.view.View;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 public abstract class AbstractMap {
 
+    protected boolean isMapReady = false;
+
+    protected MapUpdateListener listener;
+
+    public AbstractMap(MapUpdateListener listener) {
+        this.listener = listener;
+    }
+
     /**
-     * Centers the maps on the given coordinates
-     * @param latitude the latitude as a float
-     * @param longitude the longitude as a float
+     * Starts the initialization process for the map and returns the fragment to display
+     * @return The fragment used to display the map
      */
-    public abstract void centerOnCoordinates(float latitude, float longitude);
+    public abstract Fragment initialize();
+
+    public abstract void addMarker(double lat, double lng, String title, float color, boolean clearOtherMarkers);
+
+    public abstract void addMarker(double lat, double lng, String title, float color);
+
+    public abstract void addMarker(double lat, double lng, String title, boolean clearOtherMarkers);
+
+    public abstract void addMarker(double lat, double lng, String title);
+
+    public abstract void clearAllMarkers();
+
+    public abstract void clearPathFromMap();
+
+    public abstract void displayRoute(double originLat, double originLng, double destinationLat, double destinationLng, String travelMode);
 
     /**
      * Centers the map on the given coordinates
@@ -34,4 +60,14 @@ public abstract class AbstractMap {
 
     //TODO: Uncomment when we can display routes
     //public abstract void displayRoute();
+
+    public interface MapUpdateListener {
+        void onMapReady();
+
+        void onEstimatedTimeUpdated(String newTime);
+
+        void onMapError(String errorString);
+
+        void onMapClicked(double latitude, double longitude);
+    }
 }

@@ -2,9 +2,13 @@ package minicap.concordia.campusnav.map;
 
 import android.graphics.Color;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
@@ -25,24 +29,33 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class InternalGoogleMaps extends AbstractMap{
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+
+public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
     private final float defaultZoom = 18;
-    private final GoogleMap mMap;
+    private GoogleMap mMap;
+
     private List<Polyline> polylines = new ArrayList<>();
 
     private List<Marker> markers = new ArrayList<>();
 
-    public InternalGoogleMaps(GoogleMap map){
-        mMap = map;
+    private SupportMapFragment mapFrag;
+
+    public InternalGoogleMaps(MapUpdateListener listener){
+        super(listener);
+    }
+
+    @Override
+    public Fragment initialize() {
+        mapFrag = SupportMapFragment.newInstance();
+
+        mapFrag.getMapAsync(this);
+
+        return mapFrag;
     }
 
     public List<Polyline> getPolylines() {
         return polylines;
-    }
-
-    @Override
-    public void centerOnCoordinates(float latitude, float longitude) {
-        centerOnCoordinates((double)latitude, (double)longitude);
     }
 
     @Override
@@ -69,50 +82,33 @@ public class InternalGoogleMaps extends AbstractMap{
 
     /**
      * Adds a marker to the map based on position with the title and color given, with the option to clear other markers
-     * @param position The position of the marker
+     * @param lat The latitude position of the marker
+     * @param lng The longitude position of the marker
      * @param title The title used for the marker
      * @param color The color of the marker (use BitmapDescriptorFactory to get the color float)
      * @param clearOtherMarkers Flag to indicate whether to clear other markers on the map
      */
-    public void addMarker(LatLng position, String title, float color, boolean clearOtherMarkers){
+    public void addMarker(double lat, double lng, String title, float color, boolean clearOtherMarkers){
         if(clearOtherMarkers) {
             clearAllMarkers();
         }
 
         MarkerOptions newMarker = new MarkerOptions()
                                         .icon(BitmapDescriptorFactory.defaultMarker(color))
-                                        .position(position)
+                                        .position(new LatLng(lat, lng))
                                         .title(title);
         markers.add(mMap.addMarker(newMarker));
     }
 
-    /**
-     * Adds a marker to the map using the default color, does not clear other markers
-     * @param position The position of the marker
-     * @param title The title of the marker
-     */
-    public void addMarker(LatLng position, String title) {
-        addMarker(position, title, BitmapDescriptorFactory.HUE_RED, false);
+    public void addMarker(double lat, double lng, String title) {
+        addMarker(lat, lng, title, BitmapDescriptorFactory.HUE_RED, false);
     }
 
-    /**
-     * Adds a marker to the map, does not clear other markers
-     * @param position The position of the marker
-     * @param title The title of the marker
-     * @param color The color of the marker (use BitmapDescriptorFactory to get the color float)
-     */
-    public void addMarker(LatLng position, String title, float color) {
-        addMarker(position, title, color, false);
+    public void addMarker(double lat, double lng, String title, float color) {
+        addMarker(lat, lng, title, color, false);
     }
-
-    /**
-     * Adds a marker to the map, clearing other markers if desired
-     * @param position The position of the marker
-     * @param title The title of the marker
-     * @param clearOtherMarkers Flag indicating whether to clear other markers
-     */
-    public void addMarker(LatLng position, String title, boolean clearOtherMarkers) {
-        addMarker(position, title, BitmapDescriptorFactory.HUE_RED, clearOtherMarkers);
+    public void addMarker(double lat, double lng, String title, boolean clearOtherMarkers) {
+        addMarker(lat, lng, title, BitmapDescriptorFactory.HUE_RED, clearOtherMarkers);
     }
 
     /**
@@ -137,12 +133,17 @@ public class InternalGoogleMaps extends AbstractMap{
     /**
      * Removes all polylines from the map (used for route)
      */
-    public void clearPolyLines(){
+    public void clearPathFromMap(){
         for (Iterator<Polyline> it = polylines.iterator(); it.hasNext();) {
             Polyline polyline = it.next();
             polyline.remove();
             it.remove();
         }
+    }
+
+    @Override
+    public void displayRoute(double originLat, double originLng, double destinationLat, double destinationLng, String travelMode) {
+        new FetchPathTask(this).fetchRoute(new LatLng(originLat, originLng), new LatLng(destinationLat, destinationLng), travelMode);
     }
 
     @Override
@@ -154,14 +155,6 @@ public class InternalGoogleMaps extends AbstractMap{
             Log.d("InternalGoogleMaps", "Permissions not granted for location");
             return false;
         }
-    }
-
-    /**
-     * Sets an onClick listener for the map
-     * @param listener The listener to be set
-     */
-    public void setOnMapClickListener(GoogleMap.OnMapClickListener listener) {
-        mMap.setOnMapClickListener(listener);
     }
 
     /**
@@ -220,6 +213,46 @@ public class InternalGoogleMaps extends AbstractMap{
             }
 
             addPolyline(polylineOptions);
+        }
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+
+        addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
+        addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+                listener.onMapClicked(latLng.latitude, latLng.longitude);
+            }
+        });
+
+        isMapReady = true;
+
+        listener.onMapReady();
+    }
+
+    @Override
+    public void onRouteFetched(JSONArray info) {
+        try {
+            JSONArray steps = info.getJSONArray(0);
+            String estimatedTimeValue = info.getString(1);
+            listener.onEstimatedTimeUpdated(estimatedTimeValue);
+
+            // Handles Route not fetched
+            if (steps == null) {
+                listener.onMapError("Error while fetching route, JSON info is null");
+                return;
+            }
+
+            parseRoutePolylineAndDisplay(steps);
+
+        } catch (JSONException e) {
+            Log.e("Route Parsing Error", e.toString());
+            listener.onMapError("Exception while parsing the google maps route: " + e.getMessage());
         }
     }
 }

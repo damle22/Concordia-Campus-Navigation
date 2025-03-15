@@ -26,8 +26,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 BuildingName.HALL,
                                 BuildingName.MOLSON_SCHOOL_OF_BUSINESS
                         )),
-                        45.49701f,
-                        -73.57877f)
+                        45.49701,
+                        -73.57877)
                 },
                 {
                     "CampusLoyola", new Campus(
@@ -37,8 +37,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 BuildingName.VANIER_EXTENSION,
                                 BuildingName.VANIER_LIBRARY
                         )),
-                        45.45863f,
-                        -73.64188f)
+                        45.45863,
+                        -73.64188)
                 },
                 {
                     "BuildingHall", new Building(
@@ -51,8 +51,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("8", new BuildingFloor("8", BuildingName.HALL, "none")),
                                 entry("9", new BuildingFloor("9", BuildingName.HALL, "none"))
                         )),
-                        45.49701f,
-                        -73.57877f)
+                        45.49701,
+                        -73.57877)
                 },
                 {
                     "BuildingJMSB", new Building(
@@ -63,8 +63,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("1", new BuildingFloor("1", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "none")),
                                 entry("S2", new BuildingFloor("S2", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "none"))
                         )),
-                        45.45863f,
-                        -73.57906f)
+                        45.45863,
+                        -73.57906)
                 },
                 {
                     "BuildingCC", new Building(
@@ -74,8 +74,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         new HashMap<>(Map.ofEntries(
                                 entry("1", new BuildingFloor("1", BuildingName.LOYOLA_CENTRAL_BUILDING, "none"))
                         )),
-                        45.45863f,
-                        -73.64066f)
+                        45.45863,
+                        -73.64066)
                 },
                 {
                     "BuildingVL", new Building(
@@ -86,8 +86,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("1", new BuildingFloor("1", BuildingName.VANIER_LIBRARY, "none")),
                                 entry("2", new BuildingFloor("2", BuildingName.VANIER_LIBRARY, "none"))
                         )),
-                        45.45891f,
-                        -73.63888f)
+                        45.45891,
+                        -73.63888)
                 },
                 {
                     "BuildingVE", new Building(
@@ -98,8 +98,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("1", new BuildingFloor("1", BuildingName.VANIER_EXTENSION, "none")),
                                 entry("2", new BuildingFloor("2", BuildingName.VANIER_EXTENSION, "none"))
                         )),
-                        45.45891f,
-                        -73.63888f)
+                        45.45891,
+                        -73.63888)
                 }
         };
     }
