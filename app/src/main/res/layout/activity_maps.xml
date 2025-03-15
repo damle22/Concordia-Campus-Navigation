@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- FrameLayout to contain the ConstraintLayout from main -->
+    <!-- Main Content Container from the main branch -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -171,6 +171,14 @@
                 app:layout_constraintEnd_toEndOf="@+id/searchArea"
                 app:layout_constraintStart_toStartOf="@+id/searchArea"
                 app:layout_constraintTop_toTopOf="@+id/searchArea" />
+
+            <!-- Added from your branch: a container for the Building Selector Fragment -->
+            <FrameLayout
+                android:id="@+id/buildingSelectorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 
@@ -183,3 +191,4 @@
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
