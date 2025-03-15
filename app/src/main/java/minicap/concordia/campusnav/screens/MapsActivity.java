@@ -19,6 +19,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
@@ -174,9 +175,23 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
         TextInputEditText searchText = findViewById(R.id.genericSearchField);
 
-        searchText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                launchSearchActivity("", false);
+
+        //Add main menu functionality to page
+        View slidingMenu = findViewById(R.id.sliding_menu);
+        ImageButton openMenuButton = findViewById(R.id.menuButton);
+        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
+        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
+        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
+        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
+        MainMenuController menu = new MainMenuController(slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
+
+
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity("", false);
+                }
             }
         });
 
