@@ -55,7 +55,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         45.49701f,
                         -73.57877f,
                         R.drawable.hallbuilding,
-                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8"
+                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
+                        BuildingName.HALL
                 )},
                 {
                     "BuildingJMSB", new Building(
@@ -69,7 +70,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         45.45863f,
                         -73.57906f,
                         0,
-                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8"
+                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
+                        BuildingName.MOLSON_SCHOOL_OF_BUSINESS
                 )},
                 {
                     "BuildingCC", new Building(
@@ -82,7 +84,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         45.45863f,
                         -73.64066f,
                         0,
-                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8"
+                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
+                        BuildingName.LOYOLA_CENTRAL_BUILDING
                 )},
                 {
                     "BuildingVL", new Building(
@@ -96,7 +99,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         45.45891f,
                         -73.63888f,
                         0,
-                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8"
+                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
+                        BuildingName.VANIER_LIBRARY
                 )},
                 {
                     "BuildingVE", new Building(
@@ -110,7 +114,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         45.45891f,
                         -73.63888f,
                         0,
-                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8"
+                        "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
+                        BuildingName.VANIER_EXTENSION
                 )}
         };
     }

@@ -1,6 +1,7 @@
 package minicap.concordia.campusnav.components;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +29,28 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
     private TextView buildingNameText, buildingAddress, buildingDetails;
     private ImageView buildingImage;
     private ImageButton directionsButton;
+
+    public interface BuildingInfoListener {
+        void directionButtonOnClick(Building building);
+    }
+
+    private BuildingInfoListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof BuildingInfoListener) {
+            listener = (BuildingInfoListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement BuildingInfoListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
 
     /**
      * Factory method to create a new instance of the Bottom Sheet with a given building name.
@@ -95,29 +118,24 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
         buildingNameText.setText(building.getBuildingName());
         buildingAddress.setText(building.getBuildingAddress());
         buildingDetails.setText(building.getDescription());
+        directionsButton.setImageResource(R.drawable.ic_directions);
 
         if (building.getBuildingImageRes() != 0) {
             buildingImage.setImageResource(building.getBuildingImageRes());
         }
 
         // Set click listener for the Directions button
-        directionsButton.setOnClickListener(v -> showLocationPopup(building));
+        directionsButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.directionButtonOnClick(building);
+                dismiss();
+            }
+        });
     }
 
-    /**
-     * Displays a popup showing the building's latitude and longitude. Will be replaced with GoogleMaps implementation.
-     */
-    private void showLocationPopup(Building building) {
-        float[] location = building.getLocation();
-        if (location == null || location.length < 2) {
-            Log.e(TAG, "Invalid location data for building.");
-            return;
-        }
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Building Location")
-                .setMessage("Latitude: " + location[0] + "\nLongitude: " + location[1])
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                .show();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        listener = null;
     }
 }

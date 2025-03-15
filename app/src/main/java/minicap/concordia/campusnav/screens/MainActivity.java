@@ -39,30 +39,21 @@ public class MainActivity extends AppCompatActivity {
 
         Button sgwCampusBtn = (Button)findViewById(R.id.viewSGWCampusButton);
 
-//        sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                LatLng coords = null;
-//
-//                Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-//                float[] campusCoordinates = sgwCampus.getLocation();
-//                coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
-//
-//                Intent i = new Intent(MainActivity.this, MapsActivity.class);
-//                i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
-//                i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
-//                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-//                i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
-//                startActivity(i);            }
-//        });
-        // bottom sheet test to be removed, uncomment above
         sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Open Bottom Sheet for Testing
-                BuildingInfoBottomSheetFragment bottomSheet = BuildingInfoBottomSheetFragment.newInstance(BuildingName.HALL);
-                bottomSheet.show(getSupportFragmentManager(), "BuildingInfoBottomSheet");
-            }
+                LatLng coords = null;
+
+                Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
+                float[] campusCoordinates = sgwCampus.getLocation();
+                coords = new LatLng(campusCoordinates[0], campusCoordinates[1]);
+
+                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                i.putExtra(MapsActivity.KEY_STARTING_LAT, coords.latitude);
+                i.putExtra(MapsActivity.KEY_STARTING_LNG, coords.longitude);
+                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
+                i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
+                startActivity(i);            }
         });
 
         Button loyCampusBtn = (Button)findViewById(R.id.viewLoyCampusButton);

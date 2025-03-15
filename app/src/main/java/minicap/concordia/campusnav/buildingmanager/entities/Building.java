@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.buildingmanager.entities;
 import java.util.Collection;
 import java.util.HashMap;
 
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 
 public class Building extends Location{
@@ -13,11 +14,14 @@ public class Building extends Location{
 
     private String buildingAddress;
     private int buildingImageRes;
+
+    private BuildingName buildingIdentifier;
     private HashMap<String, BuildingFloor> floors;
 
 
 
-    public Building(String buildingName, String description, CampusName associatedCampus, HashMap<String, BuildingFloor> floors, float latitude, float longitude, int buildingImageRes, String buildingAddress) {
+
+    public Building(String buildingName, String description, CampusName associatedCampus, HashMap<String, BuildingFloor> floors, float latitude, float longitude, int buildingImageRes, String buildingAddress, BuildingName buildingIdentifier) {
         super(latitude, longitude);
         this.associatedCampus = associatedCampus;
         this.buildingName = buildingName;
@@ -25,8 +29,13 @@ public class Building extends Location{
         this.floors = floors;
         this.buildingImageRes = buildingImageRes;
         this.buildingAddress = buildingAddress;
+        this.buildingIdentifier = buildingIdentifier;
     }
 
+
+    public BuildingName getBuildingIdentifier() {
+        return buildingIdentifier;
+    }
     public String getBuildingAddress() {
         return buildingAddress;
     }
