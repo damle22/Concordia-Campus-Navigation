@@ -156,7 +156,6 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             mMap.setMyLocationEnabled(isEnabled);
             return true;
         } catch (SecurityException e) {
-            Log.d("InternalGoogleMaps", "Permissions not granted for location");
             return false;
         }
     }
@@ -233,8 +232,6 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 listener.onMapClicked(MapCoordinates.fromGoogleMapsLatLng(latLng));
             }
         });
-
-        isMapReady = true;
 
         listener.onMapReady();
     }

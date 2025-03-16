@@ -14,6 +14,7 @@ import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 
 public class ConcordiaBuildingManagerTests {
@@ -105,5 +106,19 @@ public class ConcordiaBuildingManagerTests {
             Assert.assertTrue(expectedFloorNames.contains(floor.getFloorName()));
             Assert.assertEquals(expectedBuildingName, floor.getAssociatedBuilding());
         }
+    }
+
+    @Test
+    public void BuildingManager_GetLocation_ReturnsCorrectLocation() {
+        ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
+
+        Building hallBuilding = manager.getBuilding(BuildingName.HALL);
+
+        MapCoordinates expectedCoords = new MapCoordinates(45.49701, -73.57877);
+
+        MapCoordinates actualCoords = hallBuilding.getLocation();
+
+        Assert.assertEquals(expectedCoords.getLat(), actualCoords.getLat(), 0.0001);
+        Assert.assertEquals(expectedCoords.getLng(), actualCoords.getLng(), 0.0001);
     }
 }

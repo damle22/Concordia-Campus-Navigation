@@ -1,5 +1,7 @@
 package minicap.concordia.campusnav.map;
 
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -31,6 +34,12 @@ public class InternalGoogleMapsTests {
 
     @Mock
     private GoogleMap mapMock;
+
+    @Before
+    public void setup() {
+        Mockito.reset(mockListener);
+        Mockito.reset(mapMock);
+    }
 
     @Test
     public void testCenterOnCoordinates() {
@@ -259,14 +268,14 @@ public class InternalGoogleMapsTests {
         String jsonResponse = "{\n" +
                 "    \"steps\" : [\n" +
                 "        {\n" +
-                "            \"travelMode\": \"WALK\",\n" +
+                "            \"travelMode\": \"TRANSIT\",\n" +
                 "            \"polyline\": {\n" +
                 "                \"encodedPolyline\": \"" + encodedLine + "\"\n" +
                 "            },\n" +
                 "            \"transitDetails\": {\n" +
                 "                \"transitLine\": {\n" +
                 "                    \"vehicle\":{\n" +
-                "                        \"type\": \"BUS/SUBWAY\"\n" +
+                "                        \"type\": \"SUBWAY\"\n" +
                 "                    },\n" +
                 "                    \"name\": \"Ligne Verte\"\n" +
                 "                }\n" +
@@ -294,5 +303,91 @@ public class InternalGoogleMapsTests {
             //Purposefully fail if there is a parsing exception
             Assert.fail("Exception while parsing the JSON: " + e.getMessage());
         }
+    }
+
+    @Test
+    public void testClearPathFromMap() {
+        //Create the first polyline information
+        LatLng firstExpectedPoint = new LatLng(0,0);
+        LatLng secondExpectedPoint = new LatLng(1,1);
+        List<LatLng> firstLineExpectedPointList = new ArrayList<>();
+        firstLineExpectedPointList.add(firstExpectedPoint);
+        firstLineExpectedPointList.add(secondExpectedPoint);
+        PolylineOptions firstLineExpectedOptions = new PolylineOptions()
+                .add(firstExpectedPoint)
+                .add(secondExpectedPoint);
+
+        Polyline firstPolyline = Mockito.mock(Polyline.class);
+        Mockito.when(firstPolyline.getPoints()).thenReturn(firstLineExpectedPointList);
+
+        //Create second polyline information
+        LatLng thirdExpectedPoint = new LatLng(2, 2);
+        LatLng fourthExpectedPoint = new LatLng(3, 3);
+        LatLng fifthExpectedPoint = new LatLng(4, 4);
+        List<LatLng> secondLineExpectedPointList = new ArrayList<>();
+        secondLineExpectedPointList.add(thirdExpectedPoint);
+        secondLineExpectedPointList.add(fourthExpectedPoint);
+        secondLineExpectedPointList.add(fifthExpectedPoint);
+        PolylineOptions secondLineExpectedOptions = new PolylineOptions()
+                .add(thirdExpectedPoint)
+                .add(fourthExpectedPoint)
+                .add(fifthExpectedPoint);
+
+        Polyline secondPolyline = Mockito.mock(Polyline.class);
+        Mockito.when(secondPolyline.getPoints()).thenReturn(secondLineExpectedPointList);
+
+        //Create the map mock
+        Mockito.when(mapMock.addPolyline(firstLineExpectedOptions)).thenReturn(firstPolyline);
+        Mockito.when(mapMock.addPolyline(secondLineExpectedOptions)).thenReturn(secondPolyline);
+
+        //Act
+        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+        igm.setMap(mapMock);
+
+        igm.addPolyline(firstLineExpectedOptions);
+        igm.addPolyline(secondLineExpectedOptions);
+
+        //Assert
+        List<Polyline> lines = igm.getPolylines();
+
+        Assert.assertEquals(2, lines.size());
+
+        igm.clearPathFromMap();
+
+        lines = igm.getPolylines();
+
+        Assert.assertEquals(0, lines.size());
+    }
+
+    @Test
+    public void testInitialize() {
+        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+
+        Fragment fragment = igm.initialize();
+
+        Assert.assertNotNull(fragment);
+    }
+
+    @Test
+    public void testSwitchToFloor() {
+        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+        igm.setMap(mapMock);
+
+        String floorName = "1";
+        igm.switchToFloor(floorName);
+
+        Mockito.verifyNoInteractions(mapMock);
+        Mockito.verifyNoInteractions(mockListener);
+    }
+
+    @Test
+    public void testOnMapReady() {
+        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+
+        igm.onMapReady(mapMock);
+
+        Mockito.verify(mapMock, Mockito.atLeast(2)).addPolygon(Mockito.any(PolygonOptions.class));
+        Mockito.verify(mapMock).setOnMapClickListener(Mockito.any(GoogleMap.OnMapClickListener.class));
+        Mockito.verify(mockListener).onMapReady();
     }
 }

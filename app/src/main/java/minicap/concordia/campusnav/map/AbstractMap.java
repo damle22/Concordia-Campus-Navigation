@@ -6,8 +6,6 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 
 public abstract class AbstractMap {
 
-    protected boolean isMapReady = false;
-
     protected MapUpdateListener listener;
 
     /**
