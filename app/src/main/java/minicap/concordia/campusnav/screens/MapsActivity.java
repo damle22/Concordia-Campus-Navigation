@@ -17,10 +17,12 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,8 +34,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+
+import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
+
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.textfield.TextInputEditText;
@@ -45,24 +53,18 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
-import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
-import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.FetchPathTask;
-import minicap.concordia.campusnav.map.InternalGoogleMaps;
-// Import the BuildingSelectorFragment from your branch package:
 import minicap.concordia.ca.BuildingSelectorFragment;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, BuildingInfoBottomSheetFragment.BuildingInfoListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
-
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
@@ -72,17 +74,20 @@ public class MapsActivity extends FragmentActivity
     private final LatLng defaultUserLocation = new LatLng(45.489682435037835, -73.58808030276997);
 
     private InternalGoogleMaps gMapController;
+
     private ActivityMapsBinding binding;
     private ConcordiaBuildingManager buildingManager;
 
     private double startingLat;
     private double startingLng;
-    private boolean isDestinationSet;
     private boolean showSGW;
-    private boolean hasUserLocationBeenSet;
 
+    private boolean isDestinationSet;
+    private boolean hasUserLocationBeenSet;
     private Button campusSwitchBtn;
+
     private TextView campusTextView;
+
     private String campusNotSelected;
 
     private EditText yourLocationEditText;
@@ -139,11 +144,13 @@ public class MapsActivity extends FragmentActivity
         campusTextView = findViewById(R.id.ToCampus);
         campusTextView.setText(campusNotSelected);
         campusSwitchBtn = findViewById(R.id.campusSwitch);
+
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
-        // Check location permission
+        // check location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
+            // request perm
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
@@ -151,6 +158,7 @@ public class MapsActivity extends FragmentActivity
             // start map
             initializeMap();
         }
+
 
         // Setup travel mode buttons
         walkButton = findViewById(R.id.walkButton);
@@ -170,9 +178,23 @@ public class MapsActivity extends FragmentActivity
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
         TextInputEditText searchText = findViewById(R.id.genericSearchField);
 
-        searchText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                launchSearchActivity("", false);
+
+        //Add main menu functionality to page
+        View slidingMenu = findViewById(R.id.sliding_menu);
+        ImageButton openMenuButton = findViewById(R.id.menuButton);
+        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
+        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
+        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
+        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
+        MainMenuController menu = new MainMenuController(slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
+
+
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    launchSearchActivity("", false);
+                }
             }
         });
 
@@ -279,13 +301,25 @@ public class MapsActivity extends FragmentActivity
         drawPath(startingPoint, destination);
     }
 
+    /**
+     * Toggles the map to either the SGW campus or the Loyola campus based on which was already focused
+     */
     private void toggleCampus() {
+        //flipping the state
         showSGW = !showSGW;
+
+        // getting the new campus location
         CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
         Campus curCampus = buildingManager.getCampus(wantedCampus);
         LatLng campusCoords = new LatLng(curCampus.getLocation()[0], curCampus.getLocation()[1]);
+
+        //moving the existing marker to the new campus location
         gMapController.addMarker(campusCoords, curCampus.getCampusName(), true);
+
+        //moving the existing marker to the new campus location
         gMapController.centerOnCoordinates(campusCoords.latitude, campusCoords.longitude);
+
+        //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
     }
 
@@ -317,16 +351,27 @@ public class MapsActivity extends FragmentActivity
         }
     }
 
+    /**
+     * Initializes google maps
+     */
     private void initializeMap() {
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
+
+    /**
+     * Callback for when google maps has loaded
+     * @param googleMap The loaded google map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gMapController = new InternalGoogleMaps(googleMap);
+
         gMapController.centerOnCoordinates(startingLat, startingLng);
+
+        // create building shapes
         gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
 
@@ -337,7 +382,7 @@ public class MapsActivity extends FragmentActivity
             setDestination(address, (float) latLng.latitude, (float) latLng.longitude);
         });
 
-        // Default is user location
+        //Enables location tracking on the map
         getUserLocationPath();
         enableMyLocation();
     }
@@ -388,19 +433,37 @@ public class MapsActivity extends FragmentActivity
         }
     }
 
+    //Note: It would be best if this was handled by the map class
+    /**
+     * This handles the calls to the map to create the route
+     * @param origin LatLng
+     * @param destination LatLng
+     */
     private void drawPath(LatLng origin, LatLng destination) {
-        if (!isDestinationSet) {
+        //In case someone changes their starting location before their destination
+        if(!isDestinationSet) {
             return;
         }
+
         gMapController.clearPolyLines();
         gMapController.clearAllMarkers();
         gMapController.addMarker(origin, "Current location", BitmapDescriptorFactory.HUE_AZURE);
+
         gMapController.addMarker(destination, "Destination");
-        gMapController.centerOnCoordinates(origin.latitude, origin.longitude);
+
+        gMapController.centerOnCoordinates(origin.latitude,origin.longitude);
+
         new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    //Note: It would be best if this is handled by the map class
+    /**
+     * Will add the route to the Map
+     * Invoked when the route is fetched by the Google API
+     * @param info JSONArray
+     */
     @Override
     public void onRouteFetched(JSONArray info) {
         try {
@@ -409,10 +472,12 @@ public class MapsActivity extends FragmentActivity
             String estimatedTimeValue = info.getString(1);
             estimatedTime.setText(getString(R.string.estimated_time, estimatedTimeValue));
 
+            // Handles Route not fetched
             if (steps == null) {
                 Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             gMapController.parseRoutePolylineAndDisplay(steps);
         } catch (JSONException e) {
             Log.e("Route Parsing Error", e.toString());
