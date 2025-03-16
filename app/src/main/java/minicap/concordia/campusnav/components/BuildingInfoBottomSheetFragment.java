@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.components;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -119,6 +120,8 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
         buildingAddress.setText(building.getBuildingAddress());
         buildingDetails.setText(building.getDescription());
         directionsButton.setImageResource(R.drawable.ic_directions);
+
+        buildingDetails.setMovementMethod(new ScrollingMovementMethod());
 
         if (building.getBuildingImageRes() != 0) {
             buildingImage.setImageResource(building.getBuildingImageRes());
