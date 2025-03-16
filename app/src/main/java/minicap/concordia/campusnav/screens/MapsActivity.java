@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 
+import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,6 +36,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -48,16 +52,16 @@ import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.InternalMappedIn;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.enums.MapColors;
+import minicap.concordia.ca.BuildingSelectorFragment;
 
 public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
-
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
-
     public static final String KEY_SHOW_SGW = "show_sgw";
+
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private AbstractMap map;
@@ -121,16 +125,22 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
         }
 
+        // Hook up the Buildings button to show the BuildingSelectorFragment
+        Button buildingViewButton = findViewById(R.id.buildingView);
+        buildingViewButton.setOnClickListener(v -> showBuildingSelectorFragment());
+
+        // Initialize BottomSheet
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
-        bottomSheetBehavior.setPeekHeight(peekHeightPx); // Set peek height
-        bottomSheetBehavior.setHideable(false); // Prevent complete hiding
-        bottomSheetBehavior.setFitToContents(true); // Lock to collapsed or expanded state
-        bottomSheetBehavior.setHalfExpandedRatio(0.01f); // Disable half-expanded state
+        bottomSheetBehavior.setPeekHeight(peekHeightPx);
+        bottomSheetBehavior.setHideable(false);
+        bottomSheetBehavior.setFitToContents(true);
+        bottomSheetBehavior.setHalfExpandedRatio(0.01f);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
+        // Setup campus switching
         campusTextView = findViewById(R.id.ToCampus);
         campusTextView.setText(campusNotSelected);
         campusSwitchBtn = findViewById(R.id.campusSwitch);
@@ -149,23 +159,24 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
             initializeMap();
         }
 
+
+        // Setup travel mode buttons
         walkButton = findViewById(R.id.walkButton);
         wheelchairButton = findViewById(R.id.wheelchairButton);
         carButton = findViewById(R.id.carButton);
         transitButton = findViewById(R.id.transitButton);
 
-        //Default mode
+        // Default mode is car
         carButton.setSelected(true);
 
         walkButton.setOnClickListener(v -> changeSelectedTravelMethod(walkButton, "WALK"));
 
         //google maps does not support "wheelchair" for now, travelMode is the same as walking
         wheelchairButton.setOnClickListener(v -> changeSelectedTravelMethod(wheelchairButton, "WALK"));
-
         carButton.setOnClickListener(v -> changeSelectedTravelMethod(carButton, "DRIVE"));
-
         transitButton.setOnClickListener(v -> changeSelectedTravelMethod(transitButton, "TRANSIT"));
 
+        // Setup text fields
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
 
         searchText = findViewById(R.id.genericSearchField);
@@ -189,33 +200,23 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
             }
         });
 
-        yourLocationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
-                    launchSearchActivity(yourLocationEditText.getText().toString(), true);
-                }
+        yourLocationEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                launchSearchActivity(yourLocationEditText.getText().toString(), true);
             }
         });
 
         destinationEditText = findViewById(R.id.destinationText);
-
-        destinationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
-                    launchSearchActivity(destinationEditText.getText().toString(), false);
-                }
+        destinationEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                launchSearchActivity(destinationEditText.getText().toString(), false);
             }
         });
 
-        searchLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        HandleSearchLocationResult(result);
-                    }
-                });
+        // Register your activity result launcher
+        searchLocationLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::HandleSearchLocationResult);
 
         getUserLocationPath();
     }
@@ -270,7 +271,6 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         Intent i = new Intent(MapsActivity.this, LocationSearchActivity.class);
         i.putExtra(LocationSearchActivity.KEY_IS_STARTING_LOCATION, isStartingLocation);
         i.putExtra(LocationSearchActivity.KEY_PREVIOUS_INPUT_STRING, previousInput);
-
         searchLocationLauncher.launch(i);
     }
 
@@ -326,7 +326,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
     /**
      * Toggles the map to either the SGW campus or the Loyola campus based on which was already focused
      */
-    private void toggleCampus(){
+    private void toggleCampus() {
         //flipping the state
         showSGW = !showSGW;
 
@@ -363,21 +363,24 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // start map
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initializeMap();
             } else {
-                // error if no perm
-                Toast.makeText(this, "Location permission is required to show your location", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        "Location permission is required to show your location",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     /**
-     * Initializes the desired map (for now, google only)
+     * Initializes the desired map
      */
     private void initializeMap() {
         map = new InternalMappedIn(this);
@@ -405,11 +408,11 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
      * Gets the User Location and invokes drawPath
      */
     private void getUserLocationPath() {
-        if(fusedLocationClient == null) {
+        if (fusedLocationClient == null) {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, location -> {
@@ -421,7 +424,8 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
                         }
                     });
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
@@ -438,8 +442,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
             if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                return address.getAddressLine(0);  // Return the first address line
+                return addresses.get(0).getAddressLine(0);
             } else {
                 return "Address not found";
             }
@@ -499,6 +502,11 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         setDestination(address, coordinates);
     }
 
+    // Show building selector fragment
+    private void showBuildingSelectorFragment() {
+        BuildingSelectorFragment fragment = new BuildingSelectorFragment();
+        fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
+    }
 }
 
 

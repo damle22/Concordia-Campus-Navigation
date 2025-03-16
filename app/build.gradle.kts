@@ -35,6 +35,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
+
+        dataBinding = true   // added from my branch
         viewBinding = true
         buildConfig = true
     }
@@ -62,6 +64,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.maps.android:android-maps-utils:3.10.0")
     implementation("com.mappedin.sdk:mappedin:5.7.1")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.core:core-ktx:1.15.0")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -70,4 +76,11 @@ dependencies {
     testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.mockito:mockito-core:5.16.0")
     testImplementation("org.json:json:20250107")
+
+    androidTestImplementation( "androidx.test.espresso:espresso-contrib:3.6.1")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.fragment:fragment-testing:1.5.7")
+
+
 }
