@@ -137,7 +137,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         )),
                         45.45891f,
                         -73.63888f,
-                        R.drawable.vanier_extension,
+                        R.drawable.vanier_library,
                         "7141 Rue Sherbrooke O, Montréal, QC H4B 1R6",
                         BuildingName.VANIER_EXTENSION
                 )}
