@@ -259,4 +259,12 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             listener.onMapError("Exception while parsing the google maps route: " + e.getMessage());
         }
     }
+
+    /**
+     * Sets the map (used for testing)
+     * @param map The mocked google map
+     */
+    public void setMap(GoogleMap map) {
+        mMap = map;
+    }
 }

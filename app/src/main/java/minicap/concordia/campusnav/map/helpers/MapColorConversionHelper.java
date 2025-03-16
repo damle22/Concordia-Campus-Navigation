@@ -25,7 +25,7 @@ public class MapColorConversionHelper {
      * @param color The color enum
      * @return string html that contains color information
      */
-    public static String MappedInMarkerHTML(MapColors color, String title) {
+    public static String getMappedInMarkerHTML(MapColors color, String title) {
         StringBuilder builder = new StringBuilder();
         builder.append("<div style=\"background-color:white; border: 2px solid ");
         switch(color){

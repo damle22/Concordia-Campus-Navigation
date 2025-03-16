@@ -44,7 +44,7 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
             clearAllMarkers();
         }
 
-        String markerHTML = MapColorConversionHelper.MappedInMarkerHTML(color, title);
+        String markerHTML = MapColorConversionHelper.getMappedInMarkerHTML(color, title);
 
         MPIMap.MPICoordinate coord = position.toMappedInCoordinate(curMap.getCurrentMap());
         curMap.getMarkerManager().addByCoordinate(coord,
