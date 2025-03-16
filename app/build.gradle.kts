@@ -52,6 +52,14 @@ android {
         unitTests.isReturnDefaultValues = true
         unitTests.isIncludeAndroidResources = true
     }
+
+    packagingOptions {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/LICENSE"
+        }
+    }
 }
 
 dependencies {
@@ -85,9 +93,13 @@ dependencies {
     androidTestImplementation ("androidx.fragment:fragment-testing:1.5.7")
 
     implementation("com.google.android.gms:play-services-auth:21.3.0")
-    implementation("com.google.api-client:google-api-client-android:1.33.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
-    implementation("com.google.http-client:google-http-client-gson:1.42.3")
+    implementation("com.google.api-client:google-api-client-android:1.33.0") {
+        exclude(group = "org.apache.httpcomponents")
+    }
+    implementation("com.google.http-client:google-http-client-gson:1.42.3") {
+        exclude(module = "httpclient")
+    }
 }
 
 
