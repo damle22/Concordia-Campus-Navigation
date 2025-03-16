@@ -1,4 +1,4 @@
-package minicap.concordia.ca
+package minicap.concordia.campusnav.components
 
 import android.app.AlertDialog
 import android.os.Bundle

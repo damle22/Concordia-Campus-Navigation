@@ -51,7 +51,7 @@ import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.InternalMappedIn;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.enums.MapColors;
-import minicap.concordia.ca.BuildingSelectorFragment;
+import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
 
 public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener {
