@@ -1,6 +1,7 @@
 package minicap.concordia.campusnav.screens;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 import android.content.Intent;
 import android.location.Address;
@@ -8,13 +9,14 @@ import android.location.Geocoder;
 
 import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -36,9 +38,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.textfield.TextInputEditText;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +52,7 @@ import minicap.concordia.campusnav.map.InternalMappedIn;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.ca.BuildingSelectorFragment;
+import minicap.concordia.campusnav.map.enums.SupportedMaps;
 
 public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener {
 
@@ -103,6 +103,10 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
 
     private MapCoordinates origin;
 
+    private SupportedMaps currentMap;
+
+    private Fragment curMapFragment;
+
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
 
@@ -115,6 +119,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         isDestinationSet = false;
         hasUserLocationBeenSet = false;
         buildingManager = ConcordiaBuildingManager.getInstance();
+        currentMap = SupportedMaps.GOOGLE_MAPS;
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -156,7 +161,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
             // start map
-            initializeMap();
+            initializeMap(false);
         }
 
 
@@ -190,6 +195,8 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
         MainMenuController menu = new MainMenuController(slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
 
+        Button switchMap = findViewById(R.id.switchMapButton);
+        switchMap.setOnClickListener(v -> switchCurrentMap());
 
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -370,7 +377,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initializeMap();
+                initializeMap(false);
             } else {
                 Toast.makeText(this,
                         "Location permission is required to show your location",
@@ -380,19 +387,48 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
     }
 
     /**
-     * Initializes the desired map
+     * Switches the current map to a different supported map
      */
-    private void initializeMap() {
-        map = new InternalMappedIn(this);
-
-//        map = new InternalGoogleMaps(this);
-        Fragment mapFragment = map.initialize();
+    private void switchCurrentMap() {
+        if(currentMap == SupportedMaps.GOOGLE_MAPS) {
+            currentMap = SupportedMaps.MAPPED_IN;
+        }
+        else {
+            currentMap = SupportedMaps.GOOGLE_MAPS;
+        }
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.map, mapFragment)
+                .remove(curMapFragment)
                 .commit();
 
-        campusSwitchBtn.setVisibility(GONE);
+        initializeMap(true);
+    }
+
+    /**
+     * Initializes the desired map
+     */
+    private void initializeMap(boolean replace) {
+        if(currentMap == SupportedMaps.GOOGLE_MAPS) {
+            map = new InternalGoogleMaps(this);
+            campusSwitchBtn.setVisibility(VISIBLE);
+        }
+        else {
+            map = new InternalMappedIn(this);
+            campusSwitchBtn.setVisibility(GONE);
+        }
+
+        curMapFragment = map.initialize();
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        if(replace) {
+            ft.replace(R.id.map, curMapFragment);
+        }
+        else {
+            ft.add(R.id.map, curMapFragment);
+        }
+
+        ft.commit();
     }
 
     /**
