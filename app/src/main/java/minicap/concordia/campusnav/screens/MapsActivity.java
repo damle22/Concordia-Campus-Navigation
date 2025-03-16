@@ -1,7 +1,8 @@
 package minicap.concordia.campusnav.screens;
 
+import static android.view.View.GONE;
+
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 
@@ -27,7 +28,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import android.widget.EditText;
 
 
@@ -46,6 +46,8 @@ import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.map.AbstractMap;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.InternalMappedIn;
+import minicap.concordia.campusnav.map.MapCoordinates;
+import minicap.concordia.campusnav.map.enums.MapColors;
 
 public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener {
 
@@ -62,9 +64,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
 
     private ConcordiaBuildingManager buildingManager;
 
-    private double startingLat;
-
-    private double startingLng;
+    private MapCoordinates startingCoords;
 
     private boolean isDestinationSet;
 
@@ -95,11 +95,9 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
 
     private String travelMode = "DRIVE";
 
-    private double destinationLat;
-    private double destinationLng;
+    private MapCoordinates destination;
 
-    private double originLat;
-    private double originLng;
+    private MapCoordinates origin;
 
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
@@ -116,8 +114,9 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            startingLat = bundle.getDouble(KEY_STARTING_LAT);
-            startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            double startingLat = bundle.getDouble(KEY_STARTING_LAT);
+            double startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            startingCoords = new MapCoordinates(startingLat, startingLng);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
         }
@@ -252,12 +251,13 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
         double lat = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
         double lng = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
+        MapCoordinates newCoords = new MapCoordinates(lat, lng);
         if(isDestination) {
-            setDestination(returnedLocation, lat, lng);
+            setDestination(returnedLocation, newCoords);
         }
         else {
             boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
-            setStartingPoint(useCurrentLocation, returnedLocation, lat, lng);
+            setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
     }
 
@@ -278,28 +278,30 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
      * Sets the starting point used for navigation
      * @param useCurrentLocation Flag indicating whether to use the current location of the user
      * @param locationString The name of the location
-     * @param lat The latitude of the location
-     * @param lng The longitude of the location
+     * @param coordinates The coordinates of the starting point
      */
-    private void setStartingPoint(boolean useCurrentLocation, String locationString, double lat, double lng) {
-        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + "), is current location: " + useCurrentLocation);
+    private void setStartingPoint(boolean useCurrentLocation, String locationString, MapCoordinates coordinates) {
+        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + coordinates.getLat() + ", " + coordinates.getLng() + "), is current location: " + useCurrentLocation);
 
         if(useCurrentLocation && !hasUserLocationBeenSet) {
             //getUserLocationPath will set the starting point and then call this again
             getUserLocationPath();
             return;
         }
-
+        String yourLocationText;
         if(useCurrentLocation) {
-            yourLocationEditText.setText(R.string.your_location);
+            yourLocationText = getString(R.string.your_location);
         }
         else {
             //Reset this flag in case the user wants to use their own location in the future
             hasUserLocationBeenSet = false;
-            originLat = lat;
-            originLng = lng;
-            yourLocationEditText.setText(locationString);
+            origin = coordinates;
+            yourLocationText = locationString;
         }
+
+        runOnUiThread(() -> {
+            yourLocationEditText.setText(yourLocationText);
+        });
 
         drawPath();
     }
@@ -307,15 +309,15 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
     /**
      * Sets the destination used for navigation
      * @param locationString The name of the location
-     * @param lat The location's latitude
-     * @param lng The location's longitude
+     * @param coordinates The coordinates of the location
      */
-    private void setDestination(String locationString, double lat, double lng) {
-        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + lat + ", " + lng + ")");
+    private void setDestination(String locationString, MapCoordinates coordinates) {
+        Log.d(MAPS_ACTIVITY_TAG, "Set destination to: " + locationString + " with coords: (" + coordinates.getLat() + ", " + coordinates.getLng() + ")");
 
-        destinationLat = lat;
-        destinationLng = lng;
-        destinationEditText.setText(locationString);
+        destination = coordinates;
+        runOnUiThread(() -> {
+            destinationEditText.setText(locationString);
+        });
         isDestinationSet = true;
 
         drawPath();
@@ -331,13 +333,13 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         // getting the new campus location
         CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
         Campus curCampus = buildingManager.getCampus(wantedCampus);
-        double[] campusCoords = curCampus.getLocation();
+        MapCoordinates campusCoords = curCampus.getLocation();
 
         //moving the existing marker to the new campus location
-        map.addMarker(campusCoords[0], campusCoords[1], curCampus.getCampusName(), true);
+        map.addMarker(campusCoords, curCampus.getCampusName(), true);
 
         //moving the camera smoothly to the new campus location
-        map.centerOnCoordinates(campusCoords[0], campusCoords[1]);
+        map.centerOnCoordinates(campusCoords);
 
         //updating the button text
         campusTextView.setText(showSGW ? "SGW" : "LOY");
@@ -386,6 +388,8 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.map, mapFragment)
                 .commit();
+
+        campusSwitchBtn.setVisibility(GONE);
     }
 
     /**
@@ -411,10 +415,9 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
                     .addOnSuccessListener(this, location -> {
                         if (location != null) {
                             //If you are emulating and need to change your current location, use the emulator controls.
-                            originLat = location.getLatitude();
-                            originLng = location.getLongitude();
+                            origin = new MapCoordinates(location.getLatitude(), location.getLongitude());
                             hasUserLocationBeenSet = true;
-                            setStartingPoint(true, "", 0, 0);
+                            setStartingPoint(true, "", origin);
                         }
                     });
         } else {
@@ -457,20 +460,20 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
 
         map.clearPathFromMap();
         map.clearAllMarkers();
-        map.addMarker(originLat, originLng, "Starting location", BitmapDescriptorFactory.HUE_AZURE);
+        map.addMarker(origin, "Starting location", MapColors.BLUE);
 
-        map.addMarker(destinationLat, destinationLng, "Destination");
+        map.addMarker(destination, "Destination");
 
-        map.centerOnCoordinates(originLat, originLng);
+        map.centerOnCoordinates(origin);
 
-        map.displayRoute(originLat, originLng, destinationLat, destinationLng, travelMode);
+        map.displayRoute(origin, destination, travelMode);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     @Override
     public void onMapReady() {
-        map.centerOnCoordinates(startingLat, startingLng);
+        map.centerOnCoordinates(startingCoords);
 
         //By default, origin is user location
         enableMyLocation();
@@ -490,10 +493,10 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
     }
 
     @Override
-    public void onMapClicked(double latitude, double longitude) {
-        String address = getAddressFromLocation(latitude, longitude);
-        map.addMarker(latitude, longitude, "Clicked location", true);
-        setDestination(address, latitude, longitude);
+    public void onMapClicked(MapCoordinates coordinates) {
+        String address = getAddressFromLocation(coordinates.getLat(), coordinates.getLng());
+        map.addMarker(coordinates, "Clicked location", true);
+        setDestination(address, coordinates);
     }
 
 }

@@ -17,14 +17,11 @@ import com.mappedin.sdk.models.MPINavigatable;
 import com.mappedin.sdk.models.MPIState;
 import com.mappedin.sdk.web.MPIOptions;
 
-import java.util.Iterator;
-import java.util.List;
-
 import minicap.concordia.campusnav.components.MappedInFragment;
+import minicap.concordia.campusnav.map.enums.MapColors;
+import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalMappedIn extends AbstractMap implements MPIMapViewListener, MPIMapClickListener {
-
-    private List<String> markers;
 
     private MappedInFragment mappedInFragment;
 
@@ -42,32 +39,38 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
     }
 
     @Override
-    public void addMarker(double lat, double lng, String title, float color, boolean clearOtherMarkers) {
+    public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers) {
         if(clearOtherMarkers) {
             clearAllMarkers();
         }
 
-        
+        String markerHTML = MapColorConversionHelper.MappedInMarkerHTML(color, title);
+
+        MPIMap.MPICoordinate coord = position.toMappedInCoordinate(curMap.getCurrentMap());
+        curMap.getMarkerManager().addByCoordinate(coord,
+                markerHTML,
+                new MPIOptions.Marker(),
+                null);
     }
 
     @Override
-    public void addMarker(double lat, double lng, String title, float color) {
-        addMarker(lat, lng, title, color, false);
+    public void addMarker(MapCoordinates position, String title, MapColors color) {
+        addMarker(position, title, color, false);
     }
 
     @Override
-    public void addMarker(double lat, double lng, String title, boolean clearOtherMarkers) {
-        addMarker(lat, lng, title, 0, clearOtherMarkers);
+    public void addMarker(MapCoordinates position, String title, boolean clearOtherMarkers) {
+        addMarker(position, title, MapColors.DEFAULT, clearOtherMarkers);
     }
 
     @Override
-    public void addMarker(double lat, double lng, String title) {
-        addMarker(lat, lng, title, 0, false);
+    public void addMarker(MapCoordinates position, String title) {
+        addMarker(position, title, MapColors.DEFAULT, false);
     }
 
     @Override
     public void clearAllMarkers() {
-
+        curMap.getMarkerManager().removeAll();
     }
 
     @Override
@@ -76,12 +79,12 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
     }
 
     @Override
-    public void displayRoute(double originLat, double originLng, double destinationLat, double destinationLng, String travelMode) {
+    public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
 
     }
 
     @Override
-    public void centerOnCoordinates(double latitude, double longitude) {
+    public void centerOnCoordinates(MapCoordinates newCameraPosition) {
 
     }
 
@@ -92,32 +95,38 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
 
     @Override
     public boolean toggleLocationTracking(boolean isEnabled) {
-        return false;
+        if(isEnabled) {
+            curMap.getBlueDotManager().enable(new MPIOptions.BlueDot());
+        }
+        else {
+            curMap.getBlueDotManager().disable();
+        }
+        return true;
     }
 
     @Override
     public void onBlueDotPositionUpdate(@NonNull MPIBlueDotPositionUpdate mpiBlueDotPositionUpdate) {
-
+        //To be updated
     }
 
     @Override
     public void onDataLoaded(@NonNull MPIData mpiData) {
-
+        //Not used
     }
 
     @Override
     public void onMapChanged(@NonNull MPIMap mpiMap) {
-
+        //To be implemented when switching floors
     }
 
     @Override
     public void onPolygonClicked(@NonNull MPINavigatable.MPIPolygon mpiPolygon) {
-
+        //Maybe used in the future
     }
 
     @Override
     public void onNothingClicked() {
-
+        //Not used
     }
 
     @Override
@@ -131,16 +140,18 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
 
     @Override
     public void onStateChanged(@NonNull MPIState mpiState) {
-
+        //Not used
     }
 
     @Override
     public void onBlueDotStateChange(@NonNull MPIBlueDotStateChange mpiBlueDotStateChange) {
-
+        //Not used
     }
 
     @Override
     public void onClick(@NonNull MPIMapClickEvent mpiMapClickEvent) {
+        MPIMap.MPICoordinate coordinate = mpiMapClickEvent.getPosition();
 
+        listener.onMapClicked(MapCoordinates.fromMappedInCoordinate(coordinate));
     }
 }

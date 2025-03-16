@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+import minicap.concordia.campusnav.map.enums.MapColors;
+import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
     private final float defaultZoom = 18;
@@ -54,13 +56,17 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         return mapFrag;
     }
 
+    /**
+     * Returns the polylines of the current map
+     * @return List of Polyline objects
+     */
     public List<Polyline> getPolylines() {
         return polylines;
     }
 
     @Override
-    public void centerOnCoordinates(double latitude, double longitude){
-        LatLng concordia = new LatLng(latitude, longitude);
+    public void centerOnCoordinates(MapCoordinates coordinates){
+        LatLng concordia = coordinates.toGoogleMapsLatLng();
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
     }
@@ -80,40 +86,37 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         }
     }
 
-    /**
-     * Adds a marker to the map based on position with the title and color given, with the option to clear other markers
-     * @param lat The latitude position of the marker
-     * @param lng The longitude position of the marker
-     * @param title The title used for the marker
-     * @param color The color of the marker (use BitmapDescriptorFactory to get the color float)
-     * @param clearOtherMarkers Flag to indicate whether to clear other markers on the map
-     */
-    public void addMarker(double lat, double lng, String title, float color, boolean clearOtherMarkers){
+    @Override
+    public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers){
         if(clearOtherMarkers) {
             clearAllMarkers();
         }
 
+        float markerColor = MapColorConversionHelper.getGoogleMapsColor(color);
+
         MarkerOptions newMarker = new MarkerOptions()
-                                        .icon(BitmapDescriptorFactory.defaultMarker(color))
-                                        .position(new LatLng(lat, lng))
+                                        .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
+                                        .position(position.toGoogleMapsLatLng())
                                         .title(title);
         markers.add(mMap.addMarker(newMarker));
     }
 
-    public void addMarker(double lat, double lng, String title) {
-        addMarker(lat, lng, title, BitmapDescriptorFactory.HUE_RED, false);
+    @Override
+    public void addMarker(MapCoordinates position, String title) {
+        addMarker(position, title, MapColors.DEFAULT, false);
     }
 
-    public void addMarker(double lat, double lng, String title, float color) {
-        addMarker(lat, lng, title, color, false);
-    }
-    public void addMarker(double lat, double lng, String title, boolean clearOtherMarkers) {
-        addMarker(lat, lng, title, BitmapDescriptorFactory.HUE_RED, clearOtherMarkers);
+    @Override
+    public void addMarker(MapCoordinates position, String title, MapColors color) {
+        addMarker(position, title, color, false);
     }
 
-    /**
-     * Clears all the current markers from the map
-     */
+    @Override
+    public void addMarker(MapCoordinates position, String title, boolean clearOtherMarkers) {
+        addMarker(position, title, MapColors.DEFAULT, clearOtherMarkers);
+    }
+
+    @Override
     public void clearAllMarkers() {
         for (Iterator<Marker> allMarkers = markers.iterator(); allMarkers.hasNext();) {
             Marker cur = allMarkers.next();
@@ -133,6 +136,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     /**
      * Removes all polylines from the map (used for route)
      */
+    @Override
     public void clearPathFromMap(){
         for (Iterator<Polyline> it = polylines.iterator(); it.hasNext();) {
             Polyline polyline = it.next();
@@ -142,8 +146,8 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     }
 
     @Override
-    public void displayRoute(double originLat, double originLng, double destinationLat, double destinationLng, String travelMode) {
-        new FetchPathTask(this).fetchRoute(new LatLng(originLat, originLng), new LatLng(destinationLat, destinationLng), travelMode);
+    public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
+        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
     }
 
     @Override
@@ -226,7 +230,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(@NonNull LatLng latLng) {
-                listener.onMapClicked(latLng.latitude, latLng.longitude);
+                listener.onMapClicked(MapCoordinates.fromGoogleMapsLatLng(latLng));
             }
         });
 

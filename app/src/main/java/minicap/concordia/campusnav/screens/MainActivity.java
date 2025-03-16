@@ -12,6 +12,7 @@ import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-                double[] campusCoordinates = sgwCampus.getLocation();
+                MapCoordinates campusCoordinates = sgwCampus.getLocation();
 
                 Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates[0]);
-                i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates[1]);
+                i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
+                i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
                 i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
                 i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
                 startActivity(i);
@@ -52,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Campus loyolaCampus = buildingManager.getCampus(CampusName.LOYOLA);
-                double[] campusCoordinates = loyolaCampus.getLocation();
+                MapCoordinates campusCoordinates = loyolaCampus.getLocation();
 
                 Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates[0]);
-                i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates[1]);
+                i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
+                i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
                 i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
                 i.putExtra(MapsActivity.KEY_SHOW_SGW, false);
                 startActivity(i);
