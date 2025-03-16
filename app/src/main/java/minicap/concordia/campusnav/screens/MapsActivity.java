@@ -195,9 +195,6 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
         MainMenuController menu = new MainMenuController(slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
 
-        Button switchMap = findViewById(R.id.switchMapButton);
-        switchMap.setOnClickListener(v -> switchCurrentMap());
-
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
