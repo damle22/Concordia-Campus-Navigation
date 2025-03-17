@@ -73,7 +73,7 @@ public class ClassScheduleActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CALENDAR}, REQUEST_CALENDAR_PERMISSION);
         } else {
-            fetchCalendarEvents();
+            // fetchCalendarEvents();
         }
     }
 
