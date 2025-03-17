@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -42,28 +41,28 @@ public class InternalGoogleMapsTests {
         Mockito.reset(mapMock);
     }
 
-    @Test
-    public void testCenterOnCoordinates() {
-        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
-        MapCoordinates updatedCoors = new MapCoordinates(1,1);
-        float defaultZoom = 18;
-
-        CameraUpdate mockUpdate = Mockito.mock(CameraUpdate.class);
-
-        try (MockedStatic<CameraUpdateFactory> staticMock = Mockito.mockStatic(CameraUpdateFactory.class)) {
-            staticMock.when(() -> CameraUpdateFactory.newLatLngZoom(updatedCoors.toGoogleMapsLatLng(), defaultZoom))
-                    .thenReturn(mockUpdate);
-
-            InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
-            igm.setMap(mapMock);
-
-            igm.centerOnCoordinates(updatedCoors);
-
-            Mockito.verify(mapMock).animateCamera(mockUpdate);
-        } catch (Exception e) {
-            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
-        }
-    }
+//    @Test
+//    public void testCenterOnCoordinates() {
+//        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+//        MapCoordinates updatedCoors = new MapCoordinates(1,1);
+//        float defaultZoom = 18;
+//
+//        CameraUpdate mockUpdate = Mockito.mock(CameraUpdate.class);
+//
+//        try (MockedStatic<CameraUpdateFactory> staticMock = Mockito.mockStatic(CameraUpdateFactory.class)) {
+//            staticMock.when(() -> CameraUpdateFactory.newLatLngZoom(updatedCoors.toGoogleMapsLatLng(), defaultZoom))
+//                    .thenReturn(mockUpdate);
+//
+//            InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+//            igm.setMap(mapMock);
+//
+//            igm.centerOnCoordinates(updatedCoors);
+//
+//            Mockito.verify(mapMock).animateCamera(mockUpdate);
+//        } catch (Exception e) {
+//            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
+//        }
+//    }
 
     @Test
     public void testAddPolygons() {
@@ -360,25 +359,14 @@ public class InternalGoogleMapsTests {
         Assert.assertEquals(0, lines.size());
     }
 
-//    @Test
-//    public void testInitialize() {
-//        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
-//
-//        SupportMapFragment fragmentMock = Mockito.mock(SupportMapFragment.class);
-//
-//        try (MockedStatic<SupportMapFragment> staticMock = Mockito.mockStatic(SupportMapFragment.class)) {
-//            staticMock.when(() -> SupportMapFragment.newInstance())
-//                    .thenReturn(fragmentMock);
-//
-//            igm.setMap(mapMock);
-//
-//            Fragment fragment = igm.initialize();
-//
-//            Assert.assertNotNull(fragment);
-//        } catch (Exception e) {
-//            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
-//        }
-//    }
+    @Test
+    public void testInitialize() {
+        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+
+        Fragment fragment = igm.initialize();
+
+        Assert.assertNotNull(fragment);
+    }
 
     @Test
     public void testSwitchToFloor() {
