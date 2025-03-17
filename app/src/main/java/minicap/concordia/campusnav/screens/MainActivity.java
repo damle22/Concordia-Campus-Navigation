@@ -28,13 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         buildingManager = ConcordiaBuildingManager.getInstance();
 
-        // Add button click listener for CalendarImportActivity
-        Button btnOpenCalendarImport = findViewById(R.id.btnOpenCalendarImport);
-        btnOpenCalendarImport.setOnClickListener(v -> {
-            Intent calendarIntent = new Intent(MainActivity.this, CalendarImportActivity.class);
-            startActivity(calendarIntent);
-        });
-
         subscribeButtons(this);
     }
 
