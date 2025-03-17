@@ -80,7 +80,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:cornerFamily="rounded"
-        app:icon="@drawable/ic_import"
+        app:icon="@drawable/import_img"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         app:iconSize="24dp"
