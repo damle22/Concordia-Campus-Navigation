@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -363,9 +364,20 @@ public class InternalGoogleMapsTests {
     public void testInitialize() {
         InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
 
-        Fragment fragment = igm.initialize();
+        SupportMapFragment fragmentMock = Mockito.mock(SupportMapFragment.class);
 
-        Assert.assertNotNull(fragment);
+        try (MockedStatic<SupportMapFragment> staticMock = Mockito.mockStatic(SupportMapFragment.class)) {
+            staticMock.when(() -> SupportMapFragment.newInstance())
+                    .thenReturn(fragmentMock);
+
+            igm.setMap(mapMock);
+
+            Fragment fragment = igm.initialize();
+
+            Assert.assertNotNull(fragment);
+        } catch (Exception e) {
+            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
+        }
     }
 
     @Test
