@@ -54,12 +54,15 @@ import java.util.List;
 import java.util.Locale;
 
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.ca.BuildingSelectorFragment;
 
-public class MapsActivity extends FragmentActivity implements  OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
+public class MapsActivity extends FragmentActivity
+        implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, BuildingInfoBottomSheetFragment.BuildingInfoListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_LAT = "starting_lat";
@@ -486,4 +489,16 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         BuildingSelectorFragment fragment = new BuildingSelectorFragment();
         fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
     }
+    @Override
+    public void directionButtonOnClick(Building building) {
+        float[] location = building.getLocation();
+        if (location == null || location.length < 2) {
+            Log.e("MapsActivity", "Invalid location data for building.");
+            return;
+        }
+
+        LatLng destination = new LatLng(location[0], location[1]);
+        setDestination(building.getBuildingName(), (float) destination.latitude, (float) destination.longitude);
+    }
+
 }
