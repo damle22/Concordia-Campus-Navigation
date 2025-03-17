@@ -66,7 +66,8 @@ public class MainMenuController {
     }
 
     public void openCampusMap(){
-        //Open Intent
+        Intent intent = new Intent(context, MapsActivity.class);
+        context.startActivity(intent);
     }
 
     public void open(){
