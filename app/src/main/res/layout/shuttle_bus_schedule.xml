@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <!-- Bottom Sheet for Shuttle Bus Schedule -->
+    <LinearLayout
+        android:id="@+id/shuttle_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_burgundy"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <!-- Drag Handle -->
+            <View
+                android:layout_width="100dp"
+                android:layout_height="2dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/yellow" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+                <!-- Shuttle logo and Title -->
+                <ImageView
+                    android:id="@+id/bus_logo"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/button_selector"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_transit" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Concordia Shuttle Bus Service Schedule"
+                    android:textColor="@color/white"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+
+            <!-- Separator -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/yellow" />
+
+
+            <!-- SGW Departures -->
+            <LinearLayout
+                android:layout_width="406dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="SGW Depatures"
+                    android:textColor="@color/white"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+
+
+                <!-- Mon-thurs Button -->
+                <Button
+                    android:layout_width="102dp"
+                    android:layout_height="36dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/button_selector"
+                    android:text="Mon-Thurs"
+                    android:textColor="@color/black" />
+
+
+                <!-- Fri Button -->
+                <Button
+                    android:layout_width="102dp"
+                    android:layout_height="36dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/button_selector"
+                    android:text="Friday"
+                    android:textColor="@color/black" />
+
+
+            </LinearLayout>
+
+
+            <!-- Grid Timetable -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="249dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/white"
+                android:columnCount="5"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:rowCount="6" />
+
+
+        </LinearLayout>
+
+
+        <!-- Separator -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/yellow" />
+
+
+        <!-- LOY Departures -->
+        <LinearLayout
+            android:layout_width="406dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+
+            <!-- Mon-thurs Button -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="LOY Depatures"
+                android:textColor="@color/white"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+
+            <!-- Mon-thurs Button -->
+            <Button
+                android:layout_width="102dp"
+                android:layout_height="36dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/button_selector"
+                android:text="Mon-Thurs"
+                android:textColor="@color/black" />
+
+
+            <!-- Fri Button -->
+            <Button
+                android:layout_width="102dp"
+                android:layout_height="36dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/button_selector"
+                android:text="Friday"
+                android:textColor="@color/black" />
+
+
+        </LinearLayout>
+
+
+        <!-- Grid Timetable -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="249dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/white"
+            android:columnCount="5"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:rowCount="6" />
+
+
+    </LinearLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

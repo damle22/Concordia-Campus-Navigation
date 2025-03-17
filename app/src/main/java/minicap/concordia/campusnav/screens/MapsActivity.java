@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
@@ -129,6 +130,10 @@ public class MapsActivity extends FragmentActivity
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
         binding.buildingView.setOnClickListener(v -> showBuildingSelectorFragment());
+
+        // Shuttle Button to show the Shuttle Bus Schedule
+        Button shuttleScheduleView = findViewById(R.id.shuttleScheduleView);
+        shuttleScheduleView.setOnClickListener(v -> showShuttleScheduleFragment());
 
         // Initialize BottomSheet
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
@@ -489,6 +494,14 @@ public class MapsActivity extends FragmentActivity
         BuildingSelectorFragment fragment = new BuildingSelectorFragment();
         fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
     }
+
+    // Show shuttle schedule fragment
+    private void showShuttleScheduleFragment(){
+        ShuttleBusScheduleFragment shuttleBusScheduleFragment = new ShuttleBusScheduleFragment();
+        shuttleBusScheduleFragment.show(getSupportFragmentManager(), "ShuttleBusScheduleFragment");
+    }
+
+
     @Override
     public void directionButtonOnClick(Building building) {
         float[] location = building.getLocation();
