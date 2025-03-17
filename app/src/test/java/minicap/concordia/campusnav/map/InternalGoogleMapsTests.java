@@ -41,28 +41,28 @@ public class InternalGoogleMapsTests {
         Mockito.reset(mapMock);
     }
 
-//    @Test
-//    public void testCenterOnCoordinates() {
-//        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
-//        MapCoordinates updatedCoors = new MapCoordinates(1,1);
-//        float defaultZoom = 18;
-//
-//        CameraUpdate mockUpdate = Mockito.mock(CameraUpdate.class);
-//
-//        try (MockedStatic<CameraUpdateFactory> staticMock = Mockito.mockStatic(CameraUpdateFactory.class)) {
-//            staticMock.when(() -> CameraUpdateFactory.newLatLngZoom(updatedCoors.toGoogleMapsLatLng(), defaultZoom))
-//                    .thenReturn(mockUpdate);
-//
-//            InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
-//            igm.setMap(mapMock);
-//
-//            igm.centerOnCoordinates(updatedCoors);
-//
-//            Mockito.verify(mapMock).animateCamera(mockUpdate);
-//        } catch (Exception e) {
-//            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
-//        }
-//    }
+    @Test
+    public void testCenterOnCoordinates() {
+        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
+        MapCoordinates updatedCoors = new MapCoordinates(1,1);
+        float defaultZoom = 18;
+
+        CameraUpdate mockUpdate = Mockito.mock(CameraUpdate.class);
+
+        try (MockedStatic<CameraUpdateFactory> staticMock = Mockito.mockStatic(CameraUpdateFactory.class)) {
+            staticMock.when(() -> CameraUpdateFactory.newLatLngZoom(updatedCoors.toGoogleMapsLatLng(), defaultZoom))
+                    .thenReturn(mockUpdate);
+
+            InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+            igm.setMap(mapMock);
+
+            igm.centerOnCoordinates(updatedCoors);
+
+            Mockito.verify(mapMock).animateCamera(mockUpdate);
+        } catch (Exception e) {
+            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
+        }
+    }
 
     @Test
     public void testAddPolygons() {
@@ -318,7 +318,6 @@ public class InternalGoogleMapsTests {
                 .add(secondExpectedPoint);
 
         Polyline firstPolyline = Mockito.mock(Polyline.class);
-        Mockito.when(firstPolyline.getPoints()).thenReturn(firstLineExpectedPointList);
 
         //Create second polyline information
         LatLng thirdExpectedPoint = new LatLng(2, 2);
@@ -334,7 +333,6 @@ public class InternalGoogleMapsTests {
                 .add(fifthExpectedPoint);
 
         Polyline secondPolyline = Mockito.mock(Polyline.class);
-        Mockito.when(secondPolyline.getPoints()).thenReturn(secondLineExpectedPointList);
 
         //Create the map mock
         Mockito.when(mapMock.addPolyline(firstLineExpectedOptions)).thenReturn(firstPolyline);
