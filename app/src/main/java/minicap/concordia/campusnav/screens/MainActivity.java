@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.Button;
 
 import minicap.concordia.campusnav.R;
+
+//to be removed
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
+import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
+
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;

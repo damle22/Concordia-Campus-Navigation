@@ -10,8 +10,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager
 import minicap.concordia.campusnav.buildingmanager.entities.Building
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName
 import minicap.concordia.campusnav.components.BuildingAdapter
+import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment
 import minicap.concordia.campusnav.databinding.FragmentBuildingSelectorBinding
 
 class BuildingSelectorFragment : BottomSheetDialogFragment() {
@@ -60,14 +62,14 @@ class BuildingSelectorFragment : BottomSheetDialogFragment() {
         // Create adapter for SGW buildings and set its click listener
         val sgwAdapter = BuildingAdapter(sgwBuildings)
         sgwAdapter.setOnBuildingClickListener { building ->
-            showBuildingPopup(building)
+            showBuildingInformation(building)
         }
         binding.sgwRecyclerView.adapter = sgwAdapter
 
         // Create adapter for Loyola buildings and set its click listener
         val loyAdapter = BuildingAdapter(loyBuildings)
         loyAdapter.setOnBuildingClickListener { building ->
-            showBuildingPopup(building)
+            showBuildingInformation(building)
         }
         binding.loyRecyclerView.adapter = loyAdapter
     }
@@ -75,18 +77,11 @@ class BuildingSelectorFragment : BottomSheetDialogFragment() {
     /**
      * Shows an alert dialog with the building details.
      */
-    private fun showBuildingPopup(building: Building) {
-        val message = "Building: ${building.getBuildingName()}\n" +
-                "Description: ${building.getDescription()}\n" +
-                "Campus: ${building.getAssociatedCampus()}"
-        AlertDialog.Builder(requireContext())
-            .setTitle("Building Details")
-            .setMessage(message)
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
+    private fun showBuildingInformation(building: Building) {
+
+        val bottomSheet = BuildingInfoBottomSheetFragment.newInstance(building.buildingIdentifier)
+        bottomSheet.show(parentFragmentManager, "BuildingInfoBottomSheet")
+        dismiss()
     }
 
     override fun onDestroyView() {

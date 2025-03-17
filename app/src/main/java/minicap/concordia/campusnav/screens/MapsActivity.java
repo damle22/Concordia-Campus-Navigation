@@ -44,8 +44,10 @@ import java.util.Locale;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
 import minicap.concordia.campusnav.map.AbstractMap;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.InternalMappedIn;
@@ -54,7 +56,7 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
 
-public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener {
+public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_LAT = "starting_lat";
@@ -540,7 +542,11 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         BuildingSelectorFragment fragment = new BuildingSelectorFragment();
         fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
     }
+    @Override
+    public void directionButtonOnClick(Building building) {
+        MapCoordinates location = building.getLocation();
+
+        setDestination(building.getBuildingName(), location);
+    }
+
 }
-
-
-
