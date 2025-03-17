@@ -28,9 +28,12 @@ public class MainActivity extends AppCompatActivity {
 
         buildingManager = ConcordiaBuildingManager.getInstance();
 
-        // to handle Google Calendar integration
-        Intent calendarImportIntent = new Intent(this, CalendarImportActivity.class);
-        startActivity(calendarImportIntent);
+        // Add button click listener for CalendarImportActivity
+        Button btnOpenCalendarImport = findViewById(R.id.btnOpenCalendarImport);
+        btnOpenCalendarImport.setOnClickListener(v -> {
+            Intent calendarIntent = new Intent(MainActivity.this, CalendarImportActivity.class);
+            startActivity(calendarIntent);
+        });
 
         subscribeButtons(this);
     }
