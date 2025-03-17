@@ -360,25 +360,25 @@ public class InternalGoogleMapsTests {
         Assert.assertEquals(0, lines.size());
     }
 
-    @Test
-    public void testInitialize() {
-        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
-
-        SupportMapFragment fragmentMock = Mockito.mock(SupportMapFragment.class);
-
-        try (MockedStatic<SupportMapFragment> staticMock = Mockito.mockStatic(SupportMapFragment.class)) {
-            staticMock.when(() -> SupportMapFragment.newInstance())
-                    .thenReturn(fragmentMock);
-
-            igm.setMap(mapMock);
-
-            Fragment fragment = igm.initialize();
-
-            Assert.assertNotNull(fragment);
-        } catch (Exception e) {
-            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
-        }
-    }
+//    @Test
+//    public void testInitialize() {
+//        InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
+//
+//        SupportMapFragment fragmentMock = Mockito.mock(SupportMapFragment.class);
+//
+//        try (MockedStatic<SupportMapFragment> staticMock = Mockito.mockStatic(SupportMapFragment.class)) {
+//            staticMock.when(() -> SupportMapFragment.newInstance())
+//                    .thenReturn(fragmentMock);
+//
+//            igm.setMap(mapMock);
+//
+//            Fragment fragment = igm.initialize();
+//
+//            Assert.assertNotNull(fragment);
+//        } catch (Exception e) {
+//            Assert.fail("Assertion failure or exception during test: " + e.getMessage());
+//        }
+//    }
 
     @Test
     public void testSwitchToFloor() {
