@@ -22,6 +22,10 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 public class ClassScheduleActivity extends AppCompatActivity {
+    private static final int RC_SIGN_IN = 100;
+    private static final int REQUEST_CALENDAR_PERMISSION = 101;
+
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
