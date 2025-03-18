@@ -1,20 +1,32 @@
 package minicap.concordia.campusnav.buildingmanager.entities;
 
+import minicap.concordia.campusnav.map.MapCoordinates;
+
 public class Location
 {
-    private final float latitude;
-    private final float longitude;
+    private MapCoordinates coordinates;
+    private final double latitude;
+    private final double longitude;
 
-    protected Location(float latitude, float longitude){
+    protected Location(double latitude, double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
+        this.coordinates = new MapCoordinates(latitude, longitude);
     }
 
     /**
      * Returns the latitude and longitude of the location
-     * @return 2 value float array with latitude in index 0 and longitude in index 1
+     * @return A MapCoordinates object with latitude and longitude
      */
-    public float[] getLocation() {
-        return new float[] {latitude, longitude};
+    public MapCoordinates getLocation() {
+        return coordinates;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 }

@@ -10,7 +10,7 @@ public class Campus extends Location {
 
     private String campusName;
 
-    public Campus(String campusName, ArrayList<BuildingName> associatedBuildings, float latitude, float longitude) {
+    public Campus(String campusName, ArrayList<BuildingName> associatedBuildings, double latitude, double longitude) {
         super(latitude, longitude);
         this.campusName = campusName;
         this.associatedBuildings = associatedBuildings;
