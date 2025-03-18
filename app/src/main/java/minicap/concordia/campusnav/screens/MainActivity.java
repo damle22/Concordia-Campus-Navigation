@@ -5,21 +5,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import minicap.concordia.campusnav.R;
 
 //to be removed
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
+import android.widget.ImageButton;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
+import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.components.ShuttleSchedule;
+import minicap.concordia.campusnav.helpers.ScheduleFetcher;
+import minicap.concordia.campusnav.helpers.ShuttleScraper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,8 +38,17 @@ public class MainActivity extends AppCompatActivity {
         buildingManager = ConcordiaBuildingManager.getInstance();
 
         subscribeButtons(this);
-    }
 
+        /* debugging to make sure scraper works
+        ScheduleFetcher.fetch(new ScheduleFetcher.ScheduleFetchListener() {
+            @Override
+            public void onScheduleFetched(List<ShuttleSchedule> schedules) {
+                // Log the fetched schedules to verify correctness
+                logSchedules(schedules);
+            }
+        };
+         */
+    }
     protected void subscribeButtons(Context appContext) {
 
         Button sgwCampusBtn = (Button)findViewById(R.id.viewSGWCampusButton);
@@ -76,5 +90,19 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    }
+    private void logSchedules(List<ShuttleSchedule> schedules) {
+        for (ShuttleSchedule schedule : schedules) {
+            String day = schedule.getDay();
+            String campus = schedule.getCampus();
+            List<String> times = schedule.getDepartureTimes();
+
+            // Log the day, campus, and departure times
+            Log.d("ShuttleBus", "Day: " + day + ", Campus: " + campus);
+            for (String time : times) {
+                Log.d("ShuttleBus", "Departure: " + time);
+            }
+            Log.d("ShuttleBus", "-----------------------------");
+        }
     }
 }
