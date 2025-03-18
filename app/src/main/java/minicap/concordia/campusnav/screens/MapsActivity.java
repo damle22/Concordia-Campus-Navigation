@@ -62,7 +62,7 @@ import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.ca.BuildingSelectorFragment;
 
 public class MapsActivity extends FragmentActivity
-        implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, BuildingInfoBottomSheetFragment.BuildingInfoListener {
+        implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_LAT = "starting_lat";
@@ -178,16 +178,7 @@ public class MapsActivity extends FragmentActivity
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
         TextInputEditText searchText = findViewById(R.id.genericSearchField);
 
-
-        //Add main menu functionality to page
-        View slidingMenu = findViewById(R.id.sliding_menu);
-        ImageButton openMenuButton = findViewById(R.id.menuButton);
-        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
-        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
-        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
-        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
-        MainMenuController menu = new MainMenuController(slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
-
+        binding.menuButton.setOnClickListener(v -> showMainMenuDialog());
 
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -483,6 +474,12 @@ public class MapsActivity extends FragmentActivity
             Log.e("Route Parsing Error", e.toString());
         }
     }
+
+    public void showMainMenuDialog() {
+        MainMenuDialog dialog = new MainMenuDialog(this);
+        dialog.show();
+    }
+
 
     // Show building selector fragment
     private void showBuildingSelectorFragment() {
