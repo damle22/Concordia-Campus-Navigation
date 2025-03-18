@@ -21,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.api.services.calendar.CalendarScopes;
 
 public class ClassScheduleActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 100;
@@ -45,7 +46,7 @@ public class ClassScheduleActivity extends AppCompatActivity {
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestScopes(new com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/calendar.readonly"))
+                .requestScopes(new com.google.android.gms.common.api.Scope(CalendarScopes.CALENDAR_READONLY))
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
