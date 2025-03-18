@@ -1,6 +1,7 @@
 package minicap.concordia.campusnav.components;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.widget.ImageButton;
 import com.google.android.material.sidesheet.SideSheetDialog;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.screens.ClassScheduleActivity;
+import minicap.concordia.campusnav.screens.MapsActivity;
 
 public class MainMenuDialog extends SideSheetDialog {
 
@@ -18,12 +21,14 @@ public class MainMenuDialog extends SideSheetDialog {
     ImageButton classScheduleRedirect;
     ImageButton directionsRedirect;
     ImageButton campusMapRedirect;
+    Context context;
 
     public interface MainMenuListener {
     }
 
     public MainMenuDialog(Context context) {
         super(context);
+        this.context = context;
     }
 
     @Override
@@ -38,7 +43,6 @@ public class MainMenuDialog extends SideSheetDialog {
         initializeViews(view);
         populateButtons();
     }
-
 
 
     private void initializeViews(View view) {
@@ -65,10 +69,23 @@ public class MainMenuDialog extends SideSheetDialog {
                 openCampusMap();
             }
         });
+
+        classScheduleRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openClassSchedule();
+            }
+        });
+    }
+
+    public void openClassSchedule() {
+        Intent intent = new Intent(context, ClassScheduleActivity.class);
+        context.startActivity(intent);
     }
 
     public void openCampusMap(){
-        //Open Intent
+        Intent intent = new Intent(context, MapsActivity.class);
+        context.startActivity(intent);
     }
 
     public void close(){
