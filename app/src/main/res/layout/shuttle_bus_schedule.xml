@@ -73,11 +73,14 @@
 
 
             <!-- SGW Departures -->
+
+
+            <!-- Grid Timetable -->
             <LinearLayout
-                android:layout_width="406dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="15dp"
-                android:gravity="center"
                 android:orientation="horizontal">
 
 
@@ -97,9 +100,9 @@
                     android:layout_height="36dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
+                    android:background="@drawable/button_selector"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="@drawable/button_selector"
                     android:text="Mon-Thurs"
                     android:textColor="@color/black" />
 
@@ -110,17 +113,15 @@
                     android:layout_height="36dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
+                    android:background="@drawable/button_selector"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="@drawable/button_selector"
                     android:text="Friday"
                     android:textColor="@color/black" />
 
 
             </LinearLayout>
 
-
-            <!-- Grid Timetable -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="249dp"
@@ -144,15 +145,25 @@
 
 
         <!-- LOY Departures -->
+
+
+        <!-- Grid Timetable -->
         <LinearLayout
-            android:layout_width="406dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="15dp"
-            android:gravity="center"
             android:orientation="horizontal">
 
 
             <!-- Mon-thurs Button -->
+
+
+            <!-- Mon-thurs Button -->
+
+
+            <!-- Fri Button -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -162,37 +173,31 @@
                 android:textSize="19sp"
                 android:textStyle="bold" />
 
-
-            <!-- Mon-thurs Button -->
             <Button
                 android:layout_width="102dp"
                 android:layout_height="36dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
+                android:background="@drawable/button_selector"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="@drawable/button_selector"
                 android:text="Mon-Thurs"
                 android:textColor="@color/black" />
 
-
-            <!-- Fri Button -->
             <Button
                 android:layout_width="102dp"
                 android:layout_height="36dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
+                android:background="@drawable/button_selector"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="@drawable/button_selector"
                 android:text="Friday"
                 android:textColor="@color/black" />
 
 
         </LinearLayout>
 
-
-        <!-- Grid Timetable -->
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="249dp"
