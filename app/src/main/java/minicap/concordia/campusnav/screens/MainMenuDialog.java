@@ -2,9 +2,12 @@ package minicap.concordia.campusnav.screens;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
@@ -35,11 +38,14 @@ public class MainMenuDialog extends SideSheetDialog {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.main_menu, null);
         setContentView(view);
 
+        //Make main menu start from the left
+        setSheetEdge(Gravity.START);
+
         initializeViews(view);
         populateButtons();
-        open();
-
     }
+
+
 
     private void initializeViews(View view) {
         slidingMenu = view.findViewById(R.id.sliding_menu);
@@ -71,18 +77,8 @@ public class MainMenuDialog extends SideSheetDialog {
         //Open Intent
     }
 
-    public void open(){
-        slidingMenu.animate()
-                .translationX(0)
-                .setDuration(300)
-                .start();
-    }
-
     public void close(){
-        slidingMenu.animate()
-                .translationX(-slidingMenu.getWidth())
-                .setDuration(300)
-                .start();
+        cancel();
     }
 
 }

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/sliding_menu"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    app:layout_behavior="com.google.android.material.sidesheet.SideSheetBehavior">>
 
     <ImageView
         android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true"
-        android:layout_width="388dp"
-        android:layout_height="779dp"
-        android:layout_marginStart="-50dp"
+        android:scaleType="matrix"
         android:src="@drawable/main_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.312" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <ImageButton
         android:id="@+id/closeMenu"
@@ -27,9 +27,9 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="#9E3353"
+        android:src="@drawable/close"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/close" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/Title"
@@ -53,9 +53,9 @@
         android:layout_marginTop="-10dp"
         android:background="@color/light_burgundy"
         android:scaleType="centerInside"
+        android:src="@drawable/class_schedule"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/directionsRedirect"
-        android:src="@drawable/class_schedule" />
+        app:layout_constraintTop_toBottomOf="@+id/directionsRedirect" />
 
     <ImageButton
         android:id="@+id/directionsRedirect"
@@ -65,9 +65,9 @@
         android:layout_marginTop="-10dp"
         android:background="@color/light_burgundy"
         android:scaleType="centerInside"
+        android:src="@drawable/directions"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/campusMapRedirect"
-        android:src="@drawable/directions" />
+        app:layout_constraintTop_toBottomOf="@+id/campusMapRedirect" />
 
     <ImageButton
         android:id="@+id/campusMapRedirect"
@@ -77,9 +77,9 @@
         android:layout_marginTop="236dp"
         android:background="@color/light_burgundy"
         android:scaleType="centerInside"
+        android:src="@drawable/campus_map"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/campus_map" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/viewLanguageButton"
@@ -89,9 +89,9 @@
         android:layout_marginBottom="48dp"
         android:background="@color/light_burgundy"
         android:contentDescription="change_language"
+        android:src="@drawable/lang_button"
         app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-        app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/lang_button" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_selectedLanguage"
