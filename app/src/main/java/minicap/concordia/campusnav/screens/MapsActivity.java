@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 

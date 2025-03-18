@@ -1,17 +1,11 @@
-package minicap.concordia.campusnav.screens;
+package minicap.concordia.campusnav.components;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageButton;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.android.material.sidesheet.SideSheetDialog;
 

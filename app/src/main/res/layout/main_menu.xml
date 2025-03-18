@@ -5,7 +5,9 @@
     android:id="@+id/sliding_menu"
     android:layout_width="300dp"
     android:layout_height="match_parent"
-    app:layout_behavior="com.google.android.material.sidesheet.SideSheetBehavior">>
+    app:layout_behavior="com.google.android.material.sidesheet.SideSheetBehavior"><![CDATA[>
+
+    ]]>
 
     <ImageView
         android:id="@+id/imageView3"
@@ -46,16 +48,16 @@
         app:layout_constraintTop_toTopOf="@+id/closeMenu" />
 
     <ImageButton
-        android:id="@+id/classScheduleRedirect"
+        android:id="@+id/campusMapRedirect"
         android:layout_width="272dp"
         android:layout_height="73dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="-10dp"
+        android:layout_marginTop="260dp"
         android:background="@color/light_burgundy"
         android:scaleType="centerInside"
-        android:src="@drawable/class_schedule"
+        android:src="@drawable/campus_map"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/directionsRedirect" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/directionsRedirect"
@@ -70,16 +72,16 @@
         app:layout_constraintTop_toBottomOf="@+id/campusMapRedirect" />
 
     <ImageButton
-        android:id="@+id/campusMapRedirect"
+        android:id="@+id/classScheduleRedirect"
         android:layout_width="272dp"
         android:layout_height="73dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="236dp"
+        android:layout_marginTop="-10dp"
         android:background="@color/light_burgundy"
         android:scaleType="centerInside"
-        android:src="@drawable/campus_map"
+        android:src="@drawable/class_schedule"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/directionsRedirect" />
 
     <ImageButton
         android:id="@+id/viewLanguageButton"
