@@ -91,6 +91,13 @@ public class MainMenuDialog extends SideSheetDialog {
             }
         });
 
+        directionsRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDirections();
+            }
+        });
+
     }
 
     public void openBusSchedule(){
@@ -106,7 +113,21 @@ public class MainMenuDialog extends SideSheetDialog {
         // Pass an extra to signal that a specific function should run.
         intent.putExtra("OPEN_BUS", true);
         context.startActivity(intent);
+    }
 
+    public void openDirections(){
+        ConcordiaBuildingManager buildingManager = ConcordiaBuildingManager.getInstance();
+        Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
+        MapCoordinates campusCoordinates = sgwCampus.getLocation();
+
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
+        intent.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
+        intent.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
+        intent.putExtra(MapsActivity.KEY_SHOW_SGW, true);
+        // Pass an extra to signal that a specific function should run.
+        intent.putExtra("OPEN_DIR", true);
+        context.startActivity(intent);
     }
 
     public void openClassSchedule() {

@@ -88,7 +88,8 @@ public class MapsActivity extends FragmentActivity
 
     private boolean hasUserLocationBeenSet;
 
-    private  boolean runBus;
+    private boolean runBus;
+    private boolean runDir;
 
     private Button campusSwitchBtn;
 
@@ -136,7 +137,6 @@ public class MapsActivity extends FragmentActivity
         currentMap = SupportedMaps.GOOGLE_MAPS;
 
 
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             double startingLat = bundle.getDouble(KEY_STARTING_LAT);
@@ -145,6 +145,7 @@ public class MapsActivity extends FragmentActivity
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
             runBus = bundle.getBoolean("OPEN_BUS", false);
+            runDir = bundle.getBoolean("OPEN_DIR", false);
         }
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
@@ -241,6 +242,10 @@ public class MapsActivity extends FragmentActivity
 
         if(runBus){
             showShuttleScheduleFragment();
+        }
+
+        if(runDir){
+            //placeholder for when directions implemented as a bottom sheet
         }
     }
 
