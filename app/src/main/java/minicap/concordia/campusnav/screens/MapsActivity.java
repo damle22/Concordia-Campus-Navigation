@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
@@ -201,7 +202,8 @@ public class MapsActivity extends FragmentActivity
 
         searchText = findViewById(R.id.genericSearchField);
 
-        binding.menuButton.setOnClickListener(v -> showMainMenuDialog());
+        ImageView menuButton = findViewById(R.id.menuButton);
+        menuButton.setOnClickListener(v -> showMainMenuDialog());
 
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
