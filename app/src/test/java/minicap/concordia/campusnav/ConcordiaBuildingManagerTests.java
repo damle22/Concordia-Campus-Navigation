@@ -14,6 +14,7 @@ import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 
 public class ConcordiaBuildingManagerTests {
@@ -33,8 +34,8 @@ public class ConcordiaBuildingManagerTests {
 
         Assert.assertEquals(expectedCampusName, fetchedCampus.getCampusName());
         Assert.assertEquals(expectedBuildingNames, fetchedCampus.getAssociatedBuildings());
-        Assert.assertEquals(expectedLatitude, fetchedCampus.getLocation()[0], 0.00001);
-        Assert.assertEquals(expectedLongitude, fetchedCampus.getLocation()[1], 0.00001);
+        Assert.assertEquals(expectedLatitude, fetchedCampus.getLatitude(), 0.00001);
+        Assert.assertEquals(expectedLongitude, fetchedCampus.getLongitude(), 0.00001);
     }
 
     @Test
@@ -54,8 +55,8 @@ public class ConcordiaBuildingManagerTests {
         Assert.assertEquals(expectedDescription, actualBuilding.getDescription());
         Assert.assertEquals(expectedAssociatedCampus, actualBuilding.getAssociatedCampus());
         Assert.assertEquals(expectedNumberOfFloors, actualBuilding.getFloors().size());
-        Assert.assertEquals(expectedLatitude, actualBuilding.getLocation()[0], 0.00001);
-        Assert.assertEquals(expectedLongitude, actualBuilding.getLocation()[1], 0.00001);
+        Assert.assertEquals(expectedLatitude, actualBuilding.getLatitude(), 0.00001);
+        Assert.assertEquals(expectedLongitude, actualBuilding.getLongitude(), 0.00001);
     }
 
     @Test
@@ -83,8 +84,8 @@ public class ConcordiaBuildingManagerTests {
             Assert.assertEquals(expectedDescriptions[i], currentBuilding.getDescription());
             Assert.assertEquals(expectedAssociatedCampus, currentBuilding.getAssociatedCampus());
             Assert.assertEquals(expectedNumberOfFloors[i], currentBuilding.getFloors().size());
-            Assert.assertEquals(expectedLatitudes[i], currentBuilding.getLocation()[0], 0.00001);
-            Assert.assertEquals(expectedLongitudes[i], currentBuilding.getLocation()[1], 0.00001);
+            Assert.assertEquals(expectedLatitudes[i], currentBuilding.getLatitude(), 0.00001);
+            Assert.assertEquals(expectedLongitudes[i], currentBuilding.getLongitude(), 0.00001);
         }
     }
 
@@ -106,5 +107,19 @@ public class ConcordiaBuildingManagerTests {
             Assert.assertTrue(expectedFloorNames.contains(floor.getFloorName()));
             Assert.assertEquals(expectedBuildingName, floor.getAssociatedBuilding());
         }
+    }
+
+    @Test
+    public void BuildingManager_GetLocation_ReturnsCorrectLocation() {
+        ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
+
+        Building hallBuilding = manager.getBuilding(BuildingName.HALL);
+
+        MapCoordinates expectedCoords = new MapCoordinates(45.49701, -73.57877);
+
+        MapCoordinates actualCoords = hallBuilding.getLocation();
+
+        Assert.assertEquals(expectedCoords.getLat(), actualCoords.getLat(), 0.0001);
+        Assert.assertEquals(expectedCoords.getLng(), actualCoords.getLng(), 0.0001);
     }
 }

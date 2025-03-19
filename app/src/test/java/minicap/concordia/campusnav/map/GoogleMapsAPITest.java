@@ -1,10 +1,10 @@
-package minicap.concordia.campusnav;
+package minicap.concordia.campusnav.map;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonObject;
 import com.google.maps.android.PolyUtil;
 
-import minicap.concordia.campusnav.map.FetchPathTask;
+import minicap.concordia.campusnav.BuildConfig;
 
 import org.json.JSONArray;
 import org.junit.Test;

@@ -5,12 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_layout"
     tools:context=".screens.MapsActivity">
 
     <!-- Map Fragment -->
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -83,6 +83,27 @@
                 app:cornerRadius="100dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/shuttleScheduleView"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="500dp"
+                android:layout_marginEnd="320dp"
+                app:backgroundTint="@color/light_burgundy"
+                app:cornerRadius="100dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/shuttleBusIcon"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_shuttle"
+                app:layout_constraintBottom_toBottomOf="@+id/shuttleScheduleView"
+                app:layout_constraintEnd_toEndOf="@+id/shuttleScheduleView"
+                app:layout_constraintTop_toTopOf="@+id/shuttleScheduleView" />
 
             <ImageView
                 android:id="@+id/campusIcon"
