@@ -11,7 +11,12 @@ import android.widget.ImageButton;
 import com.google.android.material.sidesheet.SideSheetDialog;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Campus;
+import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.screens.ClassScheduleActivity;
+import minicap.concordia.campusnav.screens.MainActivity;
 import minicap.concordia.campusnav.screens.MapsActivity;
 
 public class MainMenuDialog extends SideSheetDialog {
@@ -21,6 +26,7 @@ public class MainMenuDialog extends SideSheetDialog {
     ImageButton classScheduleRedirect;
     ImageButton directionsRedirect;
     ImageButton campusMapRedirect;
+    ImageButton busScheduleRedirect;
     Context context;
 
     public interface MainMenuListener {
@@ -51,6 +57,7 @@ public class MainMenuDialog extends SideSheetDialog {
         classScheduleRedirect = view.findViewById(R.id.classScheduleRedirect);
         directionsRedirect = view.findViewById(R.id.directionsRedirect);
         campusMapRedirect = view.findViewById(R.id.campusMapRedirect);
+        busScheduleRedirect = view.findViewById(R.id.busScheduleRedirect);
     }
 
     //This passes
@@ -76,6 +83,20 @@ public class MainMenuDialog extends SideSheetDialog {
                 openClassSchedule();
             }
         });
+
+        busScheduleRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openBusSchedule();
+            }
+        });
+
+    }
+
+    public void openBusSchedule(){
+        openCampusMap();
+
+
     }
 
     public void openClassSchedule() {
@@ -84,8 +105,16 @@ public class MainMenuDialog extends SideSheetDialog {
     }
 
     public void openCampusMap(){
-        Intent intent = new Intent(context, MapsActivity.class);
-        context.startActivity(intent);
+        ConcordiaBuildingManager buildingManager = ConcordiaBuildingManager.getInstance();
+        Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
+        MapCoordinates campusCoordinates = sgwCampus.getLocation();
+
+        Intent i = new Intent(context, MapsActivity.class);
+        i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
+        i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
+        i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
+        i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
+        context.startActivity(i);
     }
 
     public void close(){
