@@ -245,7 +245,7 @@ public class MapsActivity extends FragmentActivity
         }
 
         if(runDir){
-            //placeholder for when directions implemented as a bottom sheet
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
     }
 
