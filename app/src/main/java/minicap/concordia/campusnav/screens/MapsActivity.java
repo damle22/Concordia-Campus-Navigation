@@ -88,6 +88,8 @@ public class MapsActivity extends FragmentActivity
 
     private boolean hasUserLocationBeenSet;
 
+    private  boolean runBus;
+
     private Button campusSwitchBtn;
 
     private TextView campusTextView;
@@ -133,6 +135,8 @@ public class MapsActivity extends FragmentActivity
         buildingManager = ConcordiaBuildingManager.getInstance();
         currentMap = SupportedMaps.GOOGLE_MAPS;
 
+
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             double startingLat = bundle.getDouble(KEY_STARTING_LAT);
@@ -140,6 +144,7 @@ public class MapsActivity extends FragmentActivity
             startingCoords = new MapCoordinates(startingLat, startingLng);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
+            runBus = bundle.getBoolean("OPEN_BUS", false);
         }
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
@@ -233,6 +238,10 @@ public class MapsActivity extends FragmentActivity
                 this::HandleSearchLocationResult);
 
         getUserLocationPath();
+
+        if(runBus){
+            showShuttleScheduleFragment();
+        }
     }
 
     /**
