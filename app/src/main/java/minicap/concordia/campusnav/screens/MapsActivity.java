@@ -356,7 +356,7 @@ public class MapsActivity extends FragmentActivity
         map.centerOnCoordinates(campusCoords);
 
         //updating the button text
-        campusTextView.setText(showSGW ? "SGW" : "LOY");
+        campusTextView.setText(showSGW ? "LOY" : "SGW");
     }
 
     /**
