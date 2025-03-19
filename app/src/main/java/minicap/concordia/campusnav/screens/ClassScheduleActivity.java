@@ -84,7 +84,7 @@ public class ClassScheduleActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CALENDAR}, REQUEST_CALENDAR_PERMISSION);
         } else { //if already granted, we fetch the events
-            // fetchCalendarEvents();
+            fetchCalendarEvents();
         }
     }
 
@@ -94,9 +94,13 @@ public class ClassScheduleActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CALENDAR_PERMISSION && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Calendar permission granted!", Toast.LENGTH_SHORT).show();
             // we fetch the calendar events once permission is granted
-            // fetchCalendarEvents();
+            fetchCalendarEvents();
         } else {
             Toast.makeText(this, "Calendar permission denied", Toast.LENGTH_SHORT).show();
         }
     }
+    private void fetchCalendarEvents() {
+        Toast.makeText(this, "Fetching calendar events...", Toast.LENGTH_SHORT).show();
+    }
+
 }
