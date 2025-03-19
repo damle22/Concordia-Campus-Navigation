@@ -100,7 +100,7 @@ public class MainMenuDialog extends SideSheetDialog {
 
     }
 
-    public void openBusSchedule(){
+    public Intent campusMapRoutine(){
         ConcordiaBuildingManager buildingManager = ConcordiaBuildingManager.getInstance();
         Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
         MapCoordinates campusCoordinates = sgwCampus.getLocation();
@@ -110,21 +110,21 @@ public class MainMenuDialog extends SideSheetDialog {
         intent.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
         intent.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
         intent.putExtra(MapsActivity.KEY_SHOW_SGW, true);
+
+        return intent;
+    }
+
+    public void openBusSchedule(){
+        Intent intent = campusMapRoutine();
+
         // Pass an extra to signal that a specific function should run.
         intent.putExtra("OPEN_BUS", true);
         context.startActivity(intent);
     }
 
     public void openDirections(){
-        ConcordiaBuildingManager buildingManager = ConcordiaBuildingManager.getInstance();
-        Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-        MapCoordinates campusCoordinates = sgwCampus.getLocation();
+        Intent intent = campusMapRoutine();
 
-        Intent intent = new Intent(context, MapsActivity.class);
-        intent.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
-        intent.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-        intent.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-        intent.putExtra(MapsActivity.KEY_SHOW_SGW, true);
         // Pass an extra to signal that a specific function should run.
         intent.putExtra("OPEN_DIR", true);
         context.startActivity(intent);
@@ -136,16 +136,8 @@ public class MainMenuDialog extends SideSheetDialog {
     }
 
     public void openCampusMap(){
-        ConcordiaBuildingManager buildingManager = ConcordiaBuildingManager.getInstance();
-        Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-        MapCoordinates campusCoordinates = sgwCampus.getLocation();
-
-        Intent i = new Intent(context, MapsActivity.class);
-        i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
-        i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-        i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-        i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
-        context.startActivity(i);
+        Intent intent = campusMapRoutine();
+        context.startActivity(intent);
     }
 
     public void close(){
