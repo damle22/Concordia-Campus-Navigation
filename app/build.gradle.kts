@@ -68,6 +68,7 @@ dependencies {
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.0")
     implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.test.espresso:espresso-intents:3.6.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

@@ -1,117 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sliding_menu"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    app:layout_behavior="com.google.android.material.sidesheet.SideSheetBehavior"><![CDATA[>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/sliding_menu"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    ]]>
 
-        <ImageView
-            android:id="@+id/imageView3"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_width="388dp"
-            android:layout_height="779dp"
-            android:layout_marginStart="-50dp"
-            android:src="@drawable/main_menu"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.312" />
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="matrix"
+        android:src="@drawable/main_menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
-        <ImageButton
-            android:id="@+id/closeMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="#9E3353"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/close" />
+    <ImageButton
+        android:id="@+id/closeMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#9E3353"
+        android:src="@drawable/close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="-6dp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/inter"
-            android:text="Main Menu"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/closeMenu"
-            app:layout_constraintTop_toTopOf="@+id/closeMenu" />
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-6dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter"
+        android:text="Main Menu"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/closeMenu"
+        app:layout_constraintTop_toTopOf="@+id/closeMenu" />
 
-        <ImageButton
-            android:id="@+id/classScheduleRedirect"
-            android:layout_width="272dp"
-            android:layout_height="73dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="-10dp"
-            android:background="@color/light_burgundy"
-            android:scaleType="centerInside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/directionsRedirect"
-            android:src="@drawable/class_schedule" />
+    <ImageButton
+        android:id="@+id/campusMapRedirect"
+        android:layout_width="272dp"
+        android:layout_height="73dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="260dp"
+        android:background="@color/light_burgundy"
+        android:scaleType="centerInside"
+        android:src="@drawable/campus_map"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/directionsRedirect"
-            android:layout_width="272dp"
-            android:layout_height="73dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="-10dp"
-            android:background="@color/light_burgundy"
-            android:scaleType="centerInside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/campusMapRedirect"
-            android:src="@drawable/directions" />
+    <ImageButton
+        android:id="@+id/directionsRedirect"
+        android:layout_width="272dp"
+        android:layout_height="73dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="-10dp"
+        android:background="@color/light_burgundy"
+        android:scaleType="centerInside"
+        android:src="@drawable/directions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/campusMapRedirect" />
 
-        <ImageButton
-            android:id="@+id/campusMapRedirect"
-            android:layout_width="272dp"
-            android:layout_height="73dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="236dp"
-            android:background="@color/light_burgundy"
-            android:scaleType="centerInside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/campus_map" />
+    <ImageButton
+        android:id="@+id/classScheduleRedirect"
+        android:layout_width="272dp"
+        android:layout_height="73dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="-10dp"
+        android:background="@color/light_burgundy"
+        android:scaleType="centerInside"
+        android:src="@drawable/class_schedule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/directionsRedirect" />
 
-        <ImageButton
-            android:id="@+id/viewLanguageButton"
-            android:layout_width="119dp"
-            android:layout_height="54dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="48dp"
-            android:background="@color/light_burgundy"
-            android:contentDescription="change_language"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-            app:layout_constraintStart_toStartOf="parent"
-            android:src="@drawable/lang_button" />
+    <ImageButton
+        android:id="@+id/busScheduleRedirect"
+        android:layout_width="272dp"
+        android:layout_height="73dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="52dp"
+        android:background="@color/light_burgundy"
+        android:scaleType="centerInside"
+        android:src="@drawable/bus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/directionsRedirect" />
 
-        <TextView
-            android:id="@+id/tv_selectedLanguage"
-            android:layout_width="44dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/english"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@+id/viewLanguageButton"
-            app:layout_constraintEnd_toEndOf="@+id/viewLanguageButton"
-            app:layout_constraintHorizontal_bias="0.487"
-            app:layout_constraintStart_toStartOf="@+id/viewLanguageButton"
-            app:layout_constraintTop_toTopOf="@+id/viewLanguageButton"
-            app:layout_constraintVertical_bias="0.538"
-            tools:text="@string/english" />
+    <ImageButton
+        android:id="@+id/viewLanguageButton"
+        android:layout_width="119dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="48dp"
+        android:background="@color/light_burgundy"
+        android:contentDescription="change_language"
+        android:src="@drawable/lang_button"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/tv_selectedLanguage"
+        android:layout_width="44dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/english"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/viewLanguageButton"
+        app:layout_constraintEnd_toEndOf="@+id/viewLanguageButton"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="@+id/viewLanguageButton"
+        app:layout_constraintTop_toTopOf="@+id/viewLanguageButton"
+        app:layout_constraintVertical_bias="0.538"
+        tools:text="@string/english" />
 
-</merge>
+</androidx.constraintlayout.widget.ConstraintLayout>

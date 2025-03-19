@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
@@ -63,7 +65,8 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
 
-public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener {
+public class MapsActivity extends FragmentActivity
+        implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_LAT = "starting_lat";
@@ -84,6 +87,9 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
     private boolean showSGW;
 
     private boolean hasUserLocationBeenSet;
+
+    private boolean runBus;
+    private boolean runDir;
 
     private Button campusSwitchBtn;
 
@@ -130,6 +136,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         buildingManager = ConcordiaBuildingManager.getInstance();
         currentMap = SupportedMaps.GOOGLE_MAPS;
 
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             double startingLat = bundle.getDouble(KEY_STARTING_LAT);
@@ -137,6 +144,8 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
             startingCoords = new MapCoordinates(startingLat, startingLng);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
+            runBus = bundle.getBoolean("OPEN_BUS", false);
+            runDir = bundle.getBoolean("OPEN_DIR", false);
         }
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
@@ -199,14 +208,8 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
 
         searchText = findViewById(R.id.genericSearchField);
 
-        //Add main menu functionality to page
-        View slidingMenu = findViewById(R.id.sliding_menu);
-        ImageButton openMenuButton = findViewById(R.id.menuButton);
-        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
-        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
-        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
-        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
-        MainMenuController menu = new MainMenuController(this, slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
+        ImageView menuButton = findViewById(R.id.menuButton);
+        menuButton.setOnClickListener(v -> showMainMenuDialog());
 
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -236,6 +239,14 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
                 this::HandleSearchLocationResult);
 
         getUserLocationPath();
+
+        if(runBus){
+            showShuttleScheduleFragment();
+        }
+
+        if(runDir){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
     }
 
     /**
@@ -359,7 +370,7 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         map.centerOnCoordinates(campusCoords);
 
         //updating the button text
-        campusTextView.setText(showSGW ? "SGW" : "LOY");
+        campusTextView.setText(showSGW ? "LOY" : "SGW");
     }
 
     /**
@@ -547,6 +558,12 @@ public class MapsActivity extends FragmentActivity implements AbstractMap.MapUpd
         map.addMarker(coordinates, "Clicked location", true);
         setDestination(address, coordinates);
     }
+
+    public void showMainMenuDialog() {
+        MainMenuDialog dialog = new MainMenuDialog(this);
+        dialog.show();
+    }
+
 
     // Show building selector fragment
     private void showBuildingSelectorFragment() {
