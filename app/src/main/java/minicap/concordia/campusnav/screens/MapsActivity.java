@@ -312,7 +312,7 @@ public class MapsActivity extends FragmentActivity
         gMapController.centerOnCoordinates(campusCoords.latitude, campusCoords.longitude);
 
         //updating the button text
-        campusTextView.setText(showSGW ? "SGW" : "LOY");
+        campusTextView.setText(showSGW ? "LOY" : "SGW");
     }
 
     private void changeSelectedTravelMethod(ImageButton selectedButton, String newTravelMode) {
