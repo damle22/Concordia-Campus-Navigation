@@ -41,10 +41,7 @@ public class ShuttleScraper {
             schedules.add(new ShuttleSchedule("Friday", "Loyola", loyolaDeparturesFriday));
             schedules.add(new ShuttleSchedule("Friday", "SGW", sgwDeparturesFriday));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        } catch (IOException e) {}
         return schedules;
     }
 
