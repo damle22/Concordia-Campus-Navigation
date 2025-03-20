@@ -24,6 +24,7 @@ import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -142,14 +143,14 @@ public class LocationSearchActivity extends AppCompatActivity {
 
         adapter.setOnClickListener(new LocationAdapter.OnItemClickedListener() {
             @Override
-            public void onClick(String buildingName, float latitude, float longitude) {
+            public void onClick(String buildingName, MapCoordinates coordinates) {
                 runOnUiThread(() -> {
                     Intent returnData = new Intent();
                     returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, buildingName);
                     returnData.putExtra(KEY_RETURN_BOOL_CURRENT_LOCATION, false);
                     returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, !isStartLocation);
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LAT, latitude);
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LNG, longitude);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LAT, coordinates.getLat());
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LNG, coordinates.getLng());
                     setResult(RESULT_OK, returnData);
                     finish();
                 });
@@ -189,7 +190,7 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
         holder.locationText.setTextColor(Color.parseColor("#FFFFFF"));
         holder.itemView.setOnClickListener(v -> {
             if(onClickListener != null) {
-                onClickListener.onClick(cur.getBuildingName(), cur.getLocation()[0], cur.getLocation()[1]);
+                onClickListener.onClick(cur.getBuildingName(), cur.getLocation());
             }
         });
     }
@@ -225,6 +226,6 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     }
 
     public interface OnItemClickedListener {
-        void onClick(String buildingName, float latitude, float longitude);
+        void onClick(String buildingName, MapCoordinates coordinates);
     }
 }

@@ -27,8 +27,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 BuildingName.HALL,
                                 BuildingName.MOLSON_SCHOOL_OF_BUSINESS
                         )),
-                        45.49701f,
-                        -73.57877f)
+                        45.49701,
+                        -73.57877)
                 },
                 {
                     "CampusLoyola", new Campus(
@@ -38,8 +38,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 BuildingName.VANIER_EXTENSION,
                                 BuildingName.VANIER_LIBRARY
                         )),
-                        45.45863f,
-                        -73.64188f)
+                        45.45863,
+                        -73.64188)
                 },
                 {
                     "BuildingHall", new Building(
@@ -59,8 +59,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("10", new BuildingFloor("10", BuildingName.HALL, "none")),
                                 entry("11", new BuildingFloor("11", BuildingName.HALL, "none"))
                         )),
-                        45.49701f,
-                        -73.57877f,
+                        45.49701,
+                        -73.57877,
                         R.drawable.hallbuilding,
                         "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
                         BuildingName.HALL
@@ -89,8 +89,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("14", new BuildingFloor("14", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "none")),
                                 entry("15", new BuildingFloor("15", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "none"))
                         )),
-                        45.45863f,
-                        -73.57906f,
+                        45.45863,
+                        -73.57906,
                         R.drawable.jmsb,
                         "1450 Guy Street Montreal, QC H3H 0A1",
                         BuildingName.MOLSON_SCHOOL_OF_BUSINESS
@@ -103,8 +103,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         new HashMap<>(Map.ofEntries(
                                 entry("1", new BuildingFloor("1", BuildingName.LOYOLA_CENTRAL_BUILDING, "none"))
                         )),
-                        45.45863f,
-                        -73.64066f,
+                        45.45863,
+                        -73.64066,
                         R.drawable.loy_central,
                         "7141 Sherbrooke St W, Montreal, Quebec H4B 2A7",
                         BuildingName.LOYOLA_CENTRAL_BUILDING
@@ -119,8 +119,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("2", new BuildingFloor("2", BuildingName.VANIER_LIBRARY, "none")),
                                 entry("3", new BuildingFloor("3", BuildingName.VANIER_LIBRARY, "none"))
                         )),
-                        45.45891f,
-                        -73.63888f,
+                        45.45891,
+                        -73.63888,
                         R.drawable.vanier_library,
                         "7141 Sherbrooke St W, Montreal, Quebec H4B 1R6",
                         BuildingName.VANIER_LIBRARY
@@ -135,8 +135,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("2", new BuildingFloor("2", BuildingName.VANIER_EXTENSION, "none")),
                                 entry("3", new BuildingFloor("3", BuildingName.VANIER_EXTENSION, "none"))
                         )),
-                        45.45891f,
-                        -73.63888f,
+                        45.45891,
+                        -73.63888,
                         R.drawable.vanier_library,
                         "7141 Rue Sherbrooke O, Montréal, QC H4B 1R6",
                         BuildingName.VANIER_EXTENSION

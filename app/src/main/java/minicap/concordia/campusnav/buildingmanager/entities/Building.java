@@ -21,7 +21,7 @@ public class Building extends Location{
 
 
 
-    public Building(String buildingName, String description, CampusName associatedCampus, HashMap<String, BuildingFloor> floors, float latitude, float longitude, int buildingImageRes, String buildingAddress, BuildingName buildingIdentifier) {
+    public Building(String buildingName, String description, CampusName associatedCampus, HashMap<String, BuildingFloor> floors, double latitude, double longitude, int buildingImageRes, String buildingAddress, BuildingName buildingIdentifier) {
         super(latitude, longitude);
         this.associatedCampus = associatedCampus;
         this.buildingName = buildingName;
