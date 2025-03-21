@@ -1,19 +1,20 @@
 package minicap.concordia.campusnav.screens;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ImageButton;
+import androidx.fragment.app.FragmentActivity;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.components.MainMenuDialog;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -22,7 +23,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-public class ClassScheduleActivity extends AppCompatActivity {
+
+public class ClassScheduleActivity extends FragmentActivity
+        implements MainMenuDialog.MainMenuListener{
+
     private static final int RC_SIGN_IN = 100;
     private static final int REQUEST_CALENDAR_PERMISSION = 101;
 
@@ -33,14 +37,9 @@ public class ClassScheduleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        //Add main menu functionality to page
-        View slidingMenu = findViewById(R.id.sliding_menu);
-        ImageButton openMenuButton = findViewById(R.id.button_menu);
-        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
-        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
-        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
-        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
-        MainMenuController menu = new MainMenuController(this, slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
+        //Main Menu dialog
+        ImageButton menuButton = findViewById(R.id.button_menu);
+        menuButton.setOnClickListener(v -> showMainMenuDialog());
 
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -57,6 +56,11 @@ public class ClassScheduleActivity extends AppCompatActivity {
         // Import button to handle Google Calendar import
         Button importButton = findViewById(R.id.button_import_calendar);
         importButton.setOnClickListener(v -> signIn());
+    }
+
+    public void showMainMenuDialog() {
+        MainMenuDialog dialog = new MainMenuDialog(this);
+        dialog.show();
     }
 
     private void signIn() {
@@ -102,5 +106,6 @@ public class ClassScheduleActivity extends AppCompatActivity {
     private void fetchCalendarEvents() {
         Toast.makeText(this, "Fetching calendar events...", Toast.LENGTH_SHORT).show();
     }
+
 
 }

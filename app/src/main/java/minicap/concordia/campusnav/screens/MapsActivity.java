@@ -1,68 +1,72 @@
 package minicap.concordia.campusnav.screens;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;  // Make sure this is present
-import androidx.activity.result.contract.ActivityResultContracts;
-
 import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.EditText;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-
-import com.google.android.gms.maps.model.LatLng;
+import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
+import minicap.concordia.campusnav.components.MainMenuDialog;
+import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.textfield.TextInputEditText;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
-import minicap.concordia.campusnav.map.FetchPathTask;
-import minicap.concordia.ca.BuildingSelectorFragment;
+import minicap.concordia.campusnav.map.AbstractMap;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
+import minicap.concordia.campusnav.map.InternalMappedIn;
+import minicap.concordia.campusnav.map.MapCoordinates;
+import minicap.concordia.campusnav.map.enums.MapColors;
+import minicap.concordia.campusnav.components.BuildingSelectorFragment;
+import minicap.concordia.campusnav.map.enums.SupportedMaps;
 
 public class MapsActivity extends FragmentActivity
-        implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, BuildingInfoBottomSheetFragment.BuildingInfoListener {
+        implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_LAT = "starting_lat";
@@ -71,19 +75,22 @@ public class MapsActivity extends FragmentActivity
     public static final String KEY_SHOW_SGW = "show_sgw";
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private final LatLng defaultUserLocation = new LatLng(45.489682435037835, -73.58808030276997);
 
-    private InternalGoogleMaps gMapController;
+    private AbstractMap map;
 
-    private ActivityMapsBinding binding;
     private ConcordiaBuildingManager buildingManager;
 
-    private double startingLat;
-    private double startingLng;
-    private boolean showSGW;
+    private MapCoordinates startingCoords;
 
     private boolean isDestinationSet;
+
+    private boolean showSGW;
+
     private boolean hasUserLocationBeenSet;
+
+    private boolean runBus;
+    private boolean runDir;
+
     private Button campusSwitchBtn;
 
     private TextView campusTextView;
@@ -91,7 +98,10 @@ public class MapsActivity extends FragmentActivity
     private String campusNotSelected;
 
     private EditText yourLocationEditText;
+
     private EditText destinationEditText;
+
+    TextInputEditText searchText;
 
     private ImageButton walkButton;
     private ImageButton wheelchairButton;
@@ -99,40 +109,57 @@ public class MapsActivity extends FragmentActivity
     private ImageButton transitButton;
 
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
+
     private FusedLocationProviderClient fusedLocationClient;
+
     private String travelMode = "DRIVE";
 
-    private LatLng destination;
-    private LatLng startingPoint;
+    private MapCoordinates destination;
 
-    // IMPORTANT: Make sure you have the correct import for this field
+    private MapCoordinates origin;
+
+    private SupportedMaps currentMap;
+
+    private Fragment curMapFragment;
+
+    // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_maps);
+
         isDestinationSet = false;
         hasUserLocationBeenSet = false;
         buildingManager = ConcordiaBuildingManager.getInstance();
+        currentMap = SupportedMaps.GOOGLE_MAPS;
+
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            startingLat = bundle.getDouble(KEY_STARTING_LAT);
-            startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            double startingLat = bundle.getDouble(KEY_STARTING_LAT);
+            double startingLng = bundle.getDouble(KEY_STARTING_LNG);
+            startingCoords = new MapCoordinates(startingLat, startingLng);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
+            runBus = bundle.getBoolean("OPEN_BUS", false);
+            runDir = bundle.getBoolean("OPEN_DIR", false);
         }
 
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
         // Hook up the Buildings button to show the BuildingSelectorFragment
-        binding.buildingView.setOnClickListener(v -> showBuildingSelectorFragment());
+        Button buildingViewButton = findViewById(R.id.buildingView);
+        buildingViewButton.setOnClickListener(v -> showBuildingSelectorFragment());
+
+        // Shuttle Button to show the Shuttle Bus Schedule
+        Button shuttleScheduleView = findViewById(R.id.shuttleScheduleView);
+        shuttleScheduleView.setOnClickListener(v -> showShuttleScheduleFragment());
 
         // Initialize BottomSheet
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
         int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
         bottomSheetBehavior.setPeekHeight(peekHeightPx);
         bottomSheetBehavior.setHideable(false);
@@ -156,7 +183,7 @@ public class MapsActivity extends FragmentActivity
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
             // start map
-            initializeMap();
+            initializeMap(false);
         }
 
 
@@ -170,24 +197,19 @@ public class MapsActivity extends FragmentActivity
         carButton.setSelected(true);
 
         walkButton.setOnClickListener(v -> changeSelectedTravelMethod(walkButton, "WALK"));
+
+        //google maps does not support "wheelchair" for now, travelMode is the same as walking
         wheelchairButton.setOnClickListener(v -> changeSelectedTravelMethod(wheelchairButton, "WALK"));
         carButton.setOnClickListener(v -> changeSelectedTravelMethod(carButton, "DRIVE"));
         transitButton.setOnClickListener(v -> changeSelectedTravelMethod(transitButton, "TRANSIT"));
 
         // Setup text fields
         yourLocationEditText = findViewById(R.id.yourLocationEditText);
-        TextInputEditText searchText = findViewById(R.id.genericSearchField);
 
+        searchText = findViewById(R.id.genericSearchField);
 
-        //Add main menu functionality to page
-        View slidingMenu = findViewById(R.id.sliding_menu);
-        ImageButton openMenuButton = findViewById(R.id.menuButton);
-        ImageButton closeMenuButton = findViewById(R.id.closeMenu);
-        ImageButton classScheduleRedirect = findViewById(R.id.classScheduleRedirect);
-        ImageButton directionsRedirect = findViewById(R.id.directionsRedirect);
-        ImageButton campusMapRedirect = findViewById(R.id.campusMapRedirect);
-        MainMenuController menu = new MainMenuController(this, slidingMenu, openMenuButton, closeMenuButton, classScheduleRedirect, directionsRedirect, campusMapRedirect);
-
+        ImageView menuButton = findViewById(R.id.menuButton);
+        menuButton.setOnClickListener(v -> showMainMenuDialog());
 
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -214,56 +236,65 @@ public class MapsActivity extends FragmentActivity
         // Register your activity result launcher
         searchLocationLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == LocationSearchActivity.RESULT_OK) {
-                            Intent intent = result.getData();
-                            if (intent == null) {
-                                Log.e(MAPS_ACTIVITY_TAG, "Error: no intent returned");
-                                return;
-                            }
-                            Bundle returnData = intent.getExtras();
-                            if (returnData == null) {
-                                Log.e(MAPS_ACTIVITY_TAG, "Error: no data returned");
-                                return;
-                            }
+                this::HandleSearchLocationResult);
 
-                            boolean isDestination =
-                                    returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
-                            float lat = returnData.getFloat(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
-                            float lng = returnData.getFloat(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
-
-                            if (isDestination) {
-                                String returnedLocation =
-                                        returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
-                                setDestination(returnedLocation, lat, lng);
-                            } else {
-                                boolean useCurrentLocation =
-                                        returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
-                                if (useCurrentLocation) {
-                                    setStartingPoint(true, "", lat, lng);
-                                } else {
-                                    String returnedLocation =
-                                            returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
-                                    setStartingPoint(false, returnedLocation, lat, lng);
-                                }
-                            }
-                        }
-                        // Clear focus after returning
-                        runOnUiThread(() -> {
-                            searchText.clearFocus();
-                            destinationEditText.clearFocus();
-                            yourLocationEditText.clearFocus();
-                        });
-                    }
-                }
-        );
-
-        // Attempt to get user location
         getUserLocationPath();
+
+        if(runBus){
+            showShuttleScheduleFragment();
+        }
+
+        if(runDir){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
     }
 
+    /**
+     * Handles the result of the SearchLocationActivity
+     * @param result The result received from the activity
+     */
+    private void HandleSearchLocationResult(ActivityResult result) {
+        runOnUiThread(() -> {
+            searchText.clearFocus();
+            destinationEditText.clearFocus();
+            yourLocationEditText.clearFocus();
+        });
+
+        if(result.getResultCode() != LocationSearchActivity.RESULT_OK) {
+            Log.d(MAPS_ACTIVITY_TAG, "Result code for search was not 'ok', discarding...");
+            return;
+        }
+
+        Intent intent = result.getData();
+        if(intent == null) {
+            Log.e(MAPS_ACTIVITY_TAG, "Error while reading results from search, no intent returned");
+            return;
+        }
+        Bundle returnData = intent.getExtras();
+        if(returnData == null) {
+            Log.e(MAPS_ACTIVITY_TAG, "Error while reading results from search, no data was returned");
+            return;
+        }
+
+        boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
+        String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
+        double lat = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
+        double lng = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
+        MapCoordinates newCoords = new MapCoordinates(lat, lng);
+        if(isDestination) {
+            setDestination(returnedLocation, newCoords);
+        }
+        else {
+            boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
+            setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
+        }
+    }
+
+    /**
+     * Launches the search activity and sets the extra parameters
+     * @param previousInput The previous location that was selected if there was one
+     * @param isStartingLocation Flag to indicate if this is a search for starting location or destination
+     */
     private void launchSearchActivity(String previousInput, boolean isStartingLocation) {
         Intent i = new Intent(MapsActivity.this, LocationSearchActivity.class);
         i.putExtra(LocationSearchActivity.KEY_IS_STARTING_LOCATION, isStartingLocation);
@@ -271,34 +302,53 @@ public class MapsActivity extends FragmentActivity
         searchLocationLauncher.launch(i);
     }
 
-    private void setStartingPoint(boolean useCurrentLocation, String locationString, float lat, float lng) {
-        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString
-                + " coords: (" + lat + ", " + lng + ") current: " + useCurrentLocation);
+    /**
+     * Sets the starting point used for navigation
+     * @param useCurrentLocation Flag indicating whether to use the current location of the user
+     * @param locationString The name of the location
+     * @param coordinates The coordinates of the starting point
+     */
+    private void setStartingPoint(boolean useCurrentLocation, String locationString, MapCoordinates coordinates) {
+        Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + coordinates.getLat() + ", " + coordinates.getLng() + "), is current location: " + useCurrentLocation);
 
-        if (useCurrentLocation && !hasUserLocationBeenSet) {
+        if(useCurrentLocation && !hasUserLocationBeenSet) {
+            //getUserLocationPath will set the starting point and then call this again
             getUserLocationPath();
             return;
         }
-
-        if (useCurrentLocation) {
-            yourLocationEditText.setText(R.string.your_location);
-        } else {
+        String yourLocationText;
+        if(useCurrentLocation) {
+            yourLocationText = getString(R.string.your_location);
+        }
+        else {
+            //Reset this flag in case the user wants to use their own location in the future
             hasUserLocationBeenSet = false;
-            startingPoint = new LatLng(lat, lng);
-            yourLocationEditText.setText(locationString);
+            origin = coordinates;
+            yourLocationText = locationString;
         }
 
-        drawPath(startingPoint, destination);
+        runOnUiThread(() -> {
+            yourLocationEditText.setText(yourLocationText);
+        });
+
+        drawPath();
     }
 
-    private void setDestination(String locationString, float lat, float lng) {
-        Log.d(MAPS_ACTIVITY_TAG, "Set destination: " + locationString
-                + " coords: (" + lat + ", " + lng + ")");
+    /**
+     * Sets the destination used for navigation
+     * @param locationString The name of the location
+     * @param coordinates The coordinates of the location
+     */
+    private void setDestination(String locationString, MapCoordinates coordinates) {
+        Log.d(MAPS_ACTIVITY_TAG, "Set destination to: " + locationString + " with coords: (" + coordinates.getLat() + ", " + coordinates.getLng() + ")");
 
-        destination = new LatLng(lat, lng);
-        destinationEditText.setText(locationString);
+        destination = coordinates;
+        runOnUiThread(() -> {
+            destinationEditText.setText(locationString);
+        });
         isDestinationSet = true;
-        drawPath(startingPoint, destination);
+
+        drawPath();
     }
 
     /**
@@ -311,18 +361,23 @@ public class MapsActivity extends FragmentActivity
         // getting the new campus location
         CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
         Campus curCampus = buildingManager.getCampus(wantedCampus);
-        LatLng campusCoords = new LatLng(curCampus.getLocation()[0], curCampus.getLocation()[1]);
+        MapCoordinates campusCoords = curCampus.getLocation();
 
         //moving the existing marker to the new campus location
-        gMapController.addMarker(campusCoords, curCampus.getCampusName(), true);
+        map.addMarker(campusCoords, curCampus.getCampusName(), true);
 
-        //moving the existing marker to the new campus location
-        gMapController.centerOnCoordinates(campusCoords.latitude, campusCoords.longitude);
+        //moving the camera smoothly to the new campus location
+        map.centerOnCoordinates(campusCoords);
 
         //updating the button text
-        campusTextView.setText(showSGW ? "SGW" : "LOY");
+        campusTextView.setText(showSGW ? "LOY" : "SGW");
     }
 
+    /**
+     * Switches the desired travel method and re-draws the route line
+     * @param selectedButton The travel method button that was clicked
+     * @param newTravelMode The new travel mode to be used
+     */
     private void changeSelectedTravelMethod(ImageButton selectedButton, String newTravelMode) {
         walkButton.setSelected(false);
         wheelchairButton.setSelected(false);
@@ -331,7 +386,8 @@ public class MapsActivity extends FragmentActivity
 
         selectedButton.setSelected(true);
         travelMode = newTravelMode;
-        drawPath(startingPoint, destination);
+
+        drawPath();
     }
 
     @Override
@@ -342,7 +398,7 @@ public class MapsActivity extends FragmentActivity
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initializeMap();
+                initializeMap(false);
             } else {
                 Toast.makeText(this,
                         "Location permission is required to show your location",
@@ -352,49 +408,62 @@ public class MapsActivity extends FragmentActivity
     }
 
     /**
-     * Initializes google maps
+     * Switches the current map to a different supported map
      */
-    private void initializeMap() {
-        SupportMapFragment mapFragment = (SupportMapFragment)
-                getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
+    private void switchCurrentMap() {
+        if(currentMap == SupportedMaps.GOOGLE_MAPS) {
+            currentMap = SupportedMaps.MAPPED_IN;
+        }
+        else {
+            currentMap = SupportedMaps.GOOGLE_MAPS;
+        }
 
+        getSupportFragmentManager().beginTransaction()
+                .remove(curMapFragment)
+                .commit();
+
+        initializeMap(true);
+    }
 
     /**
-     * Callback for when google maps has loaded
-     * @param googleMap The loaded google map
+     * Initializes the desired map
      */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        gMapController = new InternalGoogleMaps(googleMap);
+    private void initializeMap(boolean replace) {
+        if(currentMap == SupportedMaps.GOOGLE_MAPS) {
+            map = new InternalGoogleMaps(this);
+            campusSwitchBtn.setVisibility(VISIBLE);
+        }
+        else {
+            map = new InternalMappedIn(this);
+            campusSwitchBtn.setVisibility(GONE);
+        }
 
-        gMapController.centerOnCoordinates(startingLat, startingLng);
+        curMapFragment = map.initialize();
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
 
-        // create building shapes
-        gMapController.addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
-        gMapController.addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
+        if(replace) {
+            ft.replace(R.id.map, curMapFragment);
+        }
+        else {
+            ft.add(R.id.map, curMapFragment);
+        }
 
-        // Let user click anywhere to set as destination
-        gMapController.setOnMapClickListener(latLng -> {
-            String address = getAddressFromLocation(latLng.latitude, latLng.longitude);
-            gMapController.addMarker(latLng, "Clicked location", true);
-            setDestination(address, (float) latLng.latitude, (float) latLng.longitude);
-        });
-
-        //Enables location tracking on the map
-        getUserLocationPath();
-        enableMyLocation();
+        ft.commit();
     }
 
+    /**
+     * Enables location tracking on the map
+     */
     private void enableMyLocation() {
-        if (!gMapController.toggleLocationTracking(true)) {
-            Toast.makeText(this,
-                    "Location permission not granted",
-                    Toast.LENGTH_SHORT).show();
+        if (!map.toggleLocationTracking(true)) {
+            Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Gets the User Location and invokes drawPath
+     */
     private void getUserLocationPath() {
         if (fusedLocationClient == null) {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -405,9 +474,10 @@ public class MapsActivity extends FragmentActivity
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, location -> {
                         if (location != null) {
-                            startingPoint = new LatLng(location.getLatitude(), location.getLongitude());
+                            //If you are emulating and need to change your current location, use the emulator controls.
+                            origin = new MapCoordinates(location.getLatitude(), location.getLongitude());
                             hasUserLocationBeenSet = true;
-                            setStartingPoint(true, "", 0f, 0f);
+                            setStartingPoint(true, "", origin);
                         }
                     });
         } else {
@@ -417,6 +487,12 @@ public class MapsActivity extends FragmentActivity
         }
     }
 
+    /**
+     * Gets the address as a String given coordinates
+     * @param latitude double
+     * @param longitude double
+     * @return String
+     */
     private String getAddressFromLocation(double latitude, double longitude) {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses;
@@ -433,72 +509,80 @@ public class MapsActivity extends FragmentActivity
         }
     }
 
-    //Note: It would be best if this was handled by the map class
     /**
      * This handles the calls to the map to create the route
-     * @param origin LatLng
-     * @param destination LatLng
      */
-    private void drawPath(LatLng origin, LatLng destination) {
+    private void drawPath() {
         //In case someone changes their starting location before their destination
         if(!isDestinationSet) {
             return;
         }
 
-        gMapController.clearPolyLines();
-        gMapController.clearAllMarkers();
-        gMapController.addMarker(origin, "Current location", BitmapDescriptorFactory.HUE_AZURE);
+        map.clearPathFromMap();
+        map.clearAllMarkers();
+        map.addMarker(origin, "Starting location", MapColors.BLUE);
 
-        gMapController.addMarker(destination, "Destination");
+        map.addMarker(destination, "Destination");
 
-        gMapController.centerOnCoordinates(origin.latitude,origin.longitude);
+        map.centerOnCoordinates(origin);
 
-        new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+        map.displayRoute(origin, destination, travelMode);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    //Note: It would be best if this is handled by the map class
-    /**
-     * Will add the route to the Map
-     * Invoked when the route is fetched by the Google API
-     * @param info JSONArray
-     */
     @Override
-    public void onRouteFetched(JSONArray info) {
-        try {
-            JSONArray steps = info.getJSONArray(0);
-            TextView estimatedTime = findViewById(R.id.estimatedTime);
-            String estimatedTimeValue = info.getString(1);
-            estimatedTime.setText(getString(R.string.estimated_time, estimatedTimeValue));
+    public void onMapReady() {
+        map.centerOnCoordinates(startingCoords);
 
-            // Handles Route not fetched
-            if (steps == null) {
-                Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            gMapController.parseRoutePolylineAndDisplay(steps);
-        } catch (JSONException e) {
-            Log.e("Route Parsing Error", e.toString());
-        }
+        //By default, origin is user location
+        enableMyLocation();
+        getUserLocationPath();
     }
+
+    @Override
+    public void onEstimatedTimeUpdated(String newTime) {
+        TextView estimatedTime = findViewById(R.id.estimatedTime);
+
+        estimatedTime.setText(getString(R.string.estimated_time, newTime));
+    }
+
+    @Override
+    public void onMapError(String errorString) {
+        Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMapClicked(MapCoordinates coordinates) {
+        String address = getAddressFromLocation(coordinates.getLat(), coordinates.getLng());
+        map.addMarker(coordinates, "Clicked location", true);
+        setDestination(address, coordinates);
+    }
+
+    public void showMainMenuDialog() {
+        MainMenuDialog dialog = new MainMenuDialog(this);
+        dialog.show();
+    }
+
 
     // Show building selector fragment
     private void showBuildingSelectorFragment() {
         BuildingSelectorFragment fragment = new BuildingSelectorFragment();
         fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
     }
+
+    // Show shuttle schedule fragment
+    private void showShuttleScheduleFragment(){
+        ShuttleBusScheduleFragment shuttleBusScheduleFragment = new ShuttleBusScheduleFragment();
+        shuttleBusScheduleFragment.show(getSupportFragmentManager(), "ShuttleBusScheduleFragment");
+    }
+
+
     @Override
     public void directionButtonOnClick(Building building) {
-        float[] location = building.getLocation();
-        if (location == null || location.length < 2) {
-            Log.e("MapsActivity", "Invalid location data for building.");
-            return;
-        }
+        MapCoordinates location = building.getLocation();
 
-        LatLng destination = new LatLng(location[0], location[1]);
-        setDestination(building.getBuildingName(), (float) destination.latitude, (float) destination.longitude);
+        setDestination(building.getBuildingName(), location);
     }
 
 }

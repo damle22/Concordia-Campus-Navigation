@@ -17,6 +17,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testApplicationId = "minicap.concordia.campusnav.tests"
 
         manifestPlaceholders["MAPS_API_KEY"] = properties["MAPS_API_KEY"] ?: ""
         manifestPlaceholders["WEB_CLIENT_ID"] = properties["WEB_CLIENT_ID"] ?: ""
@@ -38,23 +39,22 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    // Merge extra build features from my branch (dataBinding enabled)
     buildFeatures {
 
         dataBinding = true   // added from my branch
         viewBinding = true
         buildConfig = true
     }
-
-    // Add Kotlin compiler options from my branch
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
-    testOptions {
+    testOptions{
         unitTests.isReturnDefaultValues = true
         unitTests.isIncludeAndroidResources = true
+    }
+    compileOptions{
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    kotlinOptions {
+        jvmTarget = "21"
     }
 
     packagingOptions {
@@ -76,11 +76,11 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.maps.android:android-maps-utils:3.10.0")
-
-    // Additional dependencies from my branch:
+    implementation("com.mappedin.sdk:mappedin:5.7.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.0")
     implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.test.espresso:espresso-intents:3.6.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -105,7 +105,3 @@ dependencies {
         exclude(module = "httpclient")
     }
 }
-
-
-
-
