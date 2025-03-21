@@ -1,8 +1,10 @@
 package minicap.concordia.campusnav.screens;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ImageButton;
@@ -10,7 +12,6 @@ import androidx.fragment.app.FragmentActivity;
 
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import minicap.concordia.campusnav.R;
@@ -24,8 +25,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 
-public class ClassScheduleActivity extends FragmentActivity
-        implements MainMenuDialog.MainMenuListener{
+public class ClassScheduleActivity extends FragmentActivity implements MainMenuDialog.MainMenuListener{
 
     private static final int RC_SIGN_IN = 100;
     private static final int REQUEST_CALENDAR_PERMISSION = 101;
