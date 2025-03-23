@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayout"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="wrap_content"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_sheet"
-        android:layout_width="417dp"
-        android:layout_height="379dp"
+        android:layout_width="match_parent"
+        android:layout_height="384dp"
         android:background="@color/light_burgundy"
         android:backgroundTint="@color/light_burgundy"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
             android:id="@+id/widgetIcon"
@@ -25,8 +22,9 @@
             android:background="@color/yellow"
             android:clickable="false"
             android:focusable="false"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="146dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
             android:id="@+id/seperator"
@@ -47,19 +45,19 @@
             android:layout_width="0dp"
             android:layout_height="55dp"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
+            android:src="@drawable/rectangle_area"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.382"
             app:layout_constraintStart_toEndOf="@+id/currentLocationPin"
-            app:layout_constraintTop_toBottomOf="@+id/widgetIcon"
-            app:srcCompat="@drawable/rectangle_area" />
+            app:layout_constraintTop_toBottomOf="@+id/widgetIcon" />
 
         <TextView
             android:id="@+id/routeOptionsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="60dp"
             android:text="Route Options"
             android:textColor="@android:color/white"
             android:textSize="18sp"
@@ -118,10 +116,11 @@
             android:id="@+id/EstimatedTime"
             android:layout_width="277dp"
             android:layout_height="46dp"
+            android:layout_marginStart="10dp"
             android:layout_marginBottom="16dp"
+            android:src="@drawable/rectangle_area"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:srcCompat="@drawable/rectangle_area"
-            tools:layout_editor_absoluteX="13dp" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/estimatedTime"
@@ -151,23 +150,25 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="32dp"
+            android:src="@drawable/rectangle_area"
             app:layout_constraintBottom_toTopOf="@+id/seperator"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/DirectionPin"
-            app:srcCompat="@drawable/rectangle_area" />
+            app:layout_constraintStart_toEndOf="@+id/DirectionPin" />
 
         <ImageButton
             android:id="@+id/imageButton"
             android:layout_width="98dp"
             android:layout_height="44dp"
             android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:background="@color/light_burgundy"
             android:scaleType="centerInside"
+            android:src="@drawable/confirmation_button"
             app:layout_constraintBottom_toBottomOf="@+id/EstimatedTime"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/EstimatedTime"
-            app:layout_constraintTop_toTopOf="@+id/EstimatedTime"
-            app:srcCompat="@drawable/confirmation_button" />
+            app:layout_constraintTop_toTopOf="@+id/EstimatedTime" />
 
         <EditText
             android:id="@+id/destinationText"
@@ -194,67 +195,71 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <!-- Walk Button -->
-            <ImageButton
-                android:id="@+id/walkButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/button_selector"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
-                android:src="@drawable/ic_walk"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/wheelchairButton"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Wheelchair Button -->
-            <ImageButton
-                android:id="@+id/wheelchairButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/button_selector"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
-                android:src="@drawable/ic_wheelchair"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/carButton"
-                app:layout_constraintStart_toEndOf="@+id/walkButton"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Car Button -->
-            <ImageButton
-                android:id="@+id/carButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/button_selector"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
-                android:src="@drawable/ic_car"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/transitButton"
-                app:layout_constraintStart_toEndOf="@+id/wheelchairButton"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Transit Button -->
-            <ImageButton
-                android:id="@+id/transitButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/button_selector"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
-                android:src="@drawable/ic_transit"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/carButton"
-                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageButton
+            android:id="@+id/transitButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="40dp"
+            android:background="@drawable/button_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_transit"
+            app:layout_constraintBottom_toBottomOf="@+id/carButton"
+            app:layout_constraintStart_toEndOf="@+id/carButton"
+            app:layout_constraintTop_toTopOf="@+id/carButton" />
+
+        <ImageButton
+            android:id="@+id/carButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="40dp"
+            android:background="@drawable/button_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_car"
+            app:layout_constraintBottom_toBottomOf="@+id/wheelchairButton"
+            app:layout_constraintStart_toEndOf="@+id/wheelchairButton"
+            app:layout_constraintTop_toTopOf="@+id/wheelchairButton" />
+
+        <ImageButton
+            android:id="@+id/wheelchairButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="40dp"
+            android:background="@drawable/button_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_wheelchair"
+            app:layout_constraintBottom_toBottomOf="@+id/walkButton"
+            app:layout_constraintStart_toEndOf="@+id/walkButton"
+            app:layout_constraintTop_toTopOf="@+id/walkButton" />
+
+        <ImageButton
+            android:id="@+id/walkButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginBottom="14dp"
+            android:background="@drawable/button_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_walk"
+            app:layout_constraintBottom_toTopOf="@+id/EstimatedTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/routeOptionsText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
