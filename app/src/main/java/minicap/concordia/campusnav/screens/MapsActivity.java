@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -108,7 +109,7 @@ public class MapsActivity extends FragmentActivity
     private ImageButton carButton;
     private ImageButton transitButton;
 
-    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
+    private BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior;
 
     private FusedLocationProviderClient fusedLocationClient;
 
@@ -157,7 +158,7 @@ public class MapsActivity extends FragmentActivity
         shuttleScheduleView.setOnClickListener(v -> showShuttleScheduleFragment());
 
         // Initialize BottomSheet
-        LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
+        ConstraintLayout bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         int peekHeightPx = (int) (32 * getResources().getDisplayMetrics().density);
