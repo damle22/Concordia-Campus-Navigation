@@ -19,7 +19,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId = "minicap.concordia.campusnav.tests"
 
+        manifestPlaceholders["MAPS_API_KEY"] = properties["MAPS_API_KEY"] ?: ""
+        manifestPlaceholders["WEB_CLIENT_ID"] = properties["WEB_CLIENT_ID"] ?: ""
+
         buildConfigField("String", "MAPS_API_KEY", "\"${project.findProperty("MAPS_API_KEY")}\"")
+        buildConfigField("String", "WEB_CLIENT_ID", "\"${project.findProperty("WEB_CLIENT_ID")}\"")
     }
 
     buildTypes {
@@ -51,6 +55,14 @@ android {
     }
     kotlinOptions {
         jvmTarget = "21"
+    }
+
+    packagingOptions {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/LICENSE"
+        }
     }
 }
 
@@ -85,5 +97,12 @@ dependencies {
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.fragment:fragment-testing:1.5.7")
 
-
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
+    implementation("com.google.api-client:google-api-client-android:1.33.0") {
+        exclude(group = "org.apache.httpcomponents")
+    }
+    implementation("com.google.http-client:google-http-client-gson:1.42.3") {
+        exclude(module = "httpclient")
+    }
 }
