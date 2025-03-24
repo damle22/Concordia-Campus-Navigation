@@ -1,19 +1,27 @@
 package minicap.concordia.campusnav.CalendarService;
 
 
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.screens.MapsActivity;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -24,15 +32,24 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
     public void setData(List<EventItem> newData) {
-        this.eventList = newData;
+        long now = System.currentTimeMillis();
+
+        List<EventItem> filteredList = new ArrayList<>();
+        for (EventItem item : newData) {
+            if (item.getEndTime().getValue() >= now) {
+                filteredList.add(item);
+            }
+        }
+
+        this.eventList = filteredList;
         notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(android.R.layout.simple_list_item_2, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event, parent, false);
         return new EventViewHolder(view);
     }
 
@@ -50,26 +67,31 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         String formattedTimeRange = timeFormat.format(startDate) + " – " + timeFormat.format(endDate);
 
         holder.titleText.setText("📚 " + item.getTitle());
-        holder.subtitleText.setText("📅 " + formattedDate + "   🕒 " + formattedTimeRange + "\n📍 " + item.getLocation());
+        holder.timeText.setText("📅 " + formattedDate + "   🕒 " + formattedTimeRange);
+        holder.locationText.setText("📍 " + item.getLocation());
 
         // Default background
         holder.itemView.setBackgroundColor(0xFFFFFFFF);
 
         long now = System.currentTimeMillis();
 
-        // Ongoing class (now)
+        // Ongoing class
         if (now >= startDate.getTime() && now <= endDate.getTime()) {
             holder.itemView.setBackgroundColor(0xFFDFF0D8); // green
         }
-        // Next upcoming class (first class in the future)
+        // Next upcoming class
         else if (isNextUpcomingEvent(position, now)) {
             holder.itemView.setBackgroundColor(0xFFFFE5E5); // light red
         }
 
-        // Add divider styling
-        holder.itemView.setBackgroundResource(R.drawable.item_divider);
-    }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), MapsActivity.class);
+            // Pass the event's address string
+            intent.putExtra("EVENT_ADDRESS", item.getLocation());
+            v.getContext().startActivity(intent);
+        });
 
+    }
 
     private boolean isNextUpcomingEvent(int position, long now) {
         for (int i = 0; i < eventList.size(); i++) {
@@ -81,20 +103,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return false;
     }
 
-
-
     @Override
     public int getItemCount() {
         return eventList.size();
     }
 
     static class EventViewHolder extends RecyclerView.ViewHolder {
-        TextView titleText, subtitleText;
-
+        TextView titleText, timeText, locationText;
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(android.R.id.text1);
-            subtitleText = itemView.findViewById(android.R.id.text2);
+            titleText = itemView.findViewById(R.id.titleText);
+            timeText = itemView.findViewById(R.id.timeText);
+            locationText = itemView.findViewById(R.id.locationText);
         }
     }
 }
