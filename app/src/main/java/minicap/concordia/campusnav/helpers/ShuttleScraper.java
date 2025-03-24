@@ -42,6 +42,7 @@ public class ShuttleScraper {
             schedules.add(new ShuttleSchedule("Friday", "SGW", sgwDeparturesFriday));
 
         } catch (IOException e) {}
+
         return schedules;
     }
 

@@ -1,7 +1,10 @@
 package minicap.concordia.campusnav.helpers;
 
-import android.os.AsyncTask;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import android.os.Handler;
+import android.os.Looper;
 
 import minicap.concordia.campusnav.components.ShuttleSchedule;
 
@@ -12,26 +15,15 @@ public class ScheduleFetcher {
     }
 
     public static void fetch(ScheduleFetchListener listener) {
-        new FetchScheduleTask(listener).execute();
-    }
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
 
-    private static class FetchScheduleTask extends AsyncTask<Void, Void, List<ShuttleSchedule>> {
-        private ScheduleFetchListener listener;
+        executor.execute(() -> {
+            // Background work: Fetch the schedule
+            List<ShuttleSchedule> schedules = ShuttleScraper.fetchSchedule();
 
-        public FetchScheduleTask(ScheduleFetchListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        protected List<ShuttleSchedule> doInBackground(Void... voids) {
-            return ShuttleScraper.fetchSchedule();
-        }
-
-        @Override
-        protected void onPostExecute(List<ShuttleSchedule> schedules) {
-            if (listener != null) {
-                listener.onScheduleFetched(schedules);
-            }
-        }
+            // Update the UI on the main thread
+            handler.post(() -> listener.onScheduleFetched(schedules));
+        });
     }
 }
