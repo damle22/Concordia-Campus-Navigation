@@ -212,7 +212,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
                 runOnUiThread(() ->
                         Toast.makeText(this, "Error fetching events: " + e.getMessage(), Toast.LENGTH_LONG).show()
                 );

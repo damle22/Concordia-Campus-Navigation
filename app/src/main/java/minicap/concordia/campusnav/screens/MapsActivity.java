@@ -562,7 +562,6 @@ public class MapsActivity extends FragmentActivity
                 Toast.makeText(this, "Could not find location for: " + addressString, Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
-            e.printStackTrace();
             Toast.makeText(this, "Error geocoding address: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
