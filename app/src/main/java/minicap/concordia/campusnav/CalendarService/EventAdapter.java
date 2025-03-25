@@ -105,9 +105,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return eventList.size();
     }
 
-    static class EventViewHolder extends RecyclerView.ViewHolder {
-        TextView titleText, timeText, locationText;
+    public static class EventViewHolder extends RecyclerView.ViewHolder {
+        TextView titleText;
+        TextView timeText;
+        TextView locationText;
         ImageView goToClassIV;
+
+        public TextView getTitleText() {
+            return titleText;
+        }
+        public TextView getTimeText() {
+            return timeText;
+        }
+        public TextView getLocationText() {
+            return locationText;
+        }
+        public ImageView getGoToClassIV() {
+            return goToClassIV;
+        }
+
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
             titleText = itemView.findViewById(R.id.titleText);

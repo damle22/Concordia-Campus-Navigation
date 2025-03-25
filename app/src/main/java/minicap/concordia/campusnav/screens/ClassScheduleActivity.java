@@ -170,7 +170,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
 
                 // 4. Fetch events from the primary calendar
                 Events events = service.events().list("primary")
-                        .setMaxResults(10) // get up to 10 events
+                        .setMaxResults(10) // max 10 events at a time for performance purposes
                         .setOrderBy("startTime")
                         .setSingleEvents(true)
                         .execute();
@@ -192,7 +192,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                     // Handle date/time
                     DateTime start = event.getStart().getDateTime();
                     DateTime end   = event.getEnd().getDateTime();
-                    // If it's an all-day event, getDate() might be used
+
                     if (start == null) {
                         start = event.getStart().getDate();
                     }
@@ -200,7 +200,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                         end = event.getEnd().getDate();
                     }
 
-                    String timeRange = formatDateTime(start) + " - " + formatDateTime(end);
 
                     eventItemList.add(new EventItem(title, location, start, end));
                 }
@@ -226,7 +225,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
      */
     private String formatDateTime(DateTime dateTime) {
         if (dateTime == null) return "";
-        // dateTime.toStringRfc3339() returns "2025-03-23T13:00:00.000Z"
+        // dateTime.toStringRfc3339() will return "2025-03-23T13:00:00.000Z"
         return dateTime.toStringRfc3339();
     }
 
