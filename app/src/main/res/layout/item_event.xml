@@ -38,17 +38,12 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/goToClassBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:text="@string/go_to_class"
-        android:textSize="12sp"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#D57A72"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
+    <ImageView
+        android:id="@+id/goToClassIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginStart="10dp"
         android:layout_gravity="center_vertical"
-        android:background="@drawable/rounded_button"/>
+        android:contentDescription="@string/go_to_class"
+        android:src="@drawable/directionsicon" />
 </LinearLayout>
