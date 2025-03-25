@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -63,7 +64,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         String formattedTimeRange = timeFormat.format(startDate) + " – " + timeFormat.format(endDate);
 
         // Populate text fields
-        holder.titleText.setText("📚 " + item.getTitle());
+        holder.titleText.setText(item.getTitle());
         holder.timeText.setText("📅 " + formattedDate + "   🕒 " + formattedTimeRange);
         holder.locationText.setText("📍 " + item.getLocation());
 
@@ -81,7 +82,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
         // "Go to class" button → open MapsActivity
-        holder.goToClassBtn.setOnClickListener(v -> {
+        holder.goToClassIV.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), MapsActivity.class);
             // Pass the event's address string
             intent.putExtra("EVENT_ADDRESS", item.getLocation());
@@ -106,13 +107,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView titleText, timeText, locationText;
-        Button goToClassBtn;
+        ImageView goToClassIV;
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
             titleText = itemView.findViewById(R.id.titleText);
             timeText = itemView.findViewById(R.id.timeText);
             locationText = itemView.findViewById(R.id.locationText);
-            goToClassBtn = itemView.findViewById(R.id.goToClassBtn);
+            goToClassIV = itemView.findViewById(R.id.goToClassIcon);
         }
     }
 }
