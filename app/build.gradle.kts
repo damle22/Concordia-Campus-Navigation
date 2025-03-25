@@ -91,8 +91,6 @@ dependencies {
     testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.mockito:mockito-core:5.16.0")
     testImplementation("org.json:json:20250107")
-    testImplementation("org.powermock:powermock-module-junit4:2.0.9")
-    testImplementation("org.powermock:powermock-api-mockito2:2.0.9")
 
     androidTestImplementation( "androidx.test.espresso:espresso-contrib:3.6.1")
     androidTestImplementation ("androidx.test:runner:1.5.2")
