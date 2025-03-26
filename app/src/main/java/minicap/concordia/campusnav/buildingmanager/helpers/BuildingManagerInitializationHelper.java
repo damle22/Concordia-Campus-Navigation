@@ -24,6 +24,10 @@ import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 
 public class BuildingManagerInitializationHelper {
 
+    /**
+     * Creates a map of CampusName, Campus objects that are read from the resource bundle
+     * @return Map of CampusName, Campus based on resources
+     */
     public static HashMap<CampusName, Campus> createCampuses() {
         CampusName[] campusesToGet = new CampusName[] {CampusName.SGW, CampusName.LOYOLA};
         HashMap<CampusName, Campus> finalCampuses = new HashMap<>();
@@ -47,6 +51,11 @@ public class BuildingManagerInitializationHelper {
         return finalCampuses;
     }
 
+    /**
+     * Creates a map of BuildingName, Building based on the resources.
+     *  Also populates indoor points of interest for each building floor
+     * @return Map of BuildingName, Building based on the resource bundles
+     */
     public static HashMap<BuildingName, Building> createBuildings(){
         // When adding a building, add the key and the resource key below
         // Maintaining the order is extremely important

@@ -81,6 +81,10 @@ public class BuildingFloor {
         return associatedBuilding;
     }
 
+    /**
+     * Sets the IndoorPOIs for this floor
+     * @param newPOIs The new list of IndoorPOIs
+     */
     public void setFloorPOIs(List<IndoorPOI> newPOIs) {
         this.floorPOIs.clear();
         this.floorPOIs.addAll(newPOIs);

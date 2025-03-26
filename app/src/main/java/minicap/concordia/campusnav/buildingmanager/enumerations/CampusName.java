@@ -4,6 +4,10 @@ public enum CampusName {
     SGW,
     LOYOLA;
 
+    /**
+     * Gets a string representing the resource name of this campus
+     * @return String used in resource bundle to identify the campus
+     */
     public String getResourceName() {
         switch(this) {
             case SGW:

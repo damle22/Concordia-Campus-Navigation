@@ -21,7 +21,8 @@ public class IndoorPOIResource_en_CA extends ListResourceBundle {
                 {
                     BuildingName.HALL.getResourceName() + "_Floor1", new ArrayList<IndoorPOI>(Arrays.asList(
                         new IndoorPOI("Test A", POIType.CLASS_ROOM, BuildingName.HALL, "1", false, 45.49719, -73.57926),
-                        new IndoorPOI("Test 2", POIType.WASHROOM, BuildingName.HALL, "1", false, 45.49738, -73.57864)
+                        new IndoorPOI("Test 2", POIType.WASHROOM, BuildingName.HALL, "1", false, 45.49738, -73.57864),
+                        new IndoorPOI("Test Accessibility", POIType.ELEVATOR, BuildingName.HALL, "1", true, 45.9738, -73.57864)
                     ))
                 },
                 {

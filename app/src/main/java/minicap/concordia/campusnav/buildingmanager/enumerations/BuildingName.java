@@ -7,6 +7,10 @@ public enum BuildingName {
     VANIER_EXTENSION,
     LOYOLA_CENTRAL_BUILDING;
 
+    /**
+     * Gets the resource name for the current value of enum
+     * @return A string used for reading resource bundles
+     */
     public String getResourceName() {
         switch(this) {
             case HALL:
