@@ -267,6 +267,15 @@ public class MapsActivity extends FragmentActivity
             return;
         }
 
+        boolean isIndoors = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_INDOORS);
+
+        if(isIndoors) {
+            switchToMap(SupportedMaps.MAPPED_IN);
+        }
+        else {
+            switchToMap(SupportedMaps.GOOGLE_MAPS);
+        }
+
         boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
         String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION_STRING);
         MapCoordinates newCoords = returnData.getParcelable(LocationSearchActivity.KEY_RETURN_CHOSEN_COORDS, MapCoordinates.class);
@@ -400,13 +409,12 @@ public class MapsActivity extends FragmentActivity
     /**
      * Switches the current map to a different supported map
      */
-    private void switchCurrentMap() {
-        if(currentMap == SupportedMaps.GOOGLE_MAPS) {
-            currentMap = SupportedMaps.MAPPED_IN;
+    private void switchToMap(SupportedMaps newMap) {
+        if(currentMap == newMap) {
+            return;
         }
-        else {
-            currentMap = SupportedMaps.GOOGLE_MAPS;
-        }
+
+        currentMap = newMap;
 
         getSupportFragmentManager().beginTransaction()
                 .remove(curMapFragment)
