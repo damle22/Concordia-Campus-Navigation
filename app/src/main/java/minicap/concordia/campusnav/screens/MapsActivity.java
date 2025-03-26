@@ -84,6 +84,10 @@ public class MapsActivity extends FragmentActivity
     private boolean runBus;
     private boolean runDir;
 
+    private boolean isFirstTimeLoad;
+
+    private boolean isSwitchingMap;
+
     private Button campusSwitchBtn;
 
     private TextView campusTextView;
@@ -126,6 +130,8 @@ public class MapsActivity extends FragmentActivity
 
         isDestinationSet = false;
         hasUserLocationBeenSet = false;
+        isFirstTimeLoad = true;
+        isSwitchingMap = false;
         buildingManager = ConcordiaBuildingManager.getInstance();
         currentMap = SupportedMaps.GOOGLE_MAPS;
 
@@ -330,7 +336,9 @@ public class MapsActivity extends FragmentActivity
             yourLocationEditText.setText(yourLocationText);
         });
 
-        drawPath();
+        if(!isSwitchingMap) {
+            drawPath();
+        }
     }
 
     /**
@@ -347,7 +355,10 @@ public class MapsActivity extends FragmentActivity
         });
         isDestinationSet = true;
 
-        drawPath();
+        // We want to ensure that the map is loaded before we draw
+        if(!isSwitchingMap) {
+            drawPath();
+        }
     }
 
     /**
@@ -413,6 +424,8 @@ public class MapsActivity extends FragmentActivity
         if(currentMap == newMap) {
             return;
         }
+
+        isSwitchingMap = true;
 
         currentMap = newMap;
 
@@ -531,11 +544,20 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     public void onMapReady() {
-        map.centerOnCoordinates(startingCoords);
+        if(isFirstTimeLoad) {
+            isFirstTimeLoad = false;
+            map.centerOnCoordinates(startingCoords);
+        }
 
         //By default, origin is user location
         enableMyLocation();
         getUserLocationPath();
+
+
+        if(isSwitchingMap) {
+            isSwitchingMap = false;
+            drawPath();
+        }
     }
 
     @Override

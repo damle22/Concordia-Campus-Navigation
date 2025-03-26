@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "minicap.concordia.campusnav"
-        minSdk = 24
+        minSdk = 33
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -57,7 +57,7 @@ android {
         jvmTarget = "21"
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "META-INF/DEPENDENCIES"
             excludes += "META-INF/NOTICE"
