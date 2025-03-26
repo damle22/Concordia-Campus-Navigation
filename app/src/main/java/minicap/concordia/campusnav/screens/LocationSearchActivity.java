@@ -29,7 +29,6 @@ import minicap.concordia.campusnav.map.MapCoordinates;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -38,12 +37,11 @@ public class LocationSearchActivity extends AppCompatActivity {
     public static final String KEY_PREVIOUS_INPUT_STRING = "previous_input";
     public static final String KEY_IS_STARTING_LOCATION = "is_starting_location";
 
-    public static final String KEY_RETURN_CHOSEN_LOCATION = "return_chosen_location";
-    public static final String KEY_RETURN_BOOL_CURRENT_LOCATION = "return_current_location";
+    public static final String KEY_RETURN_CHOSEN_LOCATION_STRING = "return_chosen_location";
+    public static final String KEY_RETURN_IS_CURRENT_LOCATION_BOOL = "return_current_location";
     public static final String KEY_RETURN_BOOL_IS_DESTINATION = "return_is_destination";
 
-    public static final String KEY_RETURN_CHOSEN_LAT = "return_chosen_latitude";
-    public static final String KEY_RETURN_CHOSEN_LNG = "return_chosen_longitude";
+    public static final String KEY_RETURN_CHOSEN_COORDS = "return_chosen_coordinates";
     private EditText searchInput;
     private RecyclerView resultsRecyclerView;
     private LocationAdapter adapter;
@@ -73,12 +71,12 @@ public class LocationSearchActivity extends AppCompatActivity {
             currentLocationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    MapCoordinates dummyData = new MapCoordinates(0, 0);
                     Intent returnData = new Intent();
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, "");
-                    returnData.putExtra(KEY_RETURN_BOOL_CURRENT_LOCATION, true);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION_STRING, "");
+                    returnData.putExtra(KEY_RETURN_IS_CURRENT_LOCATION_BOOL, true);
                     returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, false);
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LAT, 0f);
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LNG, 0f);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_COORDS, dummyData);
                     setResult(RESULT_OK, returnData);
                     finish();
                 }
@@ -146,11 +144,10 @@ public class LocationSearchActivity extends AppCompatActivity {
             public void onClick(String buildingName, MapCoordinates coordinates) {
                 runOnUiThread(() -> {
                     Intent returnData = new Intent();
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION, buildingName);
-                    returnData.putExtra(KEY_RETURN_BOOL_CURRENT_LOCATION, false);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION_STRING, buildingName);
+                    returnData.putExtra(KEY_RETURN_IS_CURRENT_LOCATION_BOOL, false);
                     returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, !isStartLocation);
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LAT, coordinates.getLat());
-                    returnData.putExtra(KEY_RETURN_CHOSEN_LNG, coordinates.getLng());
+                    returnData.putExtra(KEY_RETURN_CHOSEN_COORDS, coordinates);
                     setResult(RESULT_OK, returnData);
                     finish();
                 });

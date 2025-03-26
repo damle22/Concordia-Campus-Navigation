@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,13 +35,9 @@ import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
-import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
-
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -52,14 +47,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
 import minicap.concordia.campusnav.map.AbstractMap;
-import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.InternalMappedIn;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.enums.MapColors;
@@ -70,8 +63,7 @@ public class MapsActivity extends FragmentActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
-    public static final String KEY_STARTING_LAT = "starting_lat";
-    public static final String KEY_STARTING_LNG = "starting_lng";
+    public static final String KEY_STARTING_COORDS = "starting_coords";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
     public static final String KEY_SHOW_SGW = "show_sgw";
 
@@ -140,9 +132,7 @@ public class MapsActivity extends FragmentActivity
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            double startingLat = bundle.getDouble(KEY_STARTING_LAT);
-            double startingLng = bundle.getDouble(KEY_STARTING_LNG);
-            startingCoords = new MapCoordinates(startingLat, startingLng);
+            startingCoords = bundle.getParcelable(KEY_STARTING_COORDS, MapCoordinates.class);
             campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
             runBus = bundle.getBoolean("OPEN_BUS", false);
@@ -278,15 +268,14 @@ public class MapsActivity extends FragmentActivity
         }
 
         boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
-        String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
-        double lat = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
-        double lng = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
-        MapCoordinates newCoords = new MapCoordinates(lat, lng);
+        String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION_STRING);
+        MapCoordinates newCoords = returnData.getParcelable(LocationSearchActivity.KEY_RETURN_CHOSEN_COORDS, MapCoordinates.class);
+
         if(isDestination) {
             setDestination(returnedLocation, newCoords);
         }
         else {
-            boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
+            boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_IS_CURRENT_LOCATION_BOOL);
             setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
     }
