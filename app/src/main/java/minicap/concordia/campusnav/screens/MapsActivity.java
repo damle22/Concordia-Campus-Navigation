@@ -119,6 +119,9 @@ public class MapsActivity extends FragmentActivity
 
     private Fragment curMapFragment;
 
+    private String eventAddress;
+
+
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
 
@@ -143,6 +146,7 @@ public class MapsActivity extends FragmentActivity
             showSGW = bundle.getBoolean(KEY_SHOW_SGW);
             runBus = bundle.getBoolean("OPEN_BUS", false);
             runDir = bundle.getBoolean("OPEN_DIR", false);
+            eventAddress = bundle.getString("EVENT_ADDRESS", "");
         }
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
@@ -557,6 +561,27 @@ public class MapsActivity extends FragmentActivity
         if(isSwitchingMap) {
             isSwitchingMap = false;
             drawPath();
+        }
+
+        // If we got an eventAddress, let's geocode it
+        if (eventAddress != null && !eventAddress.isEmpty()) {
+            geocodeAndSetDestination(eventAddress);
+        }
+    }
+    private void geocodeAndSetDestination(String addressString) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(addressString, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address addr = addresses.get(0);
+                double lat = addr.getLatitude();
+                double lng = addr.getLongitude();
+                setDestination(addressString, new MapCoordinates(lat, lng));
+            } else {
+                Toast.makeText(this, "Could not find location for: " + addressString, Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, "Error geocoding address: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
