@@ -103,14 +103,7 @@ public class MainMenuDialog extends SideSheetDialog {
     }
 
     public Intent campusMapRoutine(){
-        Campus campus = states.getCampus();
-        MapCoordinates campusCoordinates = campus.getLocation();
-
-        Intent intent = new Intent(context, MapsActivity.class);
-        intent.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
-        intent.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-
-        return intent;
+        return new Intent(context, MapsActivity.class);
     }
 
     public void openBusSchedule(){

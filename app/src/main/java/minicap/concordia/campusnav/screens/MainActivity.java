@@ -63,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
         MapCoordinates campusCoordinates = campus.getLocation();
 
         Intent i = new Intent(MainActivity.this, MapsActivity.class);
-        i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
-        i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
         startActivity(i);
     }
 }

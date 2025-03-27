@@ -71,8 +71,6 @@ public class MapsActivity extends FragmentActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
-    public static final String KEY_STARTING_LAT = "starting_lat";
-    public static final String KEY_STARTING_LNG = "starting_lng";
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -137,16 +135,20 @@ public class MapsActivity extends FragmentActivity
         buildingManager = ConcordiaBuildingManager.getInstance();
         currentMap = SupportedMaps.GOOGLE_MAPS;
 
-
+        //Check bundle for any additional requests
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            double startingLat = bundle.getDouble(KEY_STARTING_LAT);
-            double startingLng = bundle.getDouble(KEY_STARTING_LNG);
-            startingCoords = new MapCoordinates(startingLat, startingLng);
             runBus = bundle.getBoolean("OPEN_BUS", false);
             runDir = bundle.getBoolean("OPEN_DIR", false);
             eventAddress = bundle.getString("EVENT_ADDRESS", "");
         }
+
+        // Initialize campus map by pulling saved state
+        Campus campus = states.getCampus();
+        MapCoordinates campusCoordinates = campus.getLocation();
+        double startingLat = campusCoordinates.getLat();
+        double startingLng = campusCoordinates.getLng();
+        startingCoords = new MapCoordinates(startingLat, startingLng);
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
         Button buildingViewButton = findViewById(R.id.buildingView);
