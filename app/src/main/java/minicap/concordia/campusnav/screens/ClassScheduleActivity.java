@@ -171,6 +171,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                 // 4. Fetch events from the primary calendar
                 Events events = service.events().list("primary")
                         .setMaxResults(10) // max 10 events at a time for performance purposes
+                        .setTimeMin(new DateTime(System.currentTimeMillis())) // we are just fetching events that are taking place now and in the future (we don't want past events)
                         .setOrderBy("startTime")
                         .setSingleEvents(true)
                         .execute();
