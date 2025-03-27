@@ -15,6 +15,7 @@ import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.map.MapCoordinates;
+import minicap.concordia.campusnav.savedstates.States;
 import minicap.concordia.campusnav.screens.ClassScheduleActivity;
 import minicap.concordia.campusnav.screens.MainActivity;
 import minicap.concordia.campusnav.screens.MapsActivity;
@@ -28,6 +29,7 @@ public class MainMenuDialog extends SideSheetDialog {
     ImageButton campusMapRedirect;
     ImageButton busScheduleRedirect;
     Context context;
+    private final States states = States.getInstance();
 
     public interface MainMenuListener {
     }
@@ -101,9 +103,8 @@ public class MainMenuDialog extends SideSheetDialog {
     }
 
     public Intent campusMapRoutine(){
-        ConcordiaBuildingManager buildingManager = ConcordiaBuildingManager.getInstance();
-        Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-        MapCoordinates campusCoordinates = sgwCampus.getLocation();
+        Campus campus = states.getCampus();
+        MapCoordinates campusCoordinates = campus.getLocation();
 
         Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());

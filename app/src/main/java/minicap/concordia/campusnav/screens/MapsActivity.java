@@ -169,7 +169,7 @@ public class MapsActivity extends FragmentActivity
 
         // Setup campus switching
         campusTextView = findViewById(R.id.ToCampus);
-        campusTextView.setText(states.getOtherCampusNameAbreviated());
+        campusTextView.setText(states.getOtherCampusAbrev());
         campusSwitchBtn = findViewById(R.id.campusSwitch);
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
@@ -373,7 +373,7 @@ public class MapsActivity extends FragmentActivity
         map.centerOnCoordinates(campusCoords);
 
         //updating the button text
-        campusTextView.setText(states.getOtherCampusNameAbreviated());
+        campusTextView.setText(states.getOtherCampusAbrev());
     }
 
     /**

@@ -10,6 +10,8 @@ public class States {
 
     private String otherCampus;
 
+    private String otherCampusAbrev;
+
     private boolean darkMode = false;
 
     private static final States instance = new States();
@@ -33,11 +35,15 @@ public class States {
     }
 
     public void setCampus(Campus campus) {
-        campusName = campus.getCampusName();
-        if (campusName.equals("Loyola campus")){
+        String campusFullName = campus.getCampusName();
+        if (campusFullName.equals("Loyola campus")){
+            campusName = "LOYOLA";
             otherCampus = "SGW";
-        } else if (campusName.equals("Sir George William campus")){
+            otherCampusAbrev = "SGW";
+        } else if (campusFullName.equals("Sir George William campus")){
+            campusName = "SGW";
             otherCampus = "LOYOLA";
+            otherCampusAbrev = "LOY";
         }
         this.campus = campus;
     }
@@ -50,7 +56,7 @@ public class States {
         return otherCampus;
     }
 
-    public String getOtherCampusNameAbreviated(){
-        return otherCampus.substring(0, 3);
+    public String getOtherCampusAbrev() {
+        return otherCampusAbrev;
     }
 }
