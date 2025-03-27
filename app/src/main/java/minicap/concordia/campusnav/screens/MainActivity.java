@@ -13,10 +13,13 @@ import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.map.MapCoordinates;
+import minicap.concordia.campusnav.savedstates.States;
 
 public class MainActivity extends AppCompatActivity {
 
     private ConcordiaBuildingManager buildingManager;
+
+    //private States states = States.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
