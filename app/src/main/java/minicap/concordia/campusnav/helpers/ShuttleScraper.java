@@ -11,11 +11,12 @@ import java.util.List;
 
 import minicap.concordia.campusnav.components.ShuttleSchedule;
 
+// Scrapes shuttle schedule from Concordia website
 public class ShuttleScraper {
-
+    // Fetches and parses schedule from HTML
     public static List<ShuttleSchedule> fetchSchedule() {
         List<ShuttleSchedule> schedules = new ArrayList<>();
-
+        // Uses Jsoup for web scraping
         try {
             // Fetch the HTML content of the page
             Document doc = Jsoup.connect("https://www.concordia.ca/maps/shuttle-bus.html#depart").get();
@@ -46,7 +47,9 @@ public class ShuttleScraper {
         return schedules;
     }
 
+    // Helper to extract table data
     private static void extractTableData(Element table, List<String> loyolaDepartures, List<String> sgwDepartures) {
+        // Parses HTML table rows/columns
         Elements rows = table.select("tr");
         for (Element row : rows) {
             Elements columns = row.select("td");
