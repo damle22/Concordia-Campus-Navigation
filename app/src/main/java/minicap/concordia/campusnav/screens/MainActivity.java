@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(MainActivity.this, MapsActivity.class);
         i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
         i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-        i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
-        i.putExtra(MapsActivity.KEY_SHOW_SGW, false);
         startActivity(i);
     }
 }

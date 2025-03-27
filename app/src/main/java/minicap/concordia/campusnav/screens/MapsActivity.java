@@ -65,6 +65,7 @@ import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
+import minicap.concordia.campusnav.savedstates.States;
 
 public class MapsActivity extends FragmentActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
@@ -72,8 +73,6 @@ public class MapsActivity extends FragmentActivity
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_LAT = "starting_lat";
     public static final String KEY_STARTING_LNG = "starting_lng";
-    public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
-    public static final String KEY_SHOW_SGW = "show_sgw";
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -85,8 +84,6 @@ public class MapsActivity extends FragmentActivity
 
     private boolean isDestinationSet;
 
-    private boolean showSGW;
-
     private boolean hasUserLocationBeenSet;
 
     private boolean runBus;
@@ -95,8 +92,6 @@ public class MapsActivity extends FragmentActivity
     private Button campusSwitchBtn;
 
     private TextView campusTextView;
-
-    private String campusNotSelected;
 
     private EditText yourLocationEditText;
 
@@ -125,6 +120,8 @@ public class MapsActivity extends FragmentActivity
 
     private String eventAddress;
 
+    private final States states = States.getInstance();
+
 
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
@@ -146,8 +143,6 @@ public class MapsActivity extends FragmentActivity
             double startingLat = bundle.getDouble(KEY_STARTING_LAT);
             double startingLng = bundle.getDouble(KEY_STARTING_LNG);
             startingCoords = new MapCoordinates(startingLat, startingLng);
-            campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
-            showSGW = bundle.getBoolean(KEY_SHOW_SGW);
             runBus = bundle.getBoolean("OPEN_BUS", false);
             runDir = bundle.getBoolean("OPEN_DIR", false);
             eventAddress = bundle.getString("EVENT_ADDRESS", "");
@@ -174,9 +169,8 @@ public class MapsActivity extends FragmentActivity
 
         // Setup campus switching
         campusTextView = findViewById(R.id.ToCampus);
-        campusTextView.setText(campusNotSelected);
+        campusTextView.setText(states.getOtherCampusNameAbreviated());
         campusSwitchBtn = findViewById(R.id.campusSwitch);
-
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
         // check location permission
@@ -360,12 +354,16 @@ public class MapsActivity extends FragmentActivity
      * Toggles the map to either the SGW campus or the Loyola campus based on which was already focused
      */
     private void toggleCampus() {
-        //flipping the state
-        showSGW = !showSGW;
+        //get campus from saved states
+        String newCampusName = states.getOtherCampusName();
 
-        // getting the new campus location
-        CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
+        //converts string "SGW" or "LOYOLA" into the corresponding enum constant
+        CampusName wantedCampus = CampusName.valueOf(newCampusName);
         Campus curCampus = buildingManager.getCampus(wantedCampus);
+
+        //save new campus state
+        states.setCampus(curCampus);
+
         MapCoordinates campusCoords = curCampus.getLocation();
 
         //moving the existing marker to the new campus location
@@ -375,7 +373,7 @@ public class MapsActivity extends FragmentActivity
         map.centerOnCoordinates(campusCoords);
 
         //updating the button text
-        campusTextView.setText(showSGW ? "LOY" : "SGW");
+        campusTextView.setText(states.getOtherCampusNameAbreviated());
     }
 
     /**

@@ -20,10 +20,6 @@ public class States {
         return instance;
     }
 
-    public Campus getCampus() {
-        return campus;
-    }
-
     public void toggleDarkMode(){
         darkMode = !darkMode;
     }
@@ -32,14 +28,17 @@ public class States {
         return darkMode;
     }
 
+    public Campus getCampus() {
+        return campus;
+    }
+
     public void setCampus(Campus campus) {
         campusName = campus.getCampusName();
-        if (campusName.equals("LOYOLA")){
+        if (campusName.equals("Loyola campus")){
             otherCampus = "SGW";
-        } else if (campusName.equals("SGW")){
-            otherCampus = "LOY";
+        } else if (campusName.equals("Sir George William campus")){
+            otherCampus = "LOYOLA";
         }
-
         this.campus = campus;
     }
 
@@ -47,7 +46,11 @@ public class States {
         return campusName;
     }
 
-    public String getOtherCampus(){
+    public String getOtherCampusName(){
         return otherCampus;
+    }
+
+    public String getOtherCampusNameAbreviated(){
+        return otherCampus.substring(0, 3);
     }
 }

@@ -108,8 +108,6 @@ public class MainMenuDialog extends SideSheetDialog {
         Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
         intent.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-        intent.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-        intent.putExtra(MapsActivity.KEY_SHOW_SGW, true);
 
         return intent;
     }
