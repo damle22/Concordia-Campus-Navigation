@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ConcordiaBuildingManager buildingManager;
 
-    //private States states = States.getInstance();
+    private final States states = States.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Campus sgwCampus = buildingManager.getCampus(CampusName.SGW);
-                MapCoordinates campusCoordinates = sgwCampus.getLocation();
+                states.setCampus(sgwCampus);
 
-                Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
-                i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "LOY");
-                i.putExtra(MapsActivity.KEY_SHOW_SGW, true);
-                startActivity(i);
+                openIntent();
             }
         });
 
@@ -56,15 +51,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Campus loyolaCampus = buildingManager.getCampus(CampusName.LOYOLA);
-                MapCoordinates campusCoordinates = loyolaCampus.getLocation();
+                states.setCampus(loyolaCampus);
 
-                Intent i = new Intent(MainActivity.this, MapsActivity.class);
-                i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
-                i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
-                i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
-                i.putExtra(MapsActivity.KEY_SHOW_SGW, false);
-                startActivity(i);
+                openIntent();
             }
         });
+    }
+
+    private void openIntent(){
+        Campus campus = states.getCampus();
+        MapCoordinates campusCoordinates = campus.getLocation();
+
+        Intent i = new Intent(MainActivity.this, MapsActivity.class);
+        i.putExtra(MapsActivity.KEY_STARTING_LAT, campusCoordinates.getLat());
+        i.putExtra(MapsActivity.KEY_STARTING_LNG, campusCoordinates.getLng());
+        i.putExtra(MapsActivity.KEY_CAMPUS_NOT_SELECTED, "SGW");
+        i.putExtra(MapsActivity.KEY_SHOW_SGW, false);
+        startActivity(i);
     }
 }

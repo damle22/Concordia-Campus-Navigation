@@ -1,8 +1,14 @@
 package minicap.concordia.campusnav.savedstates;
 
+import minicap.concordia.campusnav.buildingmanager.entities.Campus;
+
 public class States {
 
-    private String campus;
+    private Campus campus;
+
+    private String campusName;
+
+    private String otherCampus;
 
     private boolean darkMode = false;
 
@@ -14,7 +20,7 @@ public class States {
         return instance;
     }
 
-    public String getCampus() {
+    public Campus getCampus() {
         return campus;
     }
 
@@ -26,7 +32,22 @@ public class States {
         return darkMode;
     }
 
-    public void setCampus(String campus) {
+    public void setCampus(Campus campus) {
+        campusName = campus.getCampusName();
+        if (campusName.equals("LOYOLA")){
+            otherCampus = "SGW";
+        } else if (campusName.equals("SGW")){
+            otherCampus = "LOY";
+        }
+
         this.campus = campus;
+    }
+
+    public String getCampusName(){
+        return campusName;
+    }
+
+    public String getOtherCampus(){
+        return otherCampus;
     }
 }
