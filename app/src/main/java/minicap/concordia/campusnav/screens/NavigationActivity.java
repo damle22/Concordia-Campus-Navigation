@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,10 +53,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.MapCoordinates;
 
-public class NavigationActivity extends AppCompatActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
+public class NavigationActivity extends AppCompatActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, MainMenuDialog.MainMenuListener {
 
     private static final int LOCATION_REQUEST_CODE = 101;
     private static final float DEFAULT_ZOOM = 18f;
@@ -75,9 +77,14 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     private Marker destinationMarker;
     private List<Polyline> routePolylines = new ArrayList<>();
     private TextView etaText;
+    private TextView statsText;
+    private ImageButton exit;
+    private ImageButton mainMenu;
     private JSONArray routeData;
     private boolean isNavigationActive = false;
     private LatLng lastRouteUpdatePosition;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +99,11 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
 
     private void initializeViews() {
         etaText = findViewById(R.id.eta_text);
+        statsText = findViewById(R.id.statsText);
+        mainMenu = findViewById(R.id.mainMenu);
+        exit = findViewById(R.id.exitButton);
+
+        mainMenu.setOnClickListener(v -> showMainMenuDialog());
     }
 
     private void getRouteDataFromIntent() {
@@ -237,7 +249,7 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         }
 
         float rawBearing = (float) SphericalUtil.computeHeading(closestPoint, nextPoint);
-        
+
         return rawBearing;
     }
 
@@ -455,5 +467,10 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
                 Toast.makeText(this, "Location permission required for navigation", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void showMainMenuDialog() {
+        MainMenuDialog dialog = new MainMenuDialog(this);
+        dialog.show();
     }
 }

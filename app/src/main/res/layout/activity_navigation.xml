@@ -38,11 +38,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/inter"
-        android:text="3min"
+        android:text="@string/ETAtemp"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textColor="@android:color/white"
         android:textSize="24sp"
@@ -59,5 +58,16 @@
         app:layout_constraintStart_toStartOf="@+id/navigation_map"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/menubuttonstandalone" />
+
+    <TextView
+        android:id="@+id/statsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter"
+        android:text="@string/timeEstimateTemp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/eta_text"
+        app:layout_constraintTop_toBottomOf="@+id/eta_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
