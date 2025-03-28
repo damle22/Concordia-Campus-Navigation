@@ -2,6 +2,7 @@ package minicap.concordia.campusnav.screens;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -53,9 +54,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.MapCoordinates;
+import minicap.concordia.campusnav.savedstates.States;
 
 public class NavigationActivity extends AppCompatActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, MainMenuDialog.MainMenuListener {
 
@@ -63,6 +66,7 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     private static final float DEFAULT_ZOOM = 18f;
     private static final float ROUTE_ZOOM = 15f;
     private static final float ROUTE_UPDATE_DISTANCE_THRESHOLD = 50;
+    //private final States states = States.getInstance();
 
 
     private GoogleMap googleMap;
@@ -104,6 +108,7 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         exit = findViewById(R.id.exitButton);
 
         mainMenu.setOnClickListener(v -> showMainMenuDialog());
+        exit.setOnClickListener(v -> exitIntent());
     }
 
     private void getRouteDataFromIntent() {
@@ -472,5 +477,14 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     public void showMainMenuDialog() {
         MainMenuDialog dialog = new MainMenuDialog(this);
         dialog.show();
+    }
+
+    public void exitIntent(){
+        stopNavigation();
+        stopLocationUpdates();
+
+        Intent i = new Intent(NavigationActivity.this, MapsActivity.class);
+        i.putExtra("OPEN_DIR", true);
+        startActivity(i);
     }
 }

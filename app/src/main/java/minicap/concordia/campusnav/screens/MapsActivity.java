@@ -255,6 +255,9 @@ public class MapsActivity extends FragmentActivity
         }
     }
 
+    /**
+     * Handles Launching NavigationActivity when starting a live route
+     */
     public void startRoute() {
         if (origin == null || destination == null) {
             //Error Handling
@@ -264,12 +267,6 @@ public class MapsActivity extends FragmentActivity
         new FetchPathTask(new FetchPathTask.OnRouteFetchedListener() {
             @Override
             public void onRouteFetched(JSONArray routeInfo) {
-                if (routeInfo == null || routeInfo.length() == 0) {
-                    runOnUiThread(() ->
-                            Toast.makeText(MapsActivity.this, "Failed to fetch route", Toast.LENGTH_SHORT).show());
-                    return;
-                }
-
                 Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
                 i.putExtra("origin_lat", origin.getLat());
                 i.putExtra("origin_lng", origin.getLng());
