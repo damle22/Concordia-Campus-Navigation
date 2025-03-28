@@ -2,6 +2,7 @@ package minicap.concordia.campusnav.screens;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -128,6 +130,9 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         }
         fetchAndDisplayRoute();
         checkLocationPermissions();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+        }
     }
 
     private void configureMap() {
@@ -135,6 +140,16 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         googleMap.getUiSettings().setCompassEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.setTrafficEnabled(true);
+
+        try {
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(this, R.raw.nav_map_style));
+            if (!success) {
+                Log.e("NavigationActivity", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("NavigationActivity", "Can't find style.", e);
+        }
     }
 
     private void setupMapMarkers() {
@@ -208,27 +223,9 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         }
 
         if (!allPoints.isEmpty()) {
-            PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true).zIndex(1);
+            PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true).zIndex(10);
             routePolylines.add(googleMap.addPolyline(options));
             zoomToRoute();
-        }
-    }
-
-    private int getRouteColor(String travelMode) {
-        switch (travelMode.toUpperCase()) {
-            case "WALK":
-                return Color.BLUE;
-            case "DRIVE":
-            case "CAR":
-                return Color.GREEN;
-            case "TRANSIT":
-            case "BUS":
-            case "SUBWAY":
-                return Color.parseColor("#6200EE");
-            case "BICYCLE":
-                return Color.YELLOW;
-            default:
-                return Color.GRAY;
         }
     }
 
@@ -256,21 +253,6 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             googleMap.setOnMapLoadedCallback(() ->
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
                             builder.build(), 100)));
-        }
-    }
-
-    private int getRouteColor(JSONObject step) throws JSONException {
-        String mode = step.getString("travelMode");
-
-        switch (mode) {
-            case "WALK":
-                return Color.BLUE;
-            case "DRIVE":
-                return Color.GREEN;
-            case "TRANSIT":
-                return Color.parseColor("#6200EE");
-            default:
-                return Color.GRAY;
         }
     }
 
