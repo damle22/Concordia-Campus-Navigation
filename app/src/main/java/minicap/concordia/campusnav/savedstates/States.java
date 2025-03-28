@@ -1,6 +1,7 @@
 package minicap.concordia.campusnav.savedstates;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 public class States {
 
@@ -59,4 +60,5 @@ public class States {
     public String getOtherCampusAbrev() {
         return otherCampusAbrev;
     }
+
 }

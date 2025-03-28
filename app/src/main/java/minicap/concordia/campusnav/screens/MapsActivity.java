@@ -40,13 +40,14 @@ import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
+import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
-
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.textfield.TextInputEditText;
+
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.List;
@@ -101,6 +102,7 @@ public class MapsActivity extends FragmentActivity
     private ImageButton wheelchairButton;
     private ImageButton carButton;
     private ImageButton transitButton;
+    private ImageButton startRouteButton;
 
     private BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior;
 
@@ -193,6 +195,9 @@ public class MapsActivity extends FragmentActivity
         wheelchairButton = findViewById(R.id.wheelchairButton);
         carButton = findViewById(R.id.carButton);
         transitButton = findViewById(R.id.transitButton);
+        startRouteButton = findViewById(R.id.startRoute);
+
+        startRouteButton.setOnClickListener(view -> startRoute());
 
         // Default mode is car
         carButton.setSelected(true);
@@ -248,6 +253,34 @@ public class MapsActivity extends FragmentActivity
         if(runDir){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
+    }
+
+    public void startRoute() {
+        if (origin == null || destination == null) {
+            //Error Handling
+            return;
+        }
+
+        new FetchPathTask(new FetchPathTask.OnRouteFetchedListener() {
+            @Override
+            public void onRouteFetched(JSONArray routeInfo) {
+                if (routeInfo == null || routeInfo.length() == 0) {
+                    runOnUiThread(() ->
+                            Toast.makeText(MapsActivity.this, "Failed to fetch route", Toast.LENGTH_SHORT).show());
+                    return;
+                }
+
+                Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
+                i.putExtra("origin_lat", origin.getLat());
+                i.putExtra("origin_lng", origin.getLng());
+                i.putExtra("destination_lat", destination.getLat());
+                i.putExtra("destination_lng", destination.getLng());
+                i.putExtra("travel_mode", travelMode);
+                i.putExtra("route_data", routeInfo.toString());
+
+                startActivity(i);
+            }
+        }).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
     }
 
     /**
