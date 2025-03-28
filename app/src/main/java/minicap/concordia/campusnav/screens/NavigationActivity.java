@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,7 +72,6 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     private Marker userMarker;
     private String travelMode;
 
-    private Marker originMarker;
     private Marker destinationMarker;
     private List<Polyline> routePolylines = new ArrayList<>();
     private TextView etaText;
@@ -101,14 +101,8 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
                 throw new IllegalStateException("No extras in intent");
             }
 
-            origin = new MapCoordinates(
-                    extras.getDouble("origin_lat"),
-                    extras.getDouble("origin_lng")
-            );
-            destination = new MapCoordinates(
-                    extras.getDouble("destination_lat"),
-                    extras.getDouble("destination_lng")
-            );
+            origin = new MapCoordinates(extras.getDouble("origin_lat"), extras.getDouble("origin_lng"));
+            destination = new MapCoordinates(extras.getDouble("destination_lat"), extras.getDouble("destination_lng"));
             travelMode = extras.getString("travel_mode", "WALK");
 
             String routeJson = extras.getString("route_data");
@@ -201,14 +195,14 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void updateUserPosition(Location location) {
-        if (location == null || googleMap == null) return;
+        if (location == null || googleMap == null || routePolylines.isEmpty()) return;
 
         LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        float bearing = location.hasBearing() ? location.getBearing() : 0f;
+
+        float pathBearing = calculatePathBearing(userLatLng);
 
         updateUserMarker(userLatLng);
-
-        updateCameraPosition(userLatLng, bearing);
+        updateCameraPosition(userLatLng, pathBearing);
 
         if (isNavigationActive && shouldUpdateRoute(userLatLng)) {
             lastRouteUpdatePosition = userLatLng;
@@ -216,26 +210,64 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+    private float calculatePathBearing(LatLng currentPosition) {
+        if (routePolylines.isEmpty() || routePolylines.get(0).getPoints().size() < 2) {
+            return 0;
+        }
+
+        List<LatLng> pathPoints = routePolylines.get(0).getPoints();
+        float minDistance = Float.MAX_VALUE;
+        LatLng closestPoint = null;
+        LatLng nextPoint = null;
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            LatLng start = pathPoints.get(i);
+            LatLng end = pathPoints.get(i + 1);
+
+            double distance = SphericalUtil.computeDistanceBetween(currentPosition, start);
+            if (distance < minDistance) {
+                minDistance = (float) distance;
+                closestPoint = start;
+                nextPoint = end;
+            }
+        }
+
+        if (closestPoint == null || nextPoint == null) {
+            return 0;
+        }
+
+        float rawBearing = (float) SphericalUtil.computeHeading(closestPoint, nextPoint);
+        
+        return rawBearing;
+    }
+
     private void updateUserMarker(LatLng position) {
         if (userMarker == null) {
-            BitmapDescriptor icon = bitmapDescriptorFromVector(this, R.drawable.ic_person);
+            BitmapDescriptor icon = bitmapDescriptorFromVector(this, R.drawable.token);
             if (icon == null) {
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
             }
 
-            userMarker = googleMap.addMarker(new MarkerOptions()
-                    .position(position)
-                    .title("Your Location")
-                    .icon(icon)
-                    .flat(true));
+            userMarker = googleMap.addMarker(new MarkerOptions().position(position).title("Your Location").icon(icon).anchor(0.5f, 0.5f).rotation(0).flat(false));
         } else {
             userMarker.setPosition(position);
         }
     }
 
     private void updateCameraPosition(LatLng position, float bearing) {
+        if (googleMap == null) return;
+
+        float markerRotation = (bearing + 110) % 360;
+
+        if (userMarker != null) {
+            userMarker.setRotation(markerRotation);
+        }
+
         CameraPosition cameraPosition = new CameraPosition.Builder().target(position).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 200, null);
+
+        googleMap.setPadding(0, (int)(getResources().getDisplayMetrics().heightPixels * 0.3), 0, 0);
     }
 
     private boolean shouldUpdateRoute(LatLng currentPosition) {
@@ -271,35 +303,53 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
                 etaText.setText(getString(R.string.eta_format, eta));
                 displayRouteSteps(steps);
 
+                if (userMarker != null) {
+                    float bearing = calculatePathBearing(userMarker.getPosition());
+                    updateCameraPosition(userMarker.getPosition(), bearing);
+                }
+
             } catch (Exception e) {
                 Log.e("Navigation", "Route display error", e);
-                Toast.makeText(NavigationActivity.this,
-                        "Error updating route", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+
+
     private void displayRouteSteps(JSONArray steps) {
         clearRoute();
-        List<LatLng> allPoints = new ArrayList<>();
 
-        for (int i = 0; i < steps.length(); i++) {
-            try {
-                JSONObject step = steps.getJSONObject(i);
-                JSONObject polyline = step.getJSONObject("polyline");
-                String encodedPath = polyline.getString("encodedPolyline");
-                allPoints.addAll(PolyUtil.decode(encodedPath));
-            } catch (JSONException e) {
-                Log.e("RouteDisplay", "Error parsing step " + i, e);
+        try {
+            List<LatLng> allPoints = new ArrayList<>();
+            for (int i = 0; i < steps.length(); i++) {
+                JSONObject polyline = steps.getJSONObject(i).getJSONObject("polyline");
+                allPoints.addAll(PolyUtil.decode(polyline.getString("encodedPolyline")));
             }
+
+            if (!allPoints.isEmpty()) {
+                PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true);
+
+                routePolylines.add(googleMap.addPolyline(options));
+                zoomToRouteSmoothly(allPoints);
+            }
+        } catch (JSONException e) {
+            Log.e("RouteDisplay", "Error parsing route", e);
+        }
+    }
+
+    private void zoomToRouteSmoothly(List<LatLng> points) {
+        if (googleMap == null || points.isEmpty()) return;
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng point : points) {
+            builder.include(point);
         }
 
-        if (!allPoints.isEmpty()) {
-            PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true).zIndex(10);
-
-            routePolylines.add(googleMap.addPolyline(options));
-            zoomToRoute();
-        }
+        googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(builder.build(), 100),
+                500,
+                null
+        );
     }
 
     private void clearRoute() {
@@ -309,37 +359,6 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         routePolylines.clear();
     }
 
-    private void zoomToRoute() {
-        if (googleMap == null || routePolylines.isEmpty()) return;
-
-        try {
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (Polyline polyline : routePolylines) {
-                for (LatLng point : polyline.getPoints()) {
-                    builder.include(point);
-                }
-            }
-
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
-        } catch (IllegalStateException e) {
-            googleMap.setOnMapLoadedCallback(() -> {
-                try {
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    for (Polyline polyline : routePolylines) {
-                        for (LatLng point : polyline.getPoints()) {
-                            builder.include(point);
-                        }
-                    }
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                            builder.build(), 100));
-                } catch (Exception ex) {
-                    Log.e("Navigation", "Zoom error", ex);
-                }
-            });
-        } catch (Exception e) {
-            Log.e("Navigation", "Zoom error", e);
-        }
-    }
 
     private void checkLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -369,8 +388,12 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             if (vectorDrawable == null) {
                 return null;
             }
-            vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-            Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+            int width = 100;
+            int height = 100;
+
+            vectorDrawable.setBounds(0, 0, width, height);
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             vectorDrawable.draw(canvas);
             return BitmapDescriptorFactory.fromBitmap(bitmap);
