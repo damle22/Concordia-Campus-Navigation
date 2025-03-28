@@ -50,8 +50,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
@@ -216,8 +219,10 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
 
         LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        float pathBearing = calculatePathBearing(userLatLng);
+        float remainingDistance = calculateRemainingDistance(userLatLng);
+        updateStatsText((int) remainingDistance);
 
+        float pathBearing = calculatePathBearing(userLatLng);
         updateUserMarker(userLatLng);
         updateCameraPosition(userLatLng, pathBearing);
 
@@ -225,6 +230,32 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             lastRouteUpdatePosition = userLatLng;
             fetchAndDisplayRoute(userLatLng, destination.toGoogleMapsLatLng());
         }
+    }
+
+    private float calculateRemainingDistance(LatLng currentPosition) {
+        if (routePolylines.isEmpty()) return 0;
+
+        List<LatLng> pathPoints = routePolylines.get(0).getPoints();
+        float totalDistance = 0;
+        boolean passedCurrentPos = false;
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            LatLng start = pathPoints.get(i);
+            LatLng end = pathPoints.get(i + 1);
+
+            if (!passedCurrentPos) {
+                if (SphericalUtil.computeDistanceBetween(currentPosition, end) <
+                        SphericalUtil.computeDistanceBetween(currentPosition, start)) {
+                    passedCurrentPos = true;
+                }
+            }
+
+            if (passedCurrentPos) {
+                totalDistance += SphericalUtil.computeDistanceBetween(start, end);
+            }
+        }
+
+        return totalDistance;
     }
 
     private float calculatePathBearing(LatLng currentPosition) {
@@ -304,7 +335,6 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         isNavigationActive = true;
     }
 
-    @Override
     public void onRouteFetched(JSONArray routeInfo) {
         runOnUiThread(() -> {
             try {
@@ -316,8 +346,12 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
 
                 JSONArray steps = routeInfo.getJSONArray(0);
                 String eta = routeInfo.optString(1, "N/A");
+                int totalDistance = routeInfo.optInt(2, 0);
 
                 etaText.setText(getString(R.string.eta_format, eta));
+
+                updateStatsText(totalDistance);
+
                 displayRouteSteps(steps);
 
                 if (userMarker != null) {
@@ -331,6 +365,38 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         });
     }
 
+    private String formatArrivalTime(String etaDuration) {
+        try {
+            if (etaDuration.equals("N/A")) {
+                return "";
+            }
+
+            int minutes = Integer.parseInt(etaDuration.replaceAll("[^0-9]", ""));
+            long arrivalMillis = System.currentTimeMillis() + (minutes * 60 * 1000L);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.getDefault());
+            return sdf.format(new Date(arrivalMillis));
+
+        } catch (Exception e) {
+            Log.e("Navigation", "Error formatting arrival time", e);
+            return etaDuration;
+        }
+    }
+
+    private void updateStatsText(int distanceMeters) {
+        String etaDuration = etaText.getText().toString().replaceAll("[^0-9]", "");
+        String arrivalTime = formatArrivalTime(etaDuration);
+
+        String distanceText;
+        if (distanceMeters >= 1000) {
+            distanceText = String.format("%.1f km", distanceMeters / 1000.0);
+        } else {
+            distanceText = String.format("%d m", distanceMeters);
+        }
+
+        String stats = String.format("%s • %s", distanceText, arrivalTime);
+        statsText.setText(stats);
+    }
 
 
     private void displayRouteSteps(JSONArray steps) {
