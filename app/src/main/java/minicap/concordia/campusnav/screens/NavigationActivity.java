@@ -1,9 +1,13 @@
 package minicap.concordia.campusnav.screens;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -11,6 +15,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -26,6 +31,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -51,6 +59,8 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     private static final int LOCATION_REQUEST_CODE = 101;
     private static final float DEFAULT_ZOOM = 18f;
     private static final float ROUTE_ZOOM = 15f;
+    private static final float ROUTE_UPDATE_DISTANCE_THRESHOLD = 50;
+
 
     private GoogleMap googleMap;
     private FusedLocationProviderClient locationClient;
@@ -58,6 +68,7 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
 
     private MapCoordinates origin;
     private MapCoordinates destination;
+    private Marker userMarker;
     private String travelMode;
 
     private Marker originMarker;
@@ -65,6 +76,8 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     private List<Polyline> routePolylines = new ArrayList<>();
     private TextView etaText;
     private JSONArray routeData;
+    private boolean isNavigationActive = false;
+    private LatLng lastRouteUpdatePosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,20 +95,30 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void getRouteDataFromIntent() {
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            origin = new MapCoordinates(extras.getDouble("origin_lat"), extras.getDouble("origin_lng"));
-            destination = new MapCoordinates(extras.getDouble("destination_lat"), extras.getDouble("destination_lng"));
+        try {
+            Bundle extras = getIntent().getExtras();
+            if (extras == null) {
+                throw new IllegalStateException("No extras in intent");
+            }
+
+            origin = new MapCoordinates(
+                    extras.getDouble("origin_lat"),
+                    extras.getDouble("origin_lng")
+            );
+            destination = new MapCoordinates(
+                    extras.getDouble("destination_lat"),
+                    extras.getDouble("destination_lng")
+            );
             travelMode = extras.getString("travel_mode", "WALK");
 
-            try {
-                String routeJson = extras.getString("route_data");
-                if (routeJson != null) {
-                    routeData = new JSONArray(routeJson);
-                }
-            } catch (JSONException e) {
-                Log.e("Navigation", "Error parsing route data", e);
+            String routeJson = extras.getString("route_data");
+            if (routeJson != null) {
+                routeData = new JSONArray(routeJson);
             }
+        } catch (Exception e) {
+            Log.e("Navigation", "Error parsing intent data", e);
+            Toast.makeText(this, "Invalid navigation data", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -106,32 +129,41 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) return;
                 for (Location location : locationResult.getLocations()) {
-                    updateUserPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+                    updateUserPosition(location);
                 }
             }
         };
     }
 
     private void initializeMap() {
-        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.navigation_map, mapFragment).commit();
-        mapFragment.getMapAsync(this);
+        try {
+            SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+            getSupportFragmentManager().beginTransaction().replace(R.id.navigation_map, mapFragment).commit();
+            mapFragment.getMapAsync(this);
+        } catch (Exception e) {
+            Log.e("Navigation", "Map init error", e);
+            Toast.makeText(this, "Map initialization failed", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        configureMap();
-        setupMapMarkers();
-        if (routeData != null) {
-            onRouteFetched(routeData);
-        } else {
-            fetchAndDisplayRoute();
-        }
-        fetchAndDisplayRoute();
-        checkLocationPermissions();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
+        try {
+            this.googleMap = googleMap;
+            configureMap();
+            setupMapMarkers();
+
+            if (routeData != null) {
+                onRouteFetched(routeData);
+            } else {
+                fetchAndDisplayRoute();
+            }
+
+            checkLocationPermissions();
+        } catch (Exception e) {
+            Log.e("Navigation", "Map ready error", e);
+            Toast.makeText(this, "Map setup failed", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -139,76 +171,116 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setCompassEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.setTrafficEnabled(true);
 
         try {
             boolean success = googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(this, R.raw.nav_map_style));
             if (!success) {
-                Log.e("NavigationActivity", "Style parsing failed.");
+                Log.w("Navigation", "Map style parsing failed");
             }
         } catch (Resources.NotFoundException e) {
-            Log.e("NavigationActivity", "Can't find style.", e);
+            Log.e("Navigation", "Map style not found", e);
         }
     }
 
     private void setupMapMarkers() {
-        if (originMarker != null) originMarker.remove();
         if (destinationMarker != null) destinationMarker.remove();
 
-        originMarker = googleMap.addMarker(new MarkerOptions().position(origin.toGoogleMapsLatLng()).title("Start").icon(com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker(com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE)));
-        destinationMarker = googleMap.addMarker(new MarkerOptions().position(destination.toGoogleMapsLatLng()).title("Destination").icon(com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker(com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_RED)));
+        destinationMarker = googleMap.addMarker(new MarkerOptions().position(destination.toGoogleMapsLatLng()).title("Destination").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
     }
 
     private void fetchAndDisplayRoute() {
+        if (googleMap == null || origin == null || destination == null) {
+            Toast.makeText(this, "Location data not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(origin.toGoogleMapsLatLng(), ROUTE_ZOOM));
     }
 
-    private void updateUserPosition(LatLng position) {
-        if (googleMap != null) {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM));
+    private void updateUserPosition(Location location) {
+        if (location == null || googleMap == null) return;
 
-            if (originMarker != null) {
-                originMarker.setPosition(position);
-            }
+        LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        float bearing = location.hasBearing() ? location.getBearing() : 0f;
+
+        updateUserMarker(userLatLng);
+
+        updateCameraPosition(userLatLng, bearing);
+
+        if (isNavigationActive && shouldUpdateRoute(userLatLng)) {
+            lastRouteUpdatePosition = userLatLng;
+            fetchAndDisplayRoute(userLatLng, destination.toGoogleMapsLatLng());
         }
+    }
+
+    private void updateUserMarker(LatLng position) {
+        if (userMarker == null) {
+            BitmapDescriptor icon = bitmapDescriptorFromVector(this, R.drawable.ic_person);
+            if (icon == null) {
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
+            }
+
+            userMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("Your Location")
+                    .icon(icon)
+                    .flat(true));
+        } else {
+            userMarker.setPosition(position);
+        }
+    }
+
+    private void updateCameraPosition(LatLng position, float bearing) {
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(position).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private boolean shouldUpdateRoute(LatLng currentPosition) {
+        if (lastRouteUpdatePosition == null) {
+            return true;
+        }
+
+        float[] results = new float[1];
+        Location.distanceBetween(currentPosition.latitude, currentPosition.longitude, lastRouteUpdatePosition.latitude, lastRouteUpdatePosition.longitude, results);
+        return results[0] > ROUTE_UPDATE_DISTANCE_THRESHOLD;
+    }
+
+    private void fetchAndDisplayRoute(LatLng origin, LatLng destination) {
+        if (googleMap == null) return;
+
+        new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+        isNavigationActive = true;
     }
 
     @Override
     public void onRouteFetched(JSONArray routeInfo) {
-        if (routeInfo == null) {
-            Toast.makeText(this, "Failed to fetch route", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        runOnUiThread(() -> {
+            try {
+                if (routeInfo == null || routeInfo.length() < 2) {
+                    throw new JSONException("Invalid route data");
+                }
 
-        try {
-            for (Polyline polyline : routePolylines) {
-                polyline.remove();
+                clearRoute();
+
+                JSONArray steps = routeInfo.getJSONArray(0);
+                String eta = routeInfo.optString(1, "N/A");
+
+                etaText.setText(getString(R.string.eta_format, eta));
+                displayRouteSteps(steps);
+
+            } catch (Exception e) {
+                Log.e("Navigation", "Route display error", e);
+                Toast.makeText(NavigationActivity.this,
+                        "Error updating route", Toast.LENGTH_SHORT).show();
             }
-            routePolylines.clear();
-
-            JSONArray steps = routeInfo.getJSONArray(0);
-            String eta = routeInfo.getString(1);
-
-            etaText.setText(getString(R.string.eta_format, eta));
-
-            displayRouteSteps(steps);
-
-        } catch (JSONException e) {
-            Toast.makeText(this, "Error parsing route data", Toast.LENGTH_SHORT).show();
-        }
+        });
     }
 
     private void displayRouteSteps(JSONArray steps) {
         clearRoute();
-
-        if (steps == null) {
-            Log.e("RouteDisplay", "Steps array is null");
-            return;
-        }
-
         List<LatLng> allPoints = new ArrayList<>();
 
         for (int i = 0; i < steps.length(); i++) {
@@ -224,6 +296,7 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
 
         if (!allPoints.isEmpty()) {
             PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true).zIndex(10);
+
             routePolylines.add(googleMap.addPolyline(options));
             zoomToRoute();
         }
@@ -237,22 +310,34 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void zoomToRoute() {
-        if (routePolylines.isEmpty()) return;
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (Polyline polyline : routePolylines) {
-            for (LatLng point : polyline.getPoints()) {
-                builder.include(point);
-            }
-        }
+        if (googleMap == null || routePolylines.isEmpty()) return;
 
         try {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                    builder.build(), 100));
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Polyline polyline : routePolylines) {
+                for (LatLng point : polyline.getPoints()) {
+                    builder.include(point);
+                }
+            }
+
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
         } catch (IllegalStateException e) {
-            googleMap.setOnMapLoadedCallback(() ->
+            googleMap.setOnMapLoadedCallback(() -> {
+                try {
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    for (Polyline polyline : routePolylines) {
+                        for (LatLng point : polyline.getPoints()) {
+                            builder.include(point);
+                        }
+                    }
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                            builder.build(), 100)));
+                            builder.build(), 100));
+                } catch (Exception ex) {
+                    Log.e("Navigation", "Zoom error", ex);
+                }
+            });
+        } catch (Exception e) {
+            Log.e("Navigation", "Zoom error", e);
         }
     }
 
@@ -265,16 +350,63 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void startLocationUpdates() {
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(500).build();
+        try {
+            LocationRequest locationRequest = new LocationRequest.Builder(
+                    Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(500).build();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+            }
+        } catch (Exception e) {
+            Log.e("Navigation", "Location updates error", e);
         }
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorResId) {
+        try {
+            Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+            if (vectorDrawable == null) {
+                return null;
+            }
+            vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+            Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            vectorDrawable.draw(canvas);
+            return BitmapDescriptorFactory.fromBitmap(bitmap);
+        } catch (Exception e) {
+            Log.e("Navigation", "Vector icon error", e);
+            return null;
+        }
+    }
+
+    private void stopLocationUpdates() {
+        try {
+            locationClient.removeLocationUpdates(locationCallback);
+        } catch (Exception e) {
+            Log.e("Navigation", "Stop updates error", e);
+        }
+    }
+
+    private void startNavigation() {
+        if (origin == null || destination == null) {
+            Toast.makeText(this, "Please set both origin and destination", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        fetchAndDisplayRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng());
+        isNavigationActive = true;
+    }
+
+    private void stopNavigation() {
+        isNavigationActive = false;
+        lastRouteUpdatePosition = null;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        stopNavigation();
         stopLocationUpdates();
     }
 
@@ -283,11 +415,11 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         super.onResume();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             startLocationUpdates();
-        }
-    }
 
-    private void stopLocationUpdates() {
-        locationClient.removeLocationUpdates(locationCallback);
+            if (origin != null && destination != null) {
+                startNavigation();
+            }
+        }
     }
 
     @Override
