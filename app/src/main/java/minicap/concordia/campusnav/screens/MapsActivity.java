@@ -126,6 +126,8 @@ public class MapsActivity extends FragmentActivity
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
 
+    private ActivityResultLauncher<Intent> navigationActivityLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -244,6 +246,10 @@ public class MapsActivity extends FragmentActivity
                 new ActivityResultContracts.StartActivityForResult(),
                 this::HandleSearchLocationResult);
 
+        navigationActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::HandleNavigationActivityResult);
+
         getUserLocationPath();
 
         if(runBus){
@@ -264,20 +270,18 @@ public class MapsActivity extends FragmentActivity
             return;
         }
 
-        new FetchPathTask(new FetchPathTask.OnRouteFetchedListener() {
-            @Override
-            public void onRouteFetched(JSONArray routeInfo) {
-                Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
-                i.putExtra("origin_lat", origin.getLat());
-                i.putExtra("origin_lng", origin.getLng());
-                i.putExtra("destination_lat", destination.getLat());
-                i.putExtra("destination_lng", destination.getLng());
-                i.putExtra("travel_mode", travelMode);
-                i.putExtra("route_data", routeInfo.toString());
+        Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
+        i.putExtra("origin_lat", origin.getLat());
+        i.putExtra("origin_lng", origin.getLng());
+        i.putExtra("destination_lat", destination.getLat());
+        i.putExtra("destination_lng", destination.getLng());
+        i.putExtra("travel_mode", travelMode);
 
-                startActivity(i);
-            }
-        }).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+        navigationActivityLauncher.launch(i);
+    }
+
+    private void HandleNavigationActivityResult(ActivityResult result) {
+
     }
 
     /**

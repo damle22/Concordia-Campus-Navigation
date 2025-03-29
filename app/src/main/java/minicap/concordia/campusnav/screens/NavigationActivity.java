@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -59,11 +60,13 @@ import java.util.Locale;
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.components.MainMenuDialog;
+import minicap.concordia.campusnav.map.AbstractMap;
 import minicap.concordia.campusnav.map.FetchPathTask;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.savedstates.States;
 
-public class NavigationActivity extends AppCompatActivity implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener, MainMenuDialog.MainMenuListener {
+public class NavigationActivity extends AppCompatActivity implements AbstractMap.MapUpdateListener, MainMenuDialog.MainMenuListener {
 
     private static final int LOCATION_REQUEST_CODE = 101;
     private static final float DEFAULT_ZOOM = 18f;
@@ -72,7 +75,9 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
     //private final States states = States.getInstance();
 
 
-    private GoogleMap googleMap;
+    private AbstractMap curMap;
+
+    private Fragment curMapFragment;
     private FusedLocationProviderClient locationClient;
     private LocationCallback locationCallback;
 
@@ -125,10 +130,10 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             destination = new MapCoordinates(extras.getDouble("destination_lat"), extras.getDouble("destination_lng"));
             travelMode = extras.getString("travel_mode", "WALK");
 
-            String routeJson = extras.getString("route_data");
-            if (routeJson != null) {
-                routeData = new JSONArray(routeJson);
-            }
+//            String routeJson = extras.getString("route_data");
+//            if (routeJson != null) {
+//                routeData = new JSONArray(routeJson);
+//            }
         } catch (Exception e) {
             Log.e("Navigation", "Error parsing intent data", e);
             Toast.makeText(this, "Invalid navigation data", Toast.LENGTH_SHORT).show();
@@ -143,22 +148,20 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) return;
                 for (Location location : locationResult.getLocations()) {
-                    updateUserPosition(location);
+
+                    updateUserPosition(MapCoordinates.fromAndroidLocation(location));
                 }
             }
         };
     }
 
     private void initializeMap() {
-        try {
-            SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().replace(R.id.navigation_map, mapFragment).commit();
-            mapFragment.getMapAsync(this);
-        } catch (Exception e) {
-            Log.e("Navigation", "Map init error", e);
-            Toast.makeText(this, "Map initialization failed", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        curMap = new InternalGoogleMaps(this);
+
+        curMapFragment = curMap.initialize();
+
+        getSupportFragmentManager().beginTransaction().add(R.id.navigation_map, curMapFragment)
+                .commit();
     }
 
     @Override
@@ -209,15 +212,17 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
             return;
         }
 
-        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+        curMap.displayRoute(origin, destination, travelMode);
+
+//        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(origin.toGoogleMapsLatLng(), ROUTE_ZOOM));
     }
 
-    private void updateUserPosition(Location location) {
+    private void updateUserPosition(MapCoordinates location) {
         if (location == null || googleMap == null || routePolylines.isEmpty()) return;
 
-        LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng userLatLng = location.toGoogleMapsLatLng();
 
         float remainingDistance = calculateRemainingDistance(userLatLng);
         updateStatsText((int) remainingDistance);
@@ -549,8 +554,29 @@ public class NavigationActivity extends AppCompatActivity implements OnMapReadyC
         stopNavigation();
         stopLocationUpdates();
 
-        Intent i = new Intent(NavigationActivity.this, MapsActivity.class);
+        Intent i = new Intent();
         i.putExtra("OPEN_DIR", true);
-        startActivity(i);
+        setResult(RESULT_OK, i);
+        finish();
+    }
+
+    @Override
+    public void onMapReady() {
+
+    }
+
+    @Override
+    public void onEstimatedTimeUpdated(String newTime) {
+
+    }
+
+    @Override
+    public void onMapError(String errorString) {
+
+    }
+
+    @Override
+    public void onMapClicked(MapCoordinates coordinates) {
+
     }
 }
