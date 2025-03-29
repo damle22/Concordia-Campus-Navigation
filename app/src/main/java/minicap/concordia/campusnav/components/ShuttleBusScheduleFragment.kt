@@ -40,18 +40,30 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         val loyFridayButton: Button = binding.root.findViewById(R.id.loyFridayButton)
 
         sgwMonThursButton.setOnClickListener {
+            sgwMonThursButton.isSelected = true
+            sgwFridayButton.isSelected = false
+
             filterSchedule("SGW", "Monday-Thursday")
         }
 
         sgwFridayButton.setOnClickListener {
+            sgwMonThursButton.isSelected = false
+            sgwFridayButton.isSelected = true
+
             filterSchedule("SGW", "Friday")
         }
 
         loyMonThursButton.setOnClickListener {
+            loyMonThursButton.isSelected = true
+            loyFridayButton.isSelected = false
+
             filterSchedule("Loyola", "Monday-Thursday")
         }
 
         loyFridayButton.setOnClickListener {
+            loyMonThursButton.isSelected = false
+            loyFridayButton.isSelected = true
+
             filterSchedule("Loyola", "Friday")
         }
 

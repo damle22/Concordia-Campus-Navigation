@@ -26,7 +26,7 @@
             android:value="37758349959-7eh7pjvbrjaqov5nd412d2l0ml7fdkul.apps.googleusercontent.com" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
+            android:value="AIzaSyDn1GsaPLhpzy1dtOrg7Ifeb9azhfJwRWo" />
         <meta-data
             android:name="com.google.android.gms.auth.WEB_CLIENT_ID"
             android:value="${WEB_CLIENT_ID}" />
