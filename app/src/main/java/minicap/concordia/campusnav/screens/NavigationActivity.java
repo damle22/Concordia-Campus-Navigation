@@ -64,19 +64,18 @@ import minicap.concordia.campusnav.map.AbstractMap;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.MapCoordinates;
+import minicap.concordia.campusnav.map.NavigationGoogleMaps;
+import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.savedstates.States;
 
-public class NavigationActivity extends AppCompatActivity implements AbstractMap.MapUpdateListener, MainMenuDialog.MainMenuListener {
+public class NavigationActivity extends AppCompatActivity implements FetchPathTask.OnRouteFetchedListener, AbstractMap.MapUpdateListener, MainMenuDialog.MainMenuListener {
 
     private static final int LOCATION_REQUEST_CODE = 101;
     private static final float DEFAULT_ZOOM = 18f;
     private static final float ROUTE_ZOOM = 15f;
     private static final float ROUTE_UPDATE_DISTANCE_THRESHOLD = 50;
-    //private final States states = States.getInstance();
-
 
     private AbstractMap curMap;
-
     private Fragment curMapFragment;
     private FusedLocationProviderClient locationClient;
     private LocationCallback locationCallback;
@@ -96,25 +95,34 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
     private boolean isNavigationActive = false;
     private LatLng lastRouteUpdatePosition;
 
-
-
+    /**
+     * On create method, runs when activity is created
+     * @param savedInstanceState bundle data
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Set layout to activity navigation
         setContentView(R.layout.activity_navigation);
 
+        //Run routine
         initializeViews();
         getRouteDataFromIntent();
         setupLocationClient();
         initializeMap();
     }
 
+    /**
+     * Initializing the UI components
+     */
     private void initializeViews() {
+        //Grabing UI elements from the layout
         etaText = findViewById(R.id.eta_text);
         statsText = findViewById(R.id.statsText);
         mainMenu = findViewById(R.id.mainMenu);
         exit = findViewById(R.id.exitButton);
 
+        //Setting up necessary buttons
         mainMenu.setOnClickListener(v -> showMainMenuDialog());
         exit.setOnClickListener(v -> exitIntent());
     }
@@ -155,20 +163,27 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         };
     }
 
+    /**
+     * Initializing the map through the activity
+     */
     private void initializeMap() {
-        curMap = new InternalGoogleMaps(this);
+        //set the curMap variable to an Internal Google maps
+        curMap = new NavigationGoogleMaps(this);
 
+        //get fragment from initialized variable
         curMapFragment = curMap.initialize();
 
         getSupportFragmentManager().beginTransaction().add(R.id.navigation_map, curMapFragment)
                 .commit();
+
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
+    public void onMapReady() {
         try {
-            this.googleMap = googleMap;
-            configureMap();
+            //Set map style
+            curMap.setStyle(this,R.raw.nav_map_style);
+            //setup map markers
             setupMapMarkers();
 
             if (routeData != null) {
@@ -184,43 +199,38 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
-    private void configureMap() {
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
-        googleMap.getUiSettings().setCompassEnabled(true);
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        try {
-            boolean success = googleMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(this, R.raw.nav_map_style));
-            if (!success) {
-                Log.w("Navigation", "Map style parsing failed");
-            }
-        } catch (Resources.NotFoundException e) {
-            Log.e("Navigation", "Map style not found", e);
-        }
-    }
-
     private void setupMapMarkers() {
-        if (destinationMarker != null) destinationMarker.remove();
-
-        destinationMarker = googleMap.addMarker(new MarkerOptions().position(destination.toGoogleMapsLatLng()).title("Destination").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        curMap.addMarker(
+                destination,
+                "Destination",
+                MapColors.DEFAULT,
+                true
+        );
     }
 
     private void fetchAndDisplayRoute() {
-        if (googleMap == null || origin == null || destination == null) {
+        if (/* curMap.getmMap() == null || */origin == null || destination == null) {
             Toast.makeText(this, "Location data not available", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        curMap.displayRoute(origin, destination, travelMode);
+        //curMap.displayRoute(origin, destination, travelMode);
 
-//        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(origin.toGoogleMapsLatLng(), ROUTE_ZOOM));
+        curMap.zoomCamera(origin,ROUTE_ZOOM);
+
+    }
+
+    private void fetchAndDisplayRoute(LatLng origin, LatLng destination) {
+        //if (curMap.getmMap() == null) return;
+
+        new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+        isNavigationActive = true;
     }
 
     private void updateUserPosition(MapCoordinates location) {
-        if (location == null || googleMap == null || routePolylines.isEmpty()) return;
+        if (location == null || /*curMap.getmMap() == null ||*/ routePolylines.isEmpty()) return;
 
         LatLng userLatLng = location.toGoogleMapsLatLng();
 
@@ -301,14 +311,20 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
             }
 
-            userMarker = googleMap.addMarker(new MarkerOptions().position(position).title("Your Location").icon(icon).anchor(0.5f, 0.5f).rotation(0).flat(false));
+            userMarker = curMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("Your Location")
+                    .icon(icon)
+                    .anchor(0.5f, 0.5f)
+                    .rotation(0)
+                    .flat(false));
         } else {
-            userMarker.setPosition(position);
+            curMap.updateMarkerPosition(userMarker, position);
         }
     }
 
     private void updateCameraPosition(LatLng position, float bearing) {
-        if (googleMap == null) return;
+        //if (curMap.getmMap() == null) return;
 
         float markerRotation = (bearing + 110) % 360;
 
@@ -318,9 +334,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
 
         CameraPosition cameraPosition = new CameraPosition.Builder().target(position).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
 
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 200, null);
+        int padding = (int)(getResources().getDisplayMetrics().heightPixels * 0.3);
+        curMap.moveCameraToPosition(cameraPosition, padding);
 
-        googleMap.setPadding(0, (int)(getResources().getDisplayMetrics().heightPixels * 0.3), 0, 0);
     }
 
     private boolean shouldUpdateRoute(LatLng currentPosition) {
@@ -331,13 +347,6 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         float[] results = new float[1];
         Location.distanceBetween(currentPosition.latitude, currentPosition.longitude, lastRouteUpdatePosition.latitude, lastRouteUpdatePosition.longitude, results);
         return results[0] > ROUTE_UPDATE_DISTANCE_THRESHOLD;
-    }
-
-    private void fetchAndDisplayRoute(LatLng origin, LatLng destination) {
-        if (googleMap == null) return;
-
-        new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
-        isNavigationActive = true;
     }
 
     public void onRouteFetched(JSONArray routeInfo) {
@@ -417,7 +426,7 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
             if (!allPoints.isEmpty()) {
                 PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true);
 
-                routePolylines.add(googleMap.addPolyline(options));
+                routePolylines.add(curMap.getPolyline(options));
                 zoomToRouteSmoothly(allPoints);
             }
         } catch (JSONException e) {
@@ -426,18 +435,16 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
     }
 
     private void zoomToRouteSmoothly(List<LatLng> points) {
-        if (googleMap == null || points.isEmpty()) return;
+        // if (curMap.getmMap() == null || points.isEmpty()) return;
+
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LatLng point : points) {
             builder.include(point);
         }
 
-        googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngBounds(builder.build(), 100),
-                500,
-                null
-        );
+
+        curMap.moveCameraToBounds(builder);
     }
 
     private void clearRoute() {
@@ -560,10 +567,6 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         finish();
     }
 
-    @Override
-    public void onMapReady() {
-
-    }
 
     @Override
     public void onEstimatedTimeUpdated(String newTime) {

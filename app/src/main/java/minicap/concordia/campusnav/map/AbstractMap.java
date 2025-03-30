@@ -1,6 +1,16 @@
 package minicap.concordia.campusnav.map;
 
+import android.content.Context;
+
 import androidx.fragment.app.Fragment;
+
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import minicap.concordia.campusnav.map.enums.MapColors;
 
@@ -90,6 +100,26 @@ public abstract class AbstractMap {
      * @return True if successful, false otherwise
      */
     public abstract boolean toggleLocationTracking(boolean isEnabled);
+
+    public abstract void setStyle(Context context, int resourceID);
+
+    public abstract Marker addMarker(MarkerOptions options);
+
+    public abstract Polyline getPolyline(PolylineOptions options);
+
+    public void moveCameraToBounds(LatLngBounds.Builder builder) {
+    }
+
+    public void zoomCamera(MapCoordinates center, float routeZoom) {
+    }
+
+    public void moveCameraToPosition(CameraPosition cameraPosition, int padding){
+    }
+
+
+
+    public void updateMarkerPosition(Marker marker, LatLng position){
+    }
 
     public interface MapUpdateListener {
         /**

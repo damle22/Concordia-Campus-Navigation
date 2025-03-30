@@ -1,5 +1,6 @@
 package minicap.concordia.campusnav.map;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -117,6 +119,11 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     }
 
     @Override
+    public Marker addMarker(MarkerOptions options) {
+        return mMap.addMarker(options);
+    }
+
+    @Override
     public void clearAllMarkers() {
         for (Iterator<Marker> allMarkers = markers.iterator(); allMarkers.hasNext();) {
             Marker cur = allMarkers.next();
@@ -131,6 +138,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
      */
     public void addPolyline(PolylineOptions options){
         polylines.add(mMap.addPolyline(options));
+    }
+
+    public Polyline getPolyline(PolylineOptions options){
+        return mMap.addPolyline(options);
     }
 
     /**
@@ -221,7 +232,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        mMap = googleMap;
+        setmMap(googleMap);
 
         addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
@@ -234,6 +245,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         });
 
         listener.onMapReady();
+    }
+
+    private void setmMap(@NonNull GoogleMap googleMap){
+        this.mMap = googleMap;
     }
 
     @Override
@@ -264,4 +279,9 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     public void setMap(GoogleMap map) {
         mMap = map;
     }
+
+    public void setStyle(Context context, int resourceID){
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, resourceID));
+    }
+
 }
