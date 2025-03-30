@@ -86,13 +86,6 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     }
 
     @Override
-    public void zoomCamera(@NonNull MapCoordinates center, float zoom){
-        mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(center.toGoogleMapsLatLng(), zoom)
-        );
-    }
-
-    @Override
     public void zoomToRouteSmoothly(List<MapCoordinates> coordinates) {
         if (coordinates == null || coordinates.isEmpty()) {
             return;
@@ -156,6 +149,18 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
 
     //================ Polyline Methods ================
 
+    /**
+     * Adds a polyline to the map using the specified {@link PolylineOptions} and stores it
+     * in the internal list of route polylines. The polyline will be visible on the map
+     * immediately after being added.
+     * @param options The configuration options for the polyline, including:
+     *                - Coordinates (list of points)
+     *                - Stroke width (in pixels)
+     *                - Stroke color (ARGB format)
+     *                - Geodesic status
+     *                - Z-index
+     *                - Visibility
+     */
     public void addPolyline(PolylineOptions options) {
         Polyline polyline = mMap.addPolyline(options);
         routePolylines.add(polyline);
@@ -325,6 +330,18 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
 
 
     //================ Bitmap methods ================
+
+    /**
+     * Converts a vector drawable resource into a BitmapDescriptor for use as a map marker icon.
+     * The vector is rendered into a 100x100 pixel bitmap with ARGB_8888 configuration.
+     *
+     * @param context The application context used to access resources
+     * @param vectorResId The resource ID of the vector drawable to convert
+     * @return A BitmapDescriptor created from the vector drawable, or null if:
+     *         - The drawable couldn't be loaded
+     *         - The resource ID is invalid
+     *         - Any error occurs during bitmap creation
+     */
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorResId) {
         try {
             Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);

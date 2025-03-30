@@ -95,13 +95,23 @@ public abstract class AbstractMap {
      */
     public abstract boolean toggleLocationTracking(boolean isEnabled);
 
-    //NEW ABSTRACTS METHODS DURING REFACTOR ============================================
+    /**
+     * Applies a custom style to the map using the specified style resource.
+     * The style defines the visual appearance of map elements like roads, parks, and water.
+     * @param context The application context used to access resources
+     * @param resourceID The resource ID of the JSON style file (e.g., R.raw.map_style)
+     */
     public void setStyle(Context context, int resourceID){
     }
 
-    public void zoomCamera(MapCoordinates center, float routeZoom) {
-    }
-
+    /**
+     * Moves the map camera to the specified position with custom padding and view parameters.
+     * The camera transition is animated for smooth movement.
+     * @param padding The padding in pixels from the top of the map view (used to avoid UI overlap)
+     * @param position The target geographic coordinates to center on
+     * @param zoom The zoom level (typically between 2 for world view and 21 for building detail)
+     * @param bearing The camera orientation in degrees (0 = north, 90 = east)
+     */
     public void moveCameraToPosition(int padding, MapCoordinates position, float zoom, float bearing){
     }
 
@@ -129,14 +139,30 @@ public abstract class AbstractMap {
 
     }
 
+    /**
+     * Checks whether the user marker has been initialized and exists on the map.
+     *
+     * @return {@code true} if the user marker is null (not created),
+     *         {@code false} if the marker exists
+     */
     public boolean isUserMarkerNull() {
         return true;
     }
 
+    /**
+     * Rotates the user marker to the specified angle.
+     * The rotation is applied relative to the marker's anchor point.
+     * @param markerRotation The rotation angle in degrees (0-360), where 0 points north. Positive values rotate clockwise.
+     */
     public void rotateUserMarker(float markerRotation) {
 
     }
 
+    /**
+     * Retrieves the geographic coordinates of the user marker's current position.
+     *
+     * @return The {@link MapCoordinates} of the user marker, or {@code null} if the marker doesn't exist
+     */
     public MapCoordinates getMapCoordinateFromMarker() {
         return null;
     }
@@ -167,10 +193,24 @@ public abstract class AbstractMap {
     }
 
 
+    /**
+     * Calculates the remaining distance along the current route from the specified location.
+     * The calculation follows the path from the nearest point on the route to the destination.
+     *
+     * @param location The current location coordinates to calculate from
+     * @return The remaining distance in meters along the route. Returns 0 if no route exists or if the location is at or beyond the destination.
+     */
     public float calculateRemainingDistance(MapCoordinates location) {
         return 0;
     }
 
+    /**
+     * Calculates the bearing (direction) of the path at the specified position.
+     * The bearing represents the direction of travel along the route at the nearest point.
+     *
+     * @param currentPosition The position to calculate the path bearing from
+     * @return The bearing in degrees (0-360) relative to true north. Returns 0 if no route exists or if there's insufficient data to calculate the bearing.
+     */
     public float calculatePathBearing(MapCoordinates currentPosition) {
         return 0;
     }

@@ -90,6 +90,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         exit.setOnClickListener(v -> exitIntent());
     }
 
+    /**
+     * Extracts route data from the intent.
+     */
     private void getRouteDataFromIntent() {
         try {
             Bundle extras = getIntent().getExtras();
@@ -108,6 +111,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Sets up the location client and callback.
+     */
     private void setupLocationClient() {
         locationClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
@@ -123,7 +129,7 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
     }
 
     /**
-     * Initializing the map through the activity
+     * Initializes the map.
      */
     private void initializeMap() {
         //set the curMap variable to an Internal Google maps
@@ -137,6 +143,10 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
 
     }
 
+    /**
+     * Callback method invoked when the map is ready.
+     * It sets up the map style, markers, route, and checks location permissions.
+     */
     @Override
     public void onMapReady() {
         try {
@@ -154,6 +164,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Sets up the destination marker on the map.
+     */
     private void setupMapMarkers() {
         curMap.addMarker(
                 destination,
@@ -163,6 +176,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         );
     }
 
+    /**
+     * Fetches and displays the route between origin and destination.
+     */
     private void fetchAndDisplayRoute() {
         if (origin == null || destination == null) {
             Toast.makeText(this, "Location data not available", Toast.LENGTH_SHORT).show();
@@ -171,12 +187,21 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         curMap.displayRoute(origin, destination, travelMode);
     }
 
+    /**
+     * Fetches and displays a route between specified points.
+     * @param origin The starting point.
+     * @param destination The ending point.
+     */
     private void fetchAndDisplayRoute(MapCoordinates origin, MapCoordinates destination) {
         curMap.displayRoute(origin, destination, travelMode);
         isNavigationActive = true;
     }
 
 
+    /**
+     * Updates the user position on the map, including marker and camera adjustments.
+     * @param location The current user location.
+     */
     private void updateUserPosition(MapCoordinates location) {
 
         float remainingDistance = curMap.calculateRemainingDistance(location);
@@ -192,10 +217,20 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Updates the position of the user marker on the map.
+     * @param position The new position for the user marker.
+     */
     private void updateUserMarker(MapCoordinates position) {
         curMap.updateUserMarkerPosition(position, this);
     }
 
+
+    /**
+     * Determines whether the route should be updated based on the distance threshold.
+     * @param position The current position.
+     * @return True if the distance from the last update exceeds the threshold; false otherwise.
+     */
     private void updateCameraPosition(MapCoordinates position, float bearing) {
         float markerRotation = (bearing + 110) % 360;
 
@@ -207,6 +242,10 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
 
     }
 
+    /**
+     * Updates the position of the user marker on the map.
+     * @param currentPosition The current (new) position for the user marker.
+     */
     private boolean shouldUpdateRoute(MapCoordinates currentPosition) {
         if (lastRouteUpdatePosition == null) {
             return true;
@@ -217,6 +256,12 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         return results[0] > ROUTE_UPDATE_DISTANCE_THRESHOLD;
     }
 
+
+    /**
+     * Formats the estimated time of arrival by converting the duration into an arrival time.
+     * @param etaDuration A string representing the estimated duration.
+     * @return A formatted arrival time string, or the original duration if formatting fails.
+     */
     private String formatArrivalTime(String etaDuration) {
         try {
             if (etaDuration.equals("N/A")) {
@@ -235,6 +280,10 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Updates the navigation statistics text with the remaining distance and estimated arrival time.
+     * @param distanceMeters The remaining distance in meters.
+     */
     private void updateStatsText(int distanceMeters) {
         String etaDuration = etaText.getText().toString().replaceAll("[^0-9]", "");
         String arrivalTime = formatArrivalTime(etaDuration);
@@ -251,6 +300,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
     }
 
 
+    /**
+     * Checks if location permission is granted and requests it if not.
+     */
     private void checkLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             startLocationUpdates();
@@ -259,6 +311,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Starts receiving location updates from the fused location provider.
+     */
     private void startLocationUpdates() {
         try {
             LocationRequest locationRequest = new LocationRequest.Builder(
@@ -273,6 +328,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Stops receiving location updates.
+     */
     private void stopLocationUpdates() {
         try {
             locationClient.removeLocationUpdates(locationCallback);
@@ -281,6 +339,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Initiates navigation by displaying the route between the origin and destination.
+     */
     private void startNavigation() {
         if (origin == null || destination == null) {
             Toast.makeText(this, "Please set both origin and destination", Toast.LENGTH_SHORT).show();
@@ -291,6 +352,9 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         isNavigationActive = true;
     }
 
+    /**
+     * Stops the current navigation and resets navigation state.
+     */
     private void stopNavigation() {
         isNavigationActive = false;
         lastRouteUpdatePosition = null;
@@ -327,11 +391,17 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         }
     }
 
+    /**
+     * Shows the main menu dialog.
+     */
     public void showMainMenuDialog() {
         MainMenuDialog dialog = new MainMenuDialog(this);
         dialog.show();
     }
 
+    /**
+     * Handles the exit intent, stopping navigation and returning to previous activity.
+     */
     public void exitIntent(){
         stopNavigation();
         stopLocationUpdates();
