@@ -4,11 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.mappedin.sdk.models.MPIMap;
-
-import java.io.Serializable;
 
 public class MapCoordinates implements Parcelable {
     private double lat;
@@ -55,6 +54,10 @@ public class MapCoordinates implements Parcelable {
      */
     public static MapCoordinates fromMappedInCoordinate(MPIMap.MPICoordinate coordinate) {
         return new MapCoordinates(coordinate.getLatitude(), coordinate.getLongitude(), coordinate.getX(), coordinate.getY());
+    }
+
+    public static MapCoordinates fromAndroidLocation(Location loc) {
+        return new MapCoordinates(loc.getLatitude(), loc.getLongitude());
     }
 
     /**
