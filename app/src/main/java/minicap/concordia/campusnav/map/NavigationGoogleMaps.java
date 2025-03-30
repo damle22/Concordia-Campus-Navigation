@@ -204,7 +204,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
      * Gets the points from the first polyline (if exists)
      * @return List of LatLng points or empty list if no polylines
      */
-    public List<LatLng> getFirstPolylinePoints() {
+    private List<LatLng> getFirstPolylinePoints() {
         if (routePolylines.isEmpty() || routePolylines.get(0) == null) {
             return new ArrayList<>();
         }

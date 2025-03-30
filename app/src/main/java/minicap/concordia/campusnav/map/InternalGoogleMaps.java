@@ -135,10 +135,6 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         polylines.add(mMap.addPolyline(options));
     }
 
-    public Polyline getPolyline(PolylineOptions options){
-        return mMap.addPolyline(options);
-    }
-
     /**
      * Removes all polylines from the map (used for route)
      */
