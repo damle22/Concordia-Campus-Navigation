@@ -39,8 +39,6 @@ import minicap.concordia.campusnav.R;
 
 public class NavigationGoogleMaps extends InternalGoogleMaps{
 
-    private GoogleMap mMap;
-    private List<Polyline> routePolylines = new ArrayList<>();
     private Marker userMarker;
     private int cameraPadding = 0;
 
@@ -52,12 +50,11 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         super.setMap(googleMap);
-        this.mMap = googleMap;
 
         //Set certain settings
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        super.getmMap().getUiSettings().setZoomControlsEnabled(true);
+        super.getmMap().getUiSettings().setCompassEnabled(true);
+        super.getmMap().setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         listener.onMapReady();
     }
@@ -76,13 +73,13 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
                 .tilt(45)
                 .build();
 
-        mMap.animateCamera(
+        super.getmMap().animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition),
                 200,
                 null)
         ;
 
-        mMap.setPadding(0, padding, 0, 0);
+        super.getmMap().setPadding(0, padding, 0, 0);
     }
 
     @Override
@@ -96,7 +93,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
             builder.include(coordinate.toGoogleMapsLatLng());
         }
 
-        mMap.animateCamera(
+        super.getmMap().animateCamera(
                 CameraUpdateFactory.newLatLngBounds(builder.build(), 100),
                 500,
                 null
@@ -111,7 +108,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
             icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
         }
 
-        userMarker = mMap.addMarker(new MarkerOptions()
+        userMarker = super.getmMap().addMarker(new MarkerOptions()
                         .position(position.toGoogleMapsLatLng())
                         .title("Your Location")
                         .icon(icon)
@@ -149,29 +146,12 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
 
     //================ Polyline Methods ================
 
-    /**
-     * Adds a polyline to the map using the specified {@link PolylineOptions} and stores it
-     * in the internal list of route polylines. The polyline will be visible on the map
-     * immediately after being added.
-     * @param options The configuration options for the polyline, including:
-     *                - Coordinates (list of points)
-     *                - Stroke width (in pixels)
-     *                - Stroke color (ARGB format)
-     *                - Geodesic status
-     *                - Z-index
-     *                - Visibility
-     */
-    public void addPolyline(PolylineOptions options) {
-        Polyline polyline = mMap.addPolyline(options);
-        routePolylines.add(polyline);
-    }
-
     @Override
     public void clearAllPolylines() {
-        for (Polyline polyline : routePolylines) {
+        for (Polyline polyline : super.getPolylines()) {
             polyline.remove();
         }
-        routePolylines.clear();
+        super.getPolylines().clear();
     }
 
     @Override
@@ -187,7 +167,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
                 .color(color)
                 .geodesic(geodesic);
 
-        addPolyline(options);
+        super.addPolyline(options);
     }
 
     @Override
@@ -205,10 +185,10 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
      * @return List of LatLng points or empty list if no polylines
      */
     private List<LatLng> getFirstPolylinePoints() {
-        if (routePolylines.isEmpty() || routePolylines.get(0) == null) {
+        if (super.getPolylines().isEmpty() || super.getPolylines().get(0) == null) {
             return new ArrayList<>();
         }
-        return routePolylines.get(0).getPoints();
+        return super.getPolylines().get(0).getPoints();
     }
 
     //================ Route Methods ================

@@ -36,6 +36,7 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
+
     private final float defaultZoom = 18;
     private GoogleMap mMap;
 
@@ -223,7 +224,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        setmMap(googleMap);
+        setMap(googleMap);
 
         addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
@@ -236,10 +237,6 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         });
 
         listener.onMapReady();
-    }
-
-    private void setmMap(@NonNull GoogleMap googleMap){
-        this.mMap = googleMap;
     }
 
     @Override
@@ -269,6 +266,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
      */
     public void setMap(GoogleMap map) {
         mMap = map;
+    }
+
+    public GoogleMap getmMap(){
+        return this.mMap;
     }
 
     public void setStyle(Context context, int resourceID){
