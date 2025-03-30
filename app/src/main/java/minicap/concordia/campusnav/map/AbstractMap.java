@@ -2,20 +2,16 @@ package minicap.concordia.campusnav.map;
 
 import android.content.Context;
 
-import androidx.annotation.DrawableRes;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.List;
+
 import minicap.concordia.campusnav.map.enums.MapColors;
-import minicap.concordia.campusnav.screens.NavigationActivity;
 
 public abstract class AbstractMap {
 
@@ -104,20 +100,9 @@ public abstract class AbstractMap {
      */
     public abstract boolean toggleLocationTracking(boolean isEnabled);
 
-    //NEW ABSTRACTS
+    //NEW ABSTRACTS METHODS DURING REFACTOR ============================================
 
     public void setStyle(Context context, int resourceID){
-
-    }
-    public Marker addMarker(MarkerOptions options){
-        return null;
-    }
-
-    public Polyline getPolyline(PolylineOptions options){
-        return  null;
-    }
-
-    public void moveCameraToBounds(LatLngBounds.Builder builder) {
 
     }
 
@@ -125,6 +110,13 @@ public abstract class AbstractMap {
     }
 
     public void moveCameraToPosition(CameraPosition cameraPosition, int padding){
+    }
+
+    /**
+     * Zooms the camera to show the entire route smoothly
+     * @param allPoints List of coordinates that make up the route
+     */
+    public void zoomToRouteSmoothly(List<MapCoordinates> allPoints) {
     }
 
     public void updateMarkerPosition(Marker marker, LatLng position){
@@ -164,6 +156,33 @@ public abstract class AbstractMap {
 
     }
 
+    public float calculateRemainingDistance(MapCoordinates location) {
+        return 0;
+    }
+
+    public float calculatePathBearing(MapCoordinates currentPosition) {
+        return 0;
+    }
+
+    /**
+     * Adds a polyline to the map using MapCoordinates
+     * @param coordinates List of coordinates for the polyline
+     * @param width Width of the polyline
+     * @param color Color of the polyline
+     * @param geodesic Whether the polyline should be geodesic
+     */
+    public void addPolyline(List<MapCoordinates> coordinates, int width, int color, boolean geodesic){
+
+    }
+
+    /**
+     * Decodes an encoded polyline string into MapCoordinates
+     * @param encodedPolyline The encoded polyline string
+     * @return List of MapCoordinates
+     */
+    public List<MapCoordinates> decodePolyline(String encodedPolyline) {
+        return null;
+    }
 
 
     public interface MapUpdateListener {

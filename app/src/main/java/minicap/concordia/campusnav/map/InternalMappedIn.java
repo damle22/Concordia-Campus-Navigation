@@ -6,10 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
+
 import com.mappedin.sdk.MPIMapView;
 import com.mappedin.sdk.listeners.MPIMapClickListener;
 import com.mappedin.sdk.listeners.MPIMapViewListener;
@@ -112,16 +109,6 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
     @Override
     public void setStyle(Context context, int resourceID) {
         //Not used
-    }
-
-    @Override
-    public Marker addMarker(MarkerOptions options) {
-        return null;
-    }
-
-    @Override
-    public Polyline getPolyline(PolylineOptions options) {
-        return null;
     }
 
     @Override

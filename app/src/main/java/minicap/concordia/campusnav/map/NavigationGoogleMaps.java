@@ -21,6 +21,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
 
     private GoogleMap mMap;
     private List<Polyline> routePolylines = new ArrayList<>();
+
+    //================ Starter methods ================
 
     public NavigationGoogleMaps(MapUpdateListener listener) {
         super(listener);
@@ -47,6 +51,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
         listener.onMapReady();
     }
 
+    //================ Camera methods ================
     public void moveCameraToBounds(@NonNull LatLngBounds.Builder builder){
 
         mMap.animateCamera(
@@ -74,35 +79,30 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     }
 
     @Override
+    public void zoomToRouteSmoothly(List<MapCoordinates> coordinates) {
+        if (coordinates == null || coordinates.isEmpty()) {
+            return;
+        }
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (MapCoordinates coordinate : coordinates) {
+            builder.include(coordinate.toGoogleMapsLatLng());
+        }
+
+        mMap.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(builder.build(), 100),
+                500,
+                null
+        );
+    }
+
+    //================ Marker Methods ================
+
+    @Override
     public void updateMarkerPosition(Marker marker, LatLng position) {
         if (marker != null) {
             marker.setPosition(position);
         }
-    }
-
-    @Override
-    public void addPolyline(PolylineOptions options) {
-        Polyline polyline = mMap.addPolyline(options);
-        routePolylines.add(polyline);
-    }
-
-    @Override
-    public void clearAllPolylines() {
-        for (Polyline polyline : routePolylines) {
-            polyline.remove();
-        }
-        routePolylines.clear();
-    }
-
-    /**
-     * Gets the points from the first polyline (if exists)
-     * @return List of LatLng points or empty list if no polylines
-     */
-    public List<LatLng> getFirstPolylinePoints() {
-        if (routePolylines.isEmpty() || routePolylines.get(0) == null) {
-            return new ArrayList<>();
-        }
-        return routePolylines.get(0).getPoints();
     }
 
     @Override
@@ -127,6 +127,122 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
             marker.setPosition(position.toGoogleMapsLatLng());
         }
     }
+
+    //================ Polyline Methods ================
+
+    @Override
+    public void addPolyline(PolylineOptions options) {
+        Polyline polyline = mMap.addPolyline(options);
+        routePolylines.add(polyline);
+    }
+
+    @Override
+    public void clearAllPolylines() {
+        for (Polyline polyline : routePolylines) {
+            polyline.remove();
+        }
+        routePolylines.clear();
+    }
+
+    @Override
+    public void addPolyline(List<MapCoordinates> coordinates, int width, int color, boolean geodesic) {
+        List<LatLng> points = new ArrayList<>();
+        for (MapCoordinates coord : coordinates) {
+            points.add(coord.toGoogleMapsLatLng());
+        }
+
+        PolylineOptions options = new PolylineOptions()
+                .addAll(points)
+                .width(width)
+                .color(color)
+                .geodesic(geodesic);
+
+        addPolyline(options);
+    }
+
+    @Override
+    public List<MapCoordinates> decodePolyline(String encodedPolyline) {
+        List<MapCoordinates> coordinates = new ArrayList<>();
+        List<LatLng> points = PolyUtil.decode(encodedPolyline);
+        for (LatLng point : points) {
+            coordinates.add(MapCoordinates.fromGoogleMapsLatLng(point));
+        }
+        return coordinates;
+    }
+
+    /**
+     * Gets the points from the first polyline (if exists)
+     * @return List of LatLng points or empty list if no polylines
+     */
+    public List<LatLng> getFirstPolylinePoints() {
+        if (routePolylines.isEmpty() || routePolylines.get(0) == null) {
+            return new ArrayList<>();
+        }
+        return routePolylines.get(0).getPoints();
+    }
+
+    //================ Calculation Methods ================
+    @Override
+    public float calculateRemainingDistance(MapCoordinates currentPosition) {
+        List<LatLng> pathPoints = getFirstPolylinePoints();
+        if (pathPoints.isEmpty()) return 0;
+
+        float totalDistance = 0;
+        boolean passedCurrentPos = false;
+        LatLng currentLatLng = currentPosition.toGoogleMapsLatLng();
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            LatLng start = pathPoints.get(i);
+            LatLng end = pathPoints.get(i + 1);
+
+            if (!passedCurrentPos) {
+                if (SphericalUtil.computeDistanceBetween(currentLatLng, end) <
+                        SphericalUtil.computeDistanceBetween(currentLatLng, start)) {
+                    passedCurrentPos = true;
+                }
+            }
+
+            if (passedCurrentPos) {
+                totalDistance += SphericalUtil.computeDistanceBetween(start, end);
+            }
+        }
+
+        return totalDistance;
+    }
+
+    @Override
+    public float calculatePathBearing(MapCoordinates currentPosition) {
+        List<LatLng> pathPoints = getFirstPolylinePoints();
+        if (pathPoints.size() < 2) {
+            return 0;
+        }
+
+        float minDistance = Float.MAX_VALUE;
+        LatLng closestPoint = null;
+        LatLng nextPoint = null;
+        LatLng currentLatLng = currentPosition.toGoogleMapsLatLng();
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            LatLng start = pathPoints.get(i);
+            LatLng end = pathPoints.get(i + 1);
+
+            double distance = SphericalUtil.computeDistanceBetween(currentLatLng, start);
+            if (distance < minDistance) {
+                minDistance = (float) distance;
+                closestPoint = start;
+                nextPoint = end;
+            }
+        }
+
+        if (closestPoint == null || nextPoint == null) {
+            return 0;
+        }
+
+        return (float) SphericalUtil.computeHeading(closestPoint, nextPoint);
+    }
+
+
+    //================ Bitmap methods ================
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorResId) {
         try {

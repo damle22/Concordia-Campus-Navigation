@@ -119,11 +119,6 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     }
 
     @Override
-    public Marker addMarker(MarkerOptions options) {
-        return mMap.addMarker(options);
-    }
-
-    @Override
     public void clearAllMarkers() {
         for (Iterator<Marker> allMarkers = markers.iterator(); allMarkers.hasNext();) {
             Marker cur = allMarkers.next();

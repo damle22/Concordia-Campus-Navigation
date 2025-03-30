@@ -1,5 +1,7 @@
 package minicap.concordia.campusnav.screens;
 
+import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsLatLng;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,14 +27,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
-
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
-import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,14 +65,13 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     private Marker userMarker;
     private String travelMode;
 
-    private Marker destinationMarker;
     private TextView etaText;
     private TextView statsText;
     private ImageButton exit;
     private ImageButton mainMenu;
     private JSONArray routeData;
     private boolean isNavigationActive = false;
-    private LatLng lastRouteUpdatePosition;
+    private MapCoordinates lastRouteUpdatePosition;
 
     /**
      * On create method, runs when activity is created
@@ -205,28 +200,25 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
     }
 
-    private void fetchAndDisplayRoute(LatLng origin, LatLng destination) {
+    private void fetchAndDisplayRoute(MapCoordinates origin, MapCoordinates destination) {
         //if (curMap.getmMap() == null) return;
 
-        new FetchPathTask(this).fetchRoute(origin, destination, travelMode);
+        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
         isNavigationActive = true;
     }
 
     private void updateUserPosition(MapCoordinates location) {
-        //if (location == null || /*curMap.getmMap() == null ||*/ routePolylines.isEmpty()) return;
 
-        LatLng userLatLng = location.toGoogleMapsLatLng();
-
-        float remainingDistance = calculateRemainingDistance(userLatLng);
+        float remainingDistance = curMap.calculateRemainingDistance(location);
         updateStatsText((int) remainingDistance);
 
-        float pathBearing = calculatePathBearing(userLatLng);
+        float pathBearing = curMap.calculatePathBearing(location);
         updateUserMarker(location);
-        updateCameraPosition(userLatLng, pathBearing);
+        updateCameraPosition(location, pathBearing);
 
-        if (isNavigationActive && shouldUpdateRoute(userLatLng)) {
-            lastRouteUpdatePosition = userLatLng;
-            fetchAndDisplayRoute(userLatLng, destination.toGoogleMapsLatLng());
+        if (isNavigationActive && shouldUpdateRoute(location)) {
+            lastRouteUpdatePosition = location;
+            fetchAndDisplayRoute(location, destination);
         }
     }
 
@@ -238,7 +230,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
         }
     }
 
-    private void updateCameraPosition(LatLng position, float bearing) {
+    private void updateCameraPosition(MapCoordinates position, float bearing) {
         //if (curMap.getmMap() == null) return;
 
         float markerRotation = (bearing + 110) % 360;
@@ -247,20 +239,20 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
             userMarker.setRotation(markerRotation);
         }
 
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(position).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(position.toGoogleMapsLatLng()).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
 
         int padding = (int)(getResources().getDisplayMetrics().heightPixels * 0.3);
         curMap.moveCameraToPosition(cameraPosition, padding);
 
     }
 
-    private boolean shouldUpdateRoute(LatLng currentPosition) {
+    private boolean shouldUpdateRoute(MapCoordinates currentPosition) {
         if (lastRouteUpdatePosition == null) {
             return true;
         }
 
         float[] results = new float[1];
-        Location.distanceBetween(currentPosition.latitude, currentPosition.longitude, lastRouteUpdatePosition.latitude, lastRouteUpdatePosition.longitude, results);
+        Location.distanceBetween(currentPosition.getLat(), currentPosition.getLng(), lastRouteUpdatePosition.getLat(), lastRouteUpdatePosition.getLng(), results);
         return results[0] > ROUTE_UPDATE_DISTANCE_THRESHOLD;
     }
 
@@ -283,9 +275,11 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
                 displayRouteSteps(steps);
 
+                MapCoordinates newPos = fromGoogleMapsLatLng(userMarker.getPosition());
+
                 if (userMarker != null) {
-                    float bearing = calculatePathBearing(userMarker.getPosition());
-                    updateCameraPosition(userMarker.getPosition(), bearing);
+                    float bearing = curMap.calculatePathBearing(newPos);
+                    updateCameraPosition(newPos, bearing);
                 }
 
             } catch (Exception e) {
@@ -332,93 +326,25 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
         curMap.clearAllPolylines();
 
         try {
-            List<LatLng> allPoints = new ArrayList<>();
+            List<MapCoordinates> allPoints = new ArrayList<>();
             for (int i = 0; i < steps.length(); i++) {
                 JSONObject polyline = steps.getJSONObject(i).getJSONObject("polyline");
-                allPoints.addAll(PolyUtil.decode(polyline.getString("encodedPolyline")));
+                String encodedPolyline = polyline.getString("encodedPolyline");
+                allPoints.addAll(curMap.decodePolyline(encodedPolyline));
             }
 
             if (!allPoints.isEmpty()) {
-                PolylineOptions options = new PolylineOptions()
-                        .addAll(allPoints)
-                        .width(20)
-                        .color(Color.parseColor("#4285F4"))
-                        .geodesic(true);
-
-                curMap.addPolyline(options);
-                zoomToRouteSmoothly(allPoints);
+                curMap.addPolyline(
+                        allPoints,
+                        20,
+                        Color.parseColor("#4285F4"),
+                        true
+                );
+                curMap.zoomToRouteSmoothly(allPoints);
             }
         } catch (JSONException e) {
             Log.e("RouteDisplay", "Error parsing route", e);
         }
-    }
-
-    private float calculateRemainingDistance(LatLng currentPosition) {
-        NavigationGoogleMaps navMap = (NavigationGoogleMaps) curMap;
-        List<LatLng> pathPoints = navMap.getFirstPolylinePoints();
-        if (pathPoints.isEmpty()) return 0;
-
-        float totalDistance = 0;
-        boolean passedCurrentPos = false;
-
-        for (int i = 0; i < pathPoints.size() - 1; i++) {
-            LatLng start = pathPoints.get(i);
-            LatLng end = pathPoints.get(i + 1);
-
-            if (!passedCurrentPos) {
-                if (SphericalUtil.computeDistanceBetween(currentPosition, end) <
-                        SphericalUtil.computeDistanceBetween(currentPosition, start)) {
-                    passedCurrentPos = true;
-                }
-            }
-
-            if (passedCurrentPos) {
-                totalDistance += SphericalUtil.computeDistanceBetween(start, end);
-            }
-        }
-
-        return totalDistance;
-    }
-
-    private float calculatePathBearing(LatLng currentPosition) {
-        NavigationGoogleMaps navMap = (NavigationGoogleMaps) curMap;
-        List<LatLng> pathPoints = navMap.getFirstPolylinePoints();
-        if (pathPoints.size() < 2) {
-            return 0;
-        }
-
-        float minDistance = Float.MAX_VALUE;
-        LatLng closestPoint = null;
-        LatLng nextPoint = null;
-
-        for (int i = 0; i < pathPoints.size() - 1; i++) {
-            LatLng start = pathPoints.get(i);
-            LatLng end = pathPoints.get(i + 1);
-
-            double distance = SphericalUtil.computeDistanceBetween(currentPosition, start);
-            if (distance < minDistance) {
-                minDistance = (float) distance;
-                closestPoint = start;
-                nextPoint = end;
-            }
-        }
-
-        if (closestPoint == null || nextPoint == null) {
-            return 0;
-        }
-
-        return (float) SphericalUtil.computeHeading(closestPoint, nextPoint);
-    }
-
-    private void zoomToRouteSmoothly(List<LatLng> points) {
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (LatLng point : points) {
-            builder.include(point);
-        }
-
-
-        curMap.moveCameraToBounds(builder);
     }
 
     private void clearRoute() {
@@ -462,7 +388,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
             return;
         }
 
-        fetchAndDisplayRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng());
+        fetchAndDisplayRoute(origin, destination);
         isNavigationActive = true;
     }
 
