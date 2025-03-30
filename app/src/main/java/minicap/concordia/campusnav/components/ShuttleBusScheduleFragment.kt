@@ -150,7 +150,7 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
                     val backgroundColor = when {
                         timeDate == null -> ContextCompat.getColor(requireContext(),R.color.white)// Past times
                         timeDate < currentTime -> ContextCompat.getColor(requireContext(),R.color.gray)// Past times
-                        timeDate == sortedTimes.getOrNull(0)  -> ContextCompat.getColor(requireContext(),R.color.light_burgundy) // Current time
+                        timeDate == sortedTimes.getOrNull(0)  -> ContextCompat.getColor(requireContext(),R.color.pink) // Current time
                         timeDate == sortedTimes.getOrNull(1) -> ContextCompat.getColor(requireContext(),R.color.yellow) // Upcoming time
                         else -> ContextCompat.getColor(requireContext(),R.color.white) // Default
                     }
