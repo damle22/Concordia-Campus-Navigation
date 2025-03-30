@@ -2,6 +2,8 @@ package minicap.concordia.campusnav.map;
 
 import androidx.fragment.app.Fragment;
 
+import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
+import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.map.enums.MapColors;
 
 public abstract class AbstractMap {
@@ -21,7 +23,7 @@ public abstract class AbstractMap {
      * @return The fragment used to display the map
      */
     public abstract Fragment initialize();
-
+    public abstract void addMarker(OutdoorPOI opoi);
     /**
      * Adds a marker to the map with the specified parameters
      * @param position The position of the marker
@@ -71,6 +73,8 @@ public abstract class AbstractMap {
      * @param travelMode The mode of travel to be used
      */
     public abstract void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode);
+
+    public abstract void displayPOI(MapCoordinates origin, POIType type);
 
     /**
      * Centers the map on the given coordinates

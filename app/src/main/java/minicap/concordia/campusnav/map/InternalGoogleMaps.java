@@ -29,6 +29,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
+import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
+import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
@@ -85,7 +88,17 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             mMap.addPolygon(polygonOptions);
         }
     }
+    @Override
+    public void addMarker(OutdoorPOI opoi){
 
+        MarkerOptions newMarker = new MarkerOptions()
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                .position(new MapCoordinates(opoi.getLatitude(), opoi.getLongitude()).toGoogleMapsLatLng())
+                .title(opoi.getPoiName());
+        markers.add(mMap.addMarker(newMarker));
+
+
+    }
     @Override
     public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers){
         if(clearOtherMarkers) {
@@ -148,6 +161,11 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     @Override
     public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
         new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+    }
+
+    @Override
+    public void displayPOI(MapCoordinates origin, POIType type){
+        new FetchPathTask(this).fetchPOI(origin.toGoogleMapsLatLng(), type);
     }
 
     @Override
@@ -255,6 +273,13 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             Log.e("Route Parsing Error", e.toString());
             listener.onMapError("Exception while parsing the google maps route: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS) {
+      for(OutdoorPOI op : outdoorPOIS){
+          addMarker(op);
+      }
     }
 
     /**

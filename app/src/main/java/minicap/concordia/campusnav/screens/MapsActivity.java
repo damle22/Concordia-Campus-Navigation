@@ -36,6 +36,7 @@ import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
@@ -289,6 +290,7 @@ public class MapsActivity extends FragmentActivity
             boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
             setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
+
     }
 
     /**
@@ -348,7 +350,6 @@ public class MapsActivity extends FragmentActivity
             destinationEditText.setText(locationString);
         });
         isDestinationSet = true;
-
         drawPath();
     }
 
@@ -528,6 +529,7 @@ public class MapsActivity extends FragmentActivity
         map.centerOnCoordinates(origin);
 
         map.displayRoute(origin, destination, travelMode);
+        map.displayPOI(origin, POIType.RESTAURANT);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
