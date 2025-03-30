@@ -1,9 +1,11 @@
 package minicap.concordia.campusnav.map;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 
 import com.mappedin.sdk.MPIMapView;
 import com.mappedin.sdk.listeners.MPIMapClickListener;
@@ -102,6 +104,11 @@ public class InternalMappedIn extends AbstractMap implements MPIMapViewListener,
             curMap.getBlueDotManager().disable();
         }
         return true;
+    }
+
+    @Override
+    public void setStyle(Context context, int resourceID) {
+        //Not used
     }
 
     @Override
