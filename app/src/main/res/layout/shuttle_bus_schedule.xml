@@ -119,13 +119,13 @@
             <GridLayout
                 android:id="@+id/sgwGridLayout"
                 android:layout_width="match_parent"
-                android:layout_height="215dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@color/white"
-                android:columnCount="5"
+                android:columnCount="6"
                 android:orientation="horizontal"
-                android:padding="10dp"
-                android:rowCount="6" />
+                android:rowCount="6"
+                android:useDefaultMargins="false"/>
         </LinearLayout>
 
         <!-- LOY Departures -->
@@ -197,13 +197,13 @@
             <GridLayout
                 android:id="@+id/loyGridLayout"
                 android:layout_width="match_parent"
-                android:layout_height="215dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@color/white"
-                android:columnCount="5"
+                android:columnCount="6"
                 android:orientation="horizontal"
-                android:padding="10dp"
-                android:rowCount="6" />
+                android:rowCount="6"
+                android:useDefaultMargins="false"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
