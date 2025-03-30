@@ -4,9 +4,6 @@ import android.content.Context;
 
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.PolylineOptions;
-
 import java.util.List;
 
 import minicap.concordia.campusnav.map.enums.MapColors;
@@ -105,7 +102,7 @@ public abstract class AbstractMap {
     public void zoomCamera(MapCoordinates center, float routeZoom) {
     }
 
-    public void moveCameraToPosition(CameraPosition cameraPosition, int padding){
+    public void moveCameraToPosition(int padding, MapCoordinates position, float zoom, float bearing){
     }
 
     /**
@@ -142,13 +139,6 @@ public abstract class AbstractMap {
 
     public MapCoordinates getMapCoordinateFromMarker() {
         return null;
-    }
-
-    /**
-     * Adds a polyline to the map
-     * @param options The polyline options
-     */
-    public void addPolyline(PolylineOptions options){
     }
 
     /**

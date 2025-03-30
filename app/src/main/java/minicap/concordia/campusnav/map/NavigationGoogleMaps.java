@@ -56,7 +56,16 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     }
 
     //================ Camera methods ================
-    public void moveCameraToPosition(CameraPosition cameraPosition, int padding){
+    @Override
+    public void moveCameraToPosition(int padding, MapCoordinates position, float zoom, float bearing){
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position.toGoogleMapsLatLng())
+                .zoom(zoom)
+                .bearing(bearing)
+                .tilt(45)
+                .build();
+
         mMap.animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition),
                 200,
@@ -66,6 +75,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
         mMap.setPadding(0, padding, 0, 0);
     }
 
+    @Override
     public void zoomCamera(@NonNull MapCoordinates center, float zoom){
         mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(center.toGoogleMapsLatLng(), zoom)
@@ -136,7 +146,6 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
 
     //================ Polyline Methods ================
 
-    @Override
     public void addPolyline(PolylineOptions options) {
         Polyline polyline = mMap.addPolyline(options);
         routePolylines.add(polyline);

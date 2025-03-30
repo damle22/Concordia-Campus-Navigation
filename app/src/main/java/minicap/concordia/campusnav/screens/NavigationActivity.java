@@ -1,7 +1,5 @@
 package minicap.concordia.campusnav.screens;
 
-import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsLatLng;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,8 +24,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-
-import com.google.android.gms.maps.model.CameraPosition;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -115,10 +111,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
             destination = new MapCoordinates(extras.getDouble("destination_lat"), extras.getDouble("destination_lng"));
             travelMode = extras.getString("travel_mode", "WALK");
 
-//            String routeJson = extras.getString("route_data");
-//            if (routeJson != null) {
-//                routeData = new JSONArray(routeJson);
-//            }
         } catch (Exception e) {
             Log.e("Navigation", "Error parsing intent data", e);
             Toast.makeText(this, "Invalid navigation data", Toast.LENGTH_SHORT).show();
@@ -200,8 +192,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     }
 
     private void fetchAndDisplayRoute(MapCoordinates origin, MapCoordinates destination) {
-        //if (curMap.getmMap() == null) return;
-
         new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
         isNavigationActive = true;
     }
@@ -230,10 +220,9 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
         curMap.rotateUserMarker(markerRotation);
 
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(position.toGoogleMapsLatLng()).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
-
         int padding = (int)(getResources().getDisplayMetrics().heightPixels * 0.3);
-        curMap.moveCameraToPosition(cameraPosition, padding);
+
+        curMap.moveCameraToPosition(padding, position, DEFAULT_ZOOM, bearing);
 
     }
 
