@@ -1,11 +1,15 @@
 package minicap.concordia.campusnav.map;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.mappedin.sdk.models.MPIMap;
 
-public class MapCoordinates {
+public class MapCoordinates implements Parcelable {
     private double lat;
 
     private double lng;
@@ -25,6 +29,13 @@ public class MapCoordinates {
         this(lat, lng);
         this.x = x;
         this.y = y;
+    }
+
+    protected MapCoordinates(Parcel in) {
+        this.lat = in.readDouble();
+        this.lng = in.readDouble();
+        this.x = in.readDouble();
+        this.y = in.readDouble();
     }
 
     /**
@@ -96,5 +107,30 @@ public class MapCoordinates {
      */
     public double getY() {
         return y;
+    }
+
+    public static final Parcelable.Creator<MapCoordinates> CREATOR = new Creator<MapCoordinates>() {
+        @Override
+        public MapCoordinates createFromParcel(Parcel source) {
+            return new MapCoordinates(source);
+        }
+
+        @Override
+        public MapCoordinates[] newArray(int size) {
+            return new MapCoordinates[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeDouble(this.lat);
+        dest.writeDouble(this.lng);
+        dest.writeDouble(this.x);
+        dest.writeDouble(this.y);
     }
 }
