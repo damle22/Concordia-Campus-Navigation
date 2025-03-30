@@ -28,7 +28,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Marker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +61,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
     private MapCoordinates origin;
     private MapCoordinates destination;
-    private Marker userMarker;
+
     private String travelMode;
 
     private TextView etaText;
@@ -223,21 +222,13 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     }
 
     private void updateUserMarker(MapCoordinates position) {
-        if (userMarker == null) {
-            userMarker = curMap.createUserMarker(position, R.drawable.token, this);
-        } else {
-            curMap.updateUserMarkerPosition(userMarker,position);
-        }
+        curMap.updateUserMarkerPosition(position, this);
     }
 
     private void updateCameraPosition(MapCoordinates position, float bearing) {
-        //if (curMap.getmMap() == null) return;
-
         float markerRotation = (bearing + 110) % 360;
 
-        if (userMarker != null) {
-            userMarker.setRotation(markerRotation);
-        }
+        curMap.rotateUserMarker(markerRotation);
 
         CameraPosition cameraPosition = new CameraPosition.Builder().target(position.toGoogleMapsLatLng()).zoom(DEFAULT_ZOOM).bearing(bearing).tilt(45).build();
 
@@ -275,9 +266,9 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
                 displayRouteSteps(steps);
 
-                MapCoordinates newPos = fromGoogleMapsLatLng(userMarker.getPosition());
+                MapCoordinates newPos = curMap.getMapCoordinateFromMarker();
 
-                if (userMarker != null) {
+                if (!curMap.isUserMarkerNull()) {
                     float bearing = curMap.calculatePathBearing(newPos);
                     updateCameraPosition(newPos, bearing);
                 }

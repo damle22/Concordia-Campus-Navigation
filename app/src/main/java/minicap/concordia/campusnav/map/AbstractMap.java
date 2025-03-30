@@ -5,8 +5,6 @@ import android.content.Context;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
@@ -101,9 +99,7 @@ public abstract class AbstractMap {
     public abstract boolean toggleLocationTracking(boolean isEnabled);
 
     //NEW ABSTRACTS METHODS DURING REFACTOR ============================================
-
     public void setStyle(Context context, int resourceID){
-
     }
 
     public void zoomCamera(MapCoordinates center, float routeZoom) {
@@ -119,26 +115,33 @@ public abstract class AbstractMap {
     public void zoomToRouteSmoothly(List<MapCoordinates> allPoints) {
     }
 
-    public void updateMarkerPosition(Marker marker, LatLng position){
-    }
-
     /**
      * Creates and adds a user location marker
      * @param position The position of the marker
      * @param iconResId The resource ID for the marker icon
-     * @return The created marker
      */
-    public Marker createUserMarker(MapCoordinates position, int iconResId, Context context){
-        return null;
+    public void createUserMarker(MapCoordinates position, int iconResId, Context context){
     }
 
     /**
      * Updates an existing user marker's position
-     * @param marker The marker to update
      * @param position The new position
+     * @param context The current context
      */
-    public void updateUserMarkerPosition(Marker marker, MapCoordinates position){
+    public void updateUserMarkerPosition(MapCoordinates position, Context context){
 
+    }
+
+    public boolean isUserMarkerNull() {
+        return true;
+    }
+
+    public void rotateUserMarker(float markerRotation) {
+
+    }
+
+    public MapCoordinates getMapCoordinateFromMarker() {
+        return null;
     }
 
     /**
@@ -146,22 +149,12 @@ public abstract class AbstractMap {
      * @param options The polyline options
      */
     public void addPolyline(PolylineOptions options){
-
     }
 
     /**
      * Clears all polylines from the map
      */
     public void clearAllPolylines(){
-
-    }
-
-    public float calculateRemainingDistance(MapCoordinates location) {
-        return 0;
-    }
-
-    public float calculatePathBearing(MapCoordinates currentPosition) {
-        return 0;
     }
 
     /**
@@ -172,7 +165,6 @@ public abstract class AbstractMap {
      * @param geodesic Whether the polyline should be geodesic
      */
     public void addPolyline(List<MapCoordinates> coordinates, int width, int color, boolean geodesic){
-
     }
 
     /**
@@ -183,6 +175,16 @@ public abstract class AbstractMap {
     public List<MapCoordinates> decodePolyline(String encodedPolyline) {
         return null;
     }
+
+
+    public float calculateRemainingDistance(MapCoordinates location) {
+        return 0;
+    }
+
+    public float calculatePathBearing(MapCoordinates currentPosition) {
+        return 0;
+    }
+
 
 
     public interface MapUpdateListener {

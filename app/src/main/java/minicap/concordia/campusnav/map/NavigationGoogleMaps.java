@@ -1,5 +1,7 @@
 package minicap.concordia.campusnav.map;
 
+import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsLatLng;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,13 +29,15 @@ import com.google.maps.android.SphericalUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import minicap.concordia.campusnav.R;
+
 public class NavigationGoogleMaps extends InternalGoogleMaps{
 
     private GoogleMap mMap;
     private List<Polyline> routePolylines = new ArrayList<>();
+    private Marker userMarker;
 
     //================ Starter methods ================
-
     public NavigationGoogleMaps(MapUpdateListener listener) {
         super(listener);
     }
@@ -52,16 +56,6 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     }
 
     //================ Camera methods ================
-    public void moveCameraToBounds(@NonNull LatLngBounds.Builder builder){
-
-        mMap.animateCamera(
-                CameraUpdateFactory.newLatLngBounds(builder.build(), 100),
-                500,
-                null
-        );
-
-    }
-
     public void moveCameraToPosition(CameraPosition cameraPosition, int padding){
         mMap.animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition),
@@ -97,36 +91,48 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     }
 
     //================ Marker Methods ================
-
     @Override
-    public void updateMarkerPosition(Marker marker, LatLng position) {
-        if (marker != null) {
-            marker.setPosition(position);
-        }
-    }
-
-    @Override
-    public Marker createUserMarker(MapCoordinates position, int iconResId, Context context) {
+    public void createUserMarker(MapCoordinates position, int iconResId, Context context) {
         BitmapDescriptor icon = bitmapDescriptorFromVector(context, iconResId);
         if (icon == null) {
             icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
         }
 
-        return mMap.addMarker(new MarkerOptions()
-                .position(position.toGoogleMapsLatLng())
-                .title("Your Location")
-                .icon(icon)
-                .anchor(0.5f, 0.5f)
-                .rotation(0)
-                .flat(false));
+        userMarker = mMap.addMarker(new MarkerOptions()
+                        .position(position.toGoogleMapsLatLng())
+                        .title("Your Location")
+                        .icon(icon)
+                        .anchor(0.5f, 0.5f)
+                        .rotation(0)
+                        .flat(false));
     }
 
     @Override
-    public void updateUserMarkerPosition(Marker marker, MapCoordinates position) {
-        if (marker != null) {
-            marker.setPosition(position.toGoogleMapsLatLng());
+    public void rotateUserMarker(float bearing){
+        if (!isUserMarkerNull()) {
+            userMarker.setRotation(bearing);
         }
     }
+
+    @Override
+    public void updateUserMarkerPosition(MapCoordinates position, Context context){
+        if (isUserMarkerNull()) {
+            createUserMarker(position, R.drawable.token, context);
+        } else {
+            userMarker.setPosition(position.toGoogleMapsLatLng());
+        }
+    }
+
+    @Override
+    public boolean isUserMarkerNull(){
+        return (userMarker == null);
+    }
+
+    @Override
+    public MapCoordinates getMapCoordinateFromMarker(){
+        return fromGoogleMapsLatLng(userMarker.getPosition());
+    }
+
 
     //================ Polyline Methods ================
 
@@ -243,7 +249,6 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
 
 
     //================ Bitmap methods ================
-
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorResId) {
         try {
             Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
