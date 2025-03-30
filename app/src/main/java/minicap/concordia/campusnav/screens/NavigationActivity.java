@@ -406,9 +406,6 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
         stopNavigation();
         stopLocationUpdates();
 
-        Intent i = new Intent();
-        i.putExtra("OPEN_DIR", true);
-        setResult(RESULT_OK, i);
         finish();
     }
 

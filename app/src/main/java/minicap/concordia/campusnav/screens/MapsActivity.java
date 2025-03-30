@@ -282,7 +282,7 @@ public class MapsActivity extends FragmentActivity
     }
 
     private void HandleNavigationActivityResult(ActivityResult result) {
-
+        //Empty since no result is being passed
     }
 
     /**
