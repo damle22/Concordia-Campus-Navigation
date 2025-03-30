@@ -270,20 +270,14 @@ public class MapsActivity extends FragmentActivity
             return;
         }
 
-        new FetchPathTask(new FetchPathTask.OnRouteFetchedListener() {
-            @Override
-            public void onRouteFetched(JSONArray routeInfo) {
-                Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
-                i.putExtra("origin_lat", origin.getLat());
-                i.putExtra("origin_lng", origin.getLng());
-                i.putExtra("destination_lat", destination.getLat());
-                i.putExtra("destination_lng", destination.getLng());
-                i.putExtra("travel_mode", travelMode);
-                i.putExtra("route_data", routeInfo.toString());
+        Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
+        i.putExtra("origin_lat", origin.getLat());
+        i.putExtra("origin_lng", origin.getLng());
+        i.putExtra("destination_lat", destination.getLat());
+        i.putExtra("destination_lng", destination.getLng());
+        i.putExtra("travel_mode", travelMode);
 
-                navigationActivityLauncher.launch(i);
-            }
-        }).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+        navigationActivityLauncher.launch(i);
 
     }
 

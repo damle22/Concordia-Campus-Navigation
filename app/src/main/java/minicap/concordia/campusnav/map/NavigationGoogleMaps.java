@@ -1,10 +1,12 @@
 package minicap.concordia.campusnav.map;
 
 import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsLatLng;
+import static minicap.concordia.campusnav.screens.NavigationActivity.DEFAULT_ZOOM;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
@@ -26,6 +28,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +42,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     private GoogleMap mMap;
     private List<Polyline> routePolylines = new ArrayList<>();
     private Marker userMarker;
+    private int cameraPadding = 0;
 
     //================ Starter methods ================
     public NavigationGoogleMaps(MapUpdateListener listener) {
@@ -58,6 +65,9 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
     //================ Camera methods ================
     @Override
     public void moveCameraToPosition(int padding, MapCoordinates position, float zoom, float bearing){
+        if(cameraPadding == 0){
+            this.cameraPadding = padding;
+        }
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(position.toGoogleMapsLatLng())
@@ -195,6 +205,63 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
         }
         return routePolylines.get(0).getPoints();
     }
+
+    //================ Route Methods ================
+
+    @Override
+    public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
+        new FetchPathTask(new FetchPathTask.OnRouteFetchedListener() {
+            @Override
+            public void onRouteFetched(JSONArray routeInfo) {
+                if (routeInfo == null) {
+                    listener.onMapError("Route information is null");
+                    return;
+                }
+
+                try {
+                    if (routeInfo.length() < 2) {
+                        throw new JSONException("Invalid route data");
+                    }
+
+                    clearAllPolylines();
+
+                    JSONArray steps = routeInfo.getJSONArray(0);
+                    String eta = routeInfo.optString(1, "N/A");
+
+                    listener.onEstimatedTimeUpdated(eta);
+
+                    // Display route steps
+                    List<MapCoordinates> allPoints = new ArrayList<>();
+                    for (int i = 0; i < steps.length(); i++) {
+                        JSONObject polyline = steps.getJSONObject(i).getJSONObject("polyline");
+                        String encodedPolyline = polyline.getString("encodedPolyline");
+                        allPoints.addAll(decodePolyline(encodedPolyline));
+                    }
+
+                    if (!allPoints.isEmpty()) {
+                        addPolyline(
+                                allPoints,
+                                20,
+                                Color.parseColor("#4285F4"),
+                                true
+                        );
+                        zoomToRouteSmoothly(allPoints);
+                    }
+
+                    if (!isUserMarkerNull()) {
+                        MapCoordinates newPos = getMapCoordinateFromMarker();
+                        float bearing = calculatePathBearing(newPos);
+                        moveCameraToPosition(cameraPadding, newPos, DEFAULT_ZOOM, bearing);
+                    }
+
+                } catch (JSONException e) {
+                    Log.e("Navigation", "Route display error", e);
+                    listener.onMapError("Error displaying route");
+                }
+            }
+        }).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+    }
+
 
     //================ Calculation Methods ================
     @Override

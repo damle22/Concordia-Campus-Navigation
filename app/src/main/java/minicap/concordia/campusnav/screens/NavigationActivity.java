@@ -3,7 +3,6 @@ package minicap.concordia.campusnav.screens;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -25,29 +24,21 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.map.AbstractMap;
-import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.NavigationGoogleMaps;
 import minicap.concordia.campusnav.map.enums.MapColors;
 
-public class NavigationActivity extends AppCompatActivity implements FetchPathTask.OnRouteFetchedListener, AbstractMap.MapUpdateListener, MainMenuDialog.MainMenuListener {
+public class NavigationActivity extends AppCompatActivity implements AbstractMap.MapUpdateListener, MainMenuDialog.MainMenuListener {
 
     private static final int LOCATION_REQUEST_CODE = 101;
-    private static final float DEFAULT_ZOOM = 18f;
-    private static final float ROUTE_ZOOM = 15f;
+    public static final float DEFAULT_ZOOM = 18f;
     private static final float ROUTE_UPDATE_DISTANCE_THRESHOLD = 50;
 
     private AbstractMap curMap;
@@ -64,7 +55,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     private TextView statsText;
     private ImageButton exit;
     private ImageButton mainMenu;
-    private JSONArray routeData;
     private boolean isNavigationActive = false;
     private MapCoordinates lastRouteUpdatePosition;
 
@@ -155,13 +145,9 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
             //setup map markers
             setupMapMarkers();
 
-            if (routeData != null) {
-                onRouteFetched(routeData);
-            } else {
-                fetchAndDisplayRoute();
-            }
-
+            fetchAndDisplayRoute();
             checkLocationPermissions();
+
         } catch (Exception e) {
             Log.e("Navigation", "Map ready error", e);
             Toast.makeText(this, "Map setup failed", Toast.LENGTH_SHORT).show();
@@ -178,23 +164,18 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     }
 
     private void fetchAndDisplayRoute() {
-        if (/* curMap.getmMap() == null || */origin == null || destination == null) {
+        if (origin == null || destination == null) {
             Toast.makeText(this, "Location data not available", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        //curMap.displayRoute(origin, destination, travelMode);
-
-        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
-
-        curMap.zoomCamera(origin,ROUTE_ZOOM);
-
+        curMap.displayRoute(origin, destination, travelMode);
     }
 
     private void fetchAndDisplayRoute(MapCoordinates origin, MapCoordinates destination) {
-        new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+        curMap.displayRoute(origin, destination, travelMode);
         isNavigationActive = true;
     }
+
 
     private void updateUserPosition(MapCoordinates location) {
 
@@ -236,38 +217,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
         return results[0] > ROUTE_UPDATE_DISTANCE_THRESHOLD;
     }
 
-    public void onRouteFetched(JSONArray routeInfo) {
-        runOnUiThread(() -> {
-            try {
-                if (routeInfo == null || routeInfo.length() < 2) {
-                    throw new JSONException("Invalid route data");
-                }
-
-                clearRoute();
-
-                JSONArray steps = routeInfo.getJSONArray(0);
-                String eta = routeInfo.optString(1, "N/A");
-                int totalDistance = routeInfo.optInt(2, 0);
-
-                etaText.setText(getString(R.string.eta_format, eta));
-
-                updateStatsText(totalDistance);
-
-                displayRouteSteps(steps);
-
-                MapCoordinates newPos = curMap.getMapCoordinateFromMarker();
-
-                if (!curMap.isUserMarkerNull()) {
-                    float bearing = curMap.calculatePathBearing(newPos);
-                    updateCameraPosition(newPos, bearing);
-                }
-
-            } catch (Exception e) {
-                Log.e("Navigation", "Route display error", e);
-            }
-        });
-    }
-
     private String formatArrivalTime(String etaDuration) {
         try {
             if (etaDuration.equals("N/A")) {
@@ -299,36 +248,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
         String stats = String.format("%s • %s", distanceText, arrivalTime);
         statsText.setText(stats);
-    }
-
-
-    private void displayRouteSteps(JSONArray steps) {
-        curMap.clearAllPolylines();
-
-        try {
-            List<MapCoordinates> allPoints = new ArrayList<>();
-            for (int i = 0; i < steps.length(); i++) {
-                JSONObject polyline = steps.getJSONObject(i).getJSONObject("polyline");
-                String encodedPolyline = polyline.getString("encodedPolyline");
-                allPoints.addAll(curMap.decodePolyline(encodedPolyline));
-            }
-
-            if (!allPoints.isEmpty()) {
-                curMap.addPolyline(
-                        allPoints,
-                        20,
-                        Color.parseColor("#4285F4"),
-                        true
-                );
-                curMap.zoomToRouteSmoothly(allPoints);
-            }
-        } catch (JSONException e) {
-            Log.e("RouteDisplay", "Error parsing route", e);
-        }
-    }
-
-    private void clearRoute() {
-        curMap.clearAllPolylines();
     }
 
 
@@ -426,6 +345,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
     @Override
     public void onEstimatedTimeUpdated(String newTime) {
+        etaText.setText(getString(R.string.eta_format, newTime));
 
     }
 
