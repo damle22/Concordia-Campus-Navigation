@@ -2,8 +2,10 @@ package minicap.concordia.campusnav.map;
 
 import android.content.Context;
 
+import androidx.annotation.DrawableRes;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -13,6 +15,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import minicap.concordia.campusnav.map.enums.MapColors;
+import minicap.concordia.campusnav.screens.NavigationActivity;
 
 public abstract class AbstractMap {
 
@@ -101,13 +104,21 @@ public abstract class AbstractMap {
      */
     public abstract boolean toggleLocationTracking(boolean isEnabled);
 
-    public abstract void setStyle(Context context, int resourceID);
+    //NEW ABSTRACTS
 
-    public abstract Marker addMarker(MarkerOptions options);
+    public void setStyle(Context context, int resourceID){
 
-    public abstract Polyline getPolyline(PolylineOptions options);
+    }
+    public Marker addMarker(MarkerOptions options){
+        return null;
+    }
+
+    public Polyline getPolyline(PolylineOptions options){
+        return  null;
+    }
 
     public void moveCameraToBounds(LatLngBounds.Builder builder) {
+
     }
 
     public void zoomCamera(MapCoordinates center, float routeZoom) {
@@ -116,10 +127,44 @@ public abstract class AbstractMap {
     public void moveCameraToPosition(CameraPosition cameraPosition, int padding){
     }
 
-
-
     public void updateMarkerPosition(Marker marker, LatLng position){
     }
+
+    /**
+     * Creates and adds a user location marker
+     * @param position The position of the marker
+     * @param iconResId The resource ID for the marker icon
+     * @return The created marker
+     */
+    public Marker createUserMarker(MapCoordinates position, int iconResId, Context context){
+        return null;
+    }
+
+    /**
+     * Updates an existing user marker's position
+     * @param marker The marker to update
+     * @param position The new position
+     */
+    public void updateUserMarkerPosition(Marker marker, MapCoordinates position){
+
+    }
+
+    /**
+     * Adds a polyline to the map
+     * @param options The polyline options
+     */
+    public void addPolyline(PolylineOptions options){
+
+    }
+
+    /**
+     * Clears all polylines from the map
+     */
+    public void clearAllPolylines(){
+
+    }
+
+
 
     public interface MapUpdateListener {
         /**

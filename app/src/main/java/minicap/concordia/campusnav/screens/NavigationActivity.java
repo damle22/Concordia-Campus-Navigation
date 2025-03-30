@@ -1,14 +1,9 @@
 package minicap.concordia.campusnav.screens;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -17,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -30,19 +24,12 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
+
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
@@ -58,15 +45,12 @@ import java.util.List;
 import java.util.Locale;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.map.AbstractMap;
 import minicap.concordia.campusnav.map.FetchPathTask;
-import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.NavigationGoogleMaps;
 import minicap.concordia.campusnav.map.enums.MapColors;
-import minicap.concordia.campusnav.savedstates.States;
 
 public class NavigationActivity extends AppCompatActivity implements FetchPathTask.OnRouteFetchedListener, AbstractMap.MapUpdateListener, MainMenuDialog.MainMenuListener {
 
@@ -86,7 +70,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     private String travelMode;
 
     private Marker destinationMarker;
-    private List<Polyline> routePolylines = new ArrayList<>();
     private TextView etaText;
     private TextView statsText;
     private ImageButton exit;
@@ -230,7 +213,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     }
 
     private void updateUserPosition(MapCoordinates location) {
-        if (location == null || /*curMap.getmMap() == null ||*/ routePolylines.isEmpty()) return;
+        //if (location == null || /*curMap.getmMap() == null ||*/ routePolylines.isEmpty()) return;
 
         LatLng userLatLng = location.toGoogleMapsLatLng();
 
@@ -238,7 +221,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
         updateStatsText((int) remainingDistance);
 
         float pathBearing = calculatePathBearing(userLatLng);
-        updateUserMarker(userLatLng);
+        updateUserMarker(location);
         updateCameraPosition(userLatLng, pathBearing);
 
         if (isNavigationActive && shouldUpdateRoute(userLatLng)) {
@@ -247,79 +230,11 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
         }
     }
 
-    private float calculateRemainingDistance(LatLng currentPosition) {
-        if (routePolylines.isEmpty()) return 0;
-
-        List<LatLng> pathPoints = routePolylines.get(0).getPoints();
-        float totalDistance = 0;
-        boolean passedCurrentPos = false;
-
-        for (int i = 0; i < pathPoints.size() - 1; i++) {
-            LatLng start = pathPoints.get(i);
-            LatLng end = pathPoints.get(i + 1);
-
-            if (!passedCurrentPos) {
-                if (SphericalUtil.computeDistanceBetween(currentPosition, end) <
-                        SphericalUtil.computeDistanceBetween(currentPosition, start)) {
-                    passedCurrentPos = true;
-                }
-            }
-
-            if (passedCurrentPos) {
-                totalDistance += SphericalUtil.computeDistanceBetween(start, end);
-            }
-        }
-
-        return totalDistance;
-    }
-
-    private float calculatePathBearing(LatLng currentPosition) {
-        if (routePolylines.isEmpty() || routePolylines.get(0).getPoints().size() < 2) {
-            return 0;
-        }
-
-        List<LatLng> pathPoints = routePolylines.get(0).getPoints();
-        float minDistance = Float.MAX_VALUE;
-        LatLng closestPoint = null;
-        LatLng nextPoint = null;
-
-        for (int i = 0; i < pathPoints.size() - 1; i++) {
-            LatLng start = pathPoints.get(i);
-            LatLng end = pathPoints.get(i + 1);
-
-            double distance = SphericalUtil.computeDistanceBetween(currentPosition, start);
-            if (distance < minDistance) {
-                minDistance = (float) distance;
-                closestPoint = start;
-                nextPoint = end;
-            }
-        }
-
-        if (closestPoint == null || nextPoint == null) {
-            return 0;
-        }
-
-        float rawBearing = (float) SphericalUtil.computeHeading(closestPoint, nextPoint);
-
-        return rawBearing;
-    }
-
-    private void updateUserMarker(LatLng position) {
+    private void updateUserMarker(MapCoordinates position) {
         if (userMarker == null) {
-            BitmapDescriptor icon = bitmapDescriptorFromVector(this, R.drawable.token);
-            if (icon == null) {
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
-            }
-
-            userMarker = curMap.addMarker(new MarkerOptions()
-                    .position(position)
-                    .title("Your Location")
-                    .icon(icon)
-                    .anchor(0.5f, 0.5f)
-                    .rotation(0)
-                    .flat(false));
+            userMarker = curMap.createUserMarker(position, R.drawable.token, this);
         } else {
-            curMap.updateMarkerPosition(userMarker, position);
+            curMap.updateUserMarkerPosition(userMarker,position);
         }
     }
 
@@ -414,7 +329,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
 
 
     private void displayRouteSteps(JSONArray steps) {
-        clearRoute();
+        curMap.clearAllPolylines();
 
         try {
             List<LatLng> allPoints = new ArrayList<>();
@@ -424,9 +339,13 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
             }
 
             if (!allPoints.isEmpty()) {
-                PolylineOptions options = new PolylineOptions().addAll(allPoints).width(20).color(Color.parseColor("#4285F4")).geodesic(true);
+                PolylineOptions options = new PolylineOptions()
+                        .addAll(allPoints)
+                        .width(20)
+                        .color(Color.parseColor("#4285F4"))
+                        .geodesic(true);
 
-                routePolylines.add(curMap.getPolyline(options));
+                curMap.addPolyline(options);
                 zoomToRouteSmoothly(allPoints);
             }
         } catch (JSONException e) {
@@ -434,9 +353,64 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
         }
     }
 
-    private void zoomToRouteSmoothly(List<LatLng> points) {
-        // if (curMap.getmMap() == null || points.isEmpty()) return;
+    private float calculateRemainingDistance(LatLng currentPosition) {
+        NavigationGoogleMaps navMap = (NavigationGoogleMaps) curMap;
+        List<LatLng> pathPoints = navMap.getFirstPolylinePoints();
+        if (pathPoints.isEmpty()) return 0;
 
+        float totalDistance = 0;
+        boolean passedCurrentPos = false;
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            LatLng start = pathPoints.get(i);
+            LatLng end = pathPoints.get(i + 1);
+
+            if (!passedCurrentPos) {
+                if (SphericalUtil.computeDistanceBetween(currentPosition, end) <
+                        SphericalUtil.computeDistanceBetween(currentPosition, start)) {
+                    passedCurrentPos = true;
+                }
+            }
+
+            if (passedCurrentPos) {
+                totalDistance += SphericalUtil.computeDistanceBetween(start, end);
+            }
+        }
+
+        return totalDistance;
+    }
+
+    private float calculatePathBearing(LatLng currentPosition) {
+        NavigationGoogleMaps navMap = (NavigationGoogleMaps) curMap;
+        List<LatLng> pathPoints = navMap.getFirstPolylinePoints();
+        if (pathPoints.size() < 2) {
+            return 0;
+        }
+
+        float minDistance = Float.MAX_VALUE;
+        LatLng closestPoint = null;
+        LatLng nextPoint = null;
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            LatLng start = pathPoints.get(i);
+            LatLng end = pathPoints.get(i + 1);
+
+            double distance = SphericalUtil.computeDistanceBetween(currentPosition, start);
+            if (distance < minDistance) {
+                minDistance = (float) distance;
+                closestPoint = start;
+                nextPoint = end;
+            }
+        }
+
+        if (closestPoint == null || nextPoint == null) {
+            return 0;
+        }
+
+        return (float) SphericalUtil.computeHeading(closestPoint, nextPoint);
+    }
+
+    private void zoomToRouteSmoothly(List<LatLng> points) {
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LatLng point : points) {
@@ -448,10 +422,7 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
     }
 
     private void clearRoute() {
-        for (Polyline polyline : routePolylines) {
-            polyline.remove();
-        }
-        routePolylines.clear();
+        curMap.clearAllPolylines();
     }
 
 
@@ -474,27 +445,6 @@ public class NavigationActivity extends AppCompatActivity implements FetchPathTa
             }
         } catch (Exception e) {
             Log.e("Navigation", "Location updates error", e);
-        }
-    }
-
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorResId) {
-        try {
-            Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-            if (vectorDrawable == null) {
-                return null;
-            }
-
-            int width = 100;
-            int height = 100;
-
-            vectorDrawable.setBounds(0, 0, width, height);
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            vectorDrawable.draw(canvas);
-            return BitmapDescriptorFactory.fromBitmap(bitmap);
-        } catch (Exception e) {
-            Log.e("Navigation", "Vector icon error", e);
-            return null;
         }
     }
 
