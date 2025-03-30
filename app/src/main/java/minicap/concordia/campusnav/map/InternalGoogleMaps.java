@@ -1,5 +1,6 @@
 package minicap.concordia.campusnav.map;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,6 +39,7 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
+
     private final float defaultZoom = 18;
     private GoogleMap mMap;
 
@@ -239,7 +242,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        mMap = googleMap;
+        setMap(googleMap);
 
         addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
@@ -289,4 +292,13 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     public void setMap(GoogleMap map) {
         mMap = map;
     }
+
+    public GoogleMap getmMap(){
+        return this.mMap;
+    }
+
+    public void setStyle(Context context, int resourceID){
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, resourceID));
+    }
+
 }
