@@ -142,8 +142,6 @@
         android:thumbTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guidelineVertMID"
-        app:layout_constraintTop_toTopOf="@id/guidelineBOT"
         tools:checked="false" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
