@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,42 +35,41 @@ import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
-import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
-import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
+import minicap.concordia.campusnav.map.FetchPathTask;
+import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONArray;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
 import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment;
 import minicap.concordia.campusnav.map.AbstractMap;
-import minicap.concordia.campusnav.map.InternalGoogleMaps;
 import minicap.concordia.campusnav.map.InternalMappedIn;
 import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
+import minicap.concordia.campusnav.savedstates.States;
 
 public class MapsActivity extends FragmentActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
-    public static final String KEY_STARTING_LAT = "starting_lat";
-    public static final String KEY_STARTING_LNG = "starting_lng";
+    public static final String KEY_STARTING_COORDS = "starting_coords";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
     public static final String KEY_SHOW_SGW = "show_sgw";
 
@@ -85,18 +83,18 @@ public class MapsActivity extends FragmentActivity
 
     private boolean isDestinationSet;
 
-    private boolean showSGW;
-
     private boolean hasUserLocationBeenSet;
 
     private boolean runBus;
     private boolean runDir;
 
+    private boolean isFirstTimeLoad;
+
+    private boolean isSwitchingMap;
+
     private Button campusSwitchBtn;
 
     private TextView campusTextView;
-
-    private String campusNotSelected;
 
     private EditText yourLocationEditText;
 
@@ -108,6 +106,7 @@ public class MapsActivity extends FragmentActivity
     private ImageButton wheelchairButton;
     private ImageButton carButton;
     private ImageButton transitButton;
+    private ImageButton startRouteButton;
 
     private BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior;
 
@@ -125,9 +124,13 @@ public class MapsActivity extends FragmentActivity
 
     private String eventAddress;
 
+    private final States states = States.getInstance();
+
 
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
+
+    private ActivityResultLauncher<Intent> navigationActivityLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,21 +140,25 @@ public class MapsActivity extends FragmentActivity
 
         isDestinationSet = false;
         hasUserLocationBeenSet = false;
+        isFirstTimeLoad = true;
+        isSwitchingMap = false;
         buildingManager = ConcordiaBuildingManager.getInstance();
         currentMap = SupportedMaps.GOOGLE_MAPS;
 
-
+        //Check bundle for any additional requests
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            double startingLat = bundle.getDouble(KEY_STARTING_LAT);
-            double startingLng = bundle.getDouble(KEY_STARTING_LNG);
-            startingCoords = new MapCoordinates(startingLat, startingLng);
-            campusNotSelected = bundle.getString(KEY_CAMPUS_NOT_SELECTED);
-            showSGW = bundle.getBoolean(KEY_SHOW_SGW);
             runBus = bundle.getBoolean("OPEN_BUS", false);
             runDir = bundle.getBoolean("OPEN_DIR", false);
             eventAddress = bundle.getString("EVENT_ADDRESS", "");
         }
+
+        // Initialize campus map by pulling saved state
+        Campus campus = states.getCampus();
+        MapCoordinates campusCoordinates = campus.getLocation();
+        double startingLat = campusCoordinates.getLat();
+        double startingLng = campusCoordinates.getLng();
+        startingCoords = new MapCoordinates(startingLat, startingLng);
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
         Button buildingViewButton = findViewById(R.id.buildingView);
@@ -174,9 +181,8 @@ public class MapsActivity extends FragmentActivity
 
         // Setup campus switching
         campusTextView = findViewById(R.id.ToCampus);
-        campusTextView.setText(campusNotSelected);
+        campusTextView.setText(states.getOtherCampusAbrev());
         campusSwitchBtn = findViewById(R.id.campusSwitch);
-
         campusSwitchBtn.setOnClickListener(v -> toggleCampus());
 
         // check location permission
@@ -197,6 +203,9 @@ public class MapsActivity extends FragmentActivity
         wheelchairButton = findViewById(R.id.wheelchairButton);
         carButton = findViewById(R.id.carButton);
         transitButton = findViewById(R.id.transitButton);
+        startRouteButton = findViewById(R.id.startRoute);
+
+        startRouteButton.setOnClickListener(view -> startRoute());
 
         // Default mode is car
         carButton.setSelected(true);
@@ -243,6 +252,10 @@ public class MapsActivity extends FragmentActivity
                 new ActivityResultContracts.StartActivityForResult(),
                 this::HandleSearchLocationResult);
 
+        navigationActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::HandleNavigationActivityResult);
+
         getUserLocationPath();
 
         if(runBus){
@@ -252,6 +265,30 @@ public class MapsActivity extends FragmentActivity
         if(runDir){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
+    }
+
+    /**
+     * Handles Launching NavigationActivity when starting a live route
+     */
+    public void startRoute() {
+        if (origin == null || destination == null) {
+            //Error Handling
+            return;
+        }
+
+        Intent i = new Intent(MapsActivity.this, NavigationActivity.class);
+        i.putExtra("origin_lat", origin.getLat());
+        i.putExtra("origin_lng", origin.getLng());
+        i.putExtra("destination_lat", destination.getLat());
+        i.putExtra("destination_lng", destination.getLng());
+        i.putExtra("travel_mode", travelMode);
+
+        navigationActivityLauncher.launch(i);
+
+    }
+
+    private void HandleNavigationActivityResult(ActivityResult result) {
+        //Empty since no result is being passed
     }
 
     /**
@@ -281,16 +318,24 @@ public class MapsActivity extends FragmentActivity
             return;
         }
 
+        boolean isIndoors = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_INDOORS);
+
+        if(isIndoors) {
+            switchToMap(SupportedMaps.MAPPED_IN);
+        }
+        else {
+            switchToMap(SupportedMaps.GOOGLE_MAPS);
+        }
+
         boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
-        String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION);
-        double lat = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LAT);
-        double lng = returnData.getDouble(LocationSearchActivity.KEY_RETURN_CHOSEN_LNG);
-        MapCoordinates newCoords = new MapCoordinates(lat, lng);
+        String returnedLocation = returnData.getString(LocationSearchActivity.KEY_RETURN_CHOSEN_LOCATION_STRING);
+        MapCoordinates newCoords = returnData.getParcelable(LocationSearchActivity.KEY_RETURN_CHOSEN_COORDS, MapCoordinates.class);
+
         if(isDestination) {
             setDestination(returnedLocation, newCoords);
         }
         else {
-            boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_CURRENT_LOCATION);
+            boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_IS_CURRENT_LOCATION_BOOL);
             setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
     }
@@ -336,7 +381,9 @@ public class MapsActivity extends FragmentActivity
             yourLocationEditText.setText(yourLocationText);
         });
 
-        drawPath();
+        if(!isSwitchingMap) {
+            drawPath();
+        }
     }
 
     /**
@@ -353,19 +400,26 @@ public class MapsActivity extends FragmentActivity
         });
         isDestinationSet = true;
 
-        drawPath();
+        // We want to ensure that the map is loaded before we draw
+        if(!isSwitchingMap) {
+            drawPath();
+        }
     }
 
     /**
      * Toggles the map to either the SGW campus or the Loyola campus based on which was already focused
      */
     private void toggleCampus() {
-        //flipping the state
-        showSGW = !showSGW;
+        //get campus from saved states
+        String newCampusName = states.getOtherCampusName();
 
-        // getting the new campus location
-        CampusName wantedCampus = showSGW ? CampusName.SGW : CampusName.LOYOLA;
+        //converts string "SGW" or "LOYOLA" into the corresponding enum constant
+        CampusName wantedCampus = CampusName.valueOf(newCampusName);
         Campus curCampus = buildingManager.getCampus(wantedCampus);
+
+        //save new campus state
+        states.setCampus(curCampus);
+
         MapCoordinates campusCoords = curCampus.getLocation();
 
         //moving the existing marker to the new campus location
@@ -375,7 +429,7 @@ public class MapsActivity extends FragmentActivity
         map.centerOnCoordinates(campusCoords);
 
         //updating the button text
-        campusTextView.setText(showSGW ? "LOY" : "SGW");
+        campusTextView.setText(states.getOtherCampusAbrev());
     }
 
     /**
@@ -415,13 +469,14 @@ public class MapsActivity extends FragmentActivity
     /**
      * Switches the current map to a different supported map
      */
-    private void switchCurrentMap() {
-        if(currentMap == SupportedMaps.GOOGLE_MAPS) {
-            currentMap = SupportedMaps.MAPPED_IN;
+    private void switchToMap(SupportedMaps newMap) {
+        if(currentMap == newMap) {
+            return;
         }
-        else {
-            currentMap = SupportedMaps.GOOGLE_MAPS;
-        }
+
+        isSwitchingMap = true;
+
+        currentMap = newMap;
 
         getSupportFragmentManager().beginTransaction()
                 .remove(curMapFragment)
@@ -538,11 +593,20 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     public void onMapReady() {
-        map.centerOnCoordinates(startingCoords);
+        if(isFirstTimeLoad) {
+            isFirstTimeLoad = false;
+            map.centerOnCoordinates(startingCoords);
+        }
 
         //By default, origin is user location
         enableMyLocation();
         getUserLocationPath();
+
+
+        if(isSwitchingMap) {
+            isSwitchingMap = false;
+            drawPath();
+        }
 
         // If we got an eventAddress, let's geocode it
         if (eventAddress != null && !eventAddress.isEmpty()) {
