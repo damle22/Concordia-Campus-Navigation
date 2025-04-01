@@ -33,7 +33,7 @@ import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 // Callback Interface
 public class FetchPathTask {
     private final OnRouteFetchedListener listener;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
     /**
@@ -252,7 +252,7 @@ public class FetchPathTask {
         return placesList;
     }
 
-    private String convertSecondsToTime(String secondsStr) {
+    public String convertSecondsToTime(String secondsStr) {
         long seconds = Long.parseLong(secondsStr.replace("s", ""));
         long minutes = seconds / 60;
         long hours = minutes / 60;
