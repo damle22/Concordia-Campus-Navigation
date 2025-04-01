@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -267,6 +268,18 @@ public class MapsActivity extends FragmentActivity
         if(runDir){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
+
+        //Setup POI buttons
+        LinearLayout restaurantButton = findViewById(R.id.RestaurantPOI);
+        LinearLayout coffeeButton = findViewById(R.id.CoffeePOI);
+        LinearLayout fountainButton = findViewById(R.id.FountainPOI);
+        LinearLayout elevatorButton = findViewById(R.id.ElevatorPOI);
+        LinearLayout washroomButton = findViewById(R.id.WashroomPOI);
+
+        // Set click listeners for each button
+        restaurantButton.setOnClickListener(view -> map.displayPOI(new MapCoordinates(45.57613871349257, -73.8061654), POIType.RESTAURANT));
+        coffeeButton.setOnClickListener(view -> map.displayPOI(new MapCoordinates(45.57613871349257, -73.8061654), POIType.COFFEE_SHOP));
+        //TODO handle Fountain, elevator and washroom (Indoor POI)
     }
 
     /**
@@ -590,7 +603,6 @@ public class MapsActivity extends FragmentActivity
         map.centerOnCoordinates(origin);
 
         map.displayRoute(origin, destination, travelMode);
-        map.displayPOI(origin, POIType.RESTAURANT);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }

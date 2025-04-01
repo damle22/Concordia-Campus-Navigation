@@ -247,7 +247,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
             }
 
             @Override
-            public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS) {
+            public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location) {
 
             }
         }).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
