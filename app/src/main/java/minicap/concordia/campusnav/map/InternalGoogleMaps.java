@@ -225,6 +225,9 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
         addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
+        // disable default location button
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
