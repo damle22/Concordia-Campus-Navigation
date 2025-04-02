@@ -203,7 +203,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
-
+    <include layout="@layout/poi_menu" />
     <include layout="@layout/directions_sheet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

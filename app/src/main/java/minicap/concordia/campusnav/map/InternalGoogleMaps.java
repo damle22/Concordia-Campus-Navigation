@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.map;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -10,7 +11,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,6 +34,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
+import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
@@ -43,7 +49,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     private List<Polyline> polylines = new ArrayList<>();
 
     private List<Marker> markers = new ArrayList<>();
-
+    private List<Marker> poiMarkers = new ArrayList<>();
     private SupportMapFragment mapFrag;
 
     public InternalGoogleMaps(MapUpdateListener listener){
@@ -88,7 +94,25 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             mMap.addPolygon(polygonOptions);
         }
     }
+    @Override
+    public void addMarker(OutdoorPOI opoi){
+        //Setting icon
+        BitmapDescriptor icon = switch (opoi.getPOIType()) {
+            case RESTAURANT ->
+                    BitmapDescriptorFactory.fromResource(R.drawable.ic_restaunrant_marker);
+            case COFFEE_SHOP ->
+                    BitmapDescriptorFactory.fromResource(R.drawable.ic_coffee_marker);
+            default ->
+                    BitmapDescriptorFactory.defaultMarker();
+            //TODO add icons for indoor POI
+        };
 
+        MarkerOptions newMarker = new MarkerOptions()
+                .icon(icon)
+                .position(opoi.getLocation().toGoogleMapsLatLng())
+                .title(opoi.getPoiName());
+        poiMarkers.add(mMap.addMarker(newMarker));
+    }
     @Override
     public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers){
         if(clearOtherMarkers) {
@@ -129,6 +153,26 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     }
 
     /**
+     * Moves the camera to view all currently showing POI
+     * @param position
+     * @param bearing
+     */
+    public void moveCameraToPOI(MapCoordinates position, float bearing){
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position.toGoogleMapsLatLng())
+                .zoom(16)
+                .bearing(bearing)
+                .tilt(45)
+                .build();
+
+        mMap.animateCamera(
+                CameraUpdateFactory.newCameraPosition(cameraPosition),
+                200,
+                null)
+        ;
+    }
+
+    /**
      * Adds PolyLine to the googleMaps
      * @param options PolylineOptions
      */
@@ -151,6 +195,11 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     @Override
     public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
         new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
+    }
+
+    @Override
+    public void displayPOI(MapCoordinates origin, POIType type){
+        new FetchPathTask(this).fetchPOI(origin.toGoogleMapsLatLng(), type);
     }
 
     @Override
@@ -261,6 +310,20 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             Log.e("Route Parsing Error", e.toString());
             listener.onMapError("Exception while parsing the google maps route: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS, MapCoordinates location) {
+        //Deleting previous POI markers
+        for (Iterator<Marker> allMarkers = poiMarkers.iterator(); allMarkers.hasNext();) {
+            Marker cur = allMarkers.next();
+            cur.remove();
+            allMarkers.remove();
+        }
+        for(OutdoorPOI op : outdoorPOIS){
+            addMarker(op);
+        }
+      moveCameraToPOI(location, calculatePathBearing(location));
     }
 
     /**
