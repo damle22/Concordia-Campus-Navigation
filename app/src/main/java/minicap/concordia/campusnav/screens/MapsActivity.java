@@ -164,7 +164,6 @@ public class MapsActivity extends FragmentActivity
 
         // Location tracker button setup
         MaterialButton locationButton = findViewById(R.id.locationTracker);
-        ImageView locationIcon = findViewById(R.id.nav);
         locationButton.setOnClickListener(v -> centerOnUserLocation());
 
         // Initialize BottomSheet
