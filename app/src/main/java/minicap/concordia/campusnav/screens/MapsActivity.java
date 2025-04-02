@@ -44,6 +44,7 @@ import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
@@ -167,6 +168,10 @@ public class MapsActivity extends FragmentActivity
         // Shuttle Button to show the Shuttle Bus Schedule
         Button shuttleScheduleView = findViewById(R.id.shuttleScheduleView);
         shuttleScheduleView.setOnClickListener(v -> showShuttleScheduleFragment());
+
+        // Location tracker button setup
+        MaterialButton locationButton = findViewById(R.id.locationTracker);
+        locationButton.setOnClickListener(v -> centerOnUserLocation());
 
         // Initialize BottomSheet
         ConstraintLayout bottomSheet = findViewById(R.id.bottom_sheet);
@@ -673,6 +678,16 @@ public class MapsActivity extends FragmentActivity
         MapCoordinates location = building.getLocation();
 
         setDestination(building.getBuildingName(), location);
+    }
+
+    // Replacing default Maps center location button functionality
+    private void centerOnUserLocation() {
+        if (origin != null) {
+            map.centerOnCoordinates(origin);
+        } else {
+            getUserLocationPath();
+            Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
