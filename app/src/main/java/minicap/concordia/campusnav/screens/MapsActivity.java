@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.screens;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -45,6 +46,8 @@ import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -607,6 +610,7 @@ public class MapsActivity extends FragmentActivity
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady() {
         if(isFirstTimeLoad) {
@@ -627,6 +631,20 @@ public class MapsActivity extends FragmentActivity
         // If we got an eventAddress, let's geocode it
         if (eventAddress != null && !eventAddress.isEmpty()) {
             geocodeAndSetDestination(eventAddress);
+        }
+
+        //Sets the onclick for POI Markers
+        if(currentMap == SupportedMaps.GOOGLE_MAPS){
+            ((InternalGoogleMaps)map).getmMap().setOnMarkerClickListener(marker -> {
+                if (marker.getTag() != null && "POI".equals(marker.getTag())) {
+                    LatLng position = marker.getPosition();
+                    double latitude = position.latitude;
+                    double longitude = position.longitude;
+                    setDestination(marker.getTitle(),new MapCoordinates(latitude,longitude));
+                    drawPath();
+                }
+                return false;
+            });
         }
     }
     private void geocodeAndSetDestination(String addressString) {

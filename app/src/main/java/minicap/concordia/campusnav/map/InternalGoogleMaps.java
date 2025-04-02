@@ -115,7 +115,9 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 .icon(icon)
                 .position(new MapCoordinates(opoi.getLatitude(), opoi.getLongitude()).toGoogleMapsLatLng())
                 .title(opoi.getPoiName());
-        poiMarkers.add(mMap.addMarker(newMarker));
+        Marker poiMarker = mMap.addMarker(newMarker);
+        poiMarker.setTag("POI");
+        poiMarkers.add(poiMarker);
     }
     @Override
     public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers){
