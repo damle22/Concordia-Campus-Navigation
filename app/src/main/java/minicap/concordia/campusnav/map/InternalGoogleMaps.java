@@ -3,11 +3,9 @@ package minicap.concordia.campusnav.map;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,13 +35,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import minicap.concordia.campusnav.R;
-import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
-import minicap.concordia.campusnav.screens.MapsActivity;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
 
@@ -113,7 +109,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
         MarkerOptions newMarker = new MarkerOptions()
                 .icon(icon)
-                .position(new MapCoordinates(opoi.getLatitude(), opoi.getLongitude()).toGoogleMapsLatLng())
+                .position(opoi.getLocation().toGoogleMapsLatLng())
                 .title(opoi.getPoiName());
         Marker poiMarker = mMap.addMarker(newMarker);
         poiMarker.setTag("POI");
@@ -283,6 +279,9 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
         addPolygons(CampusBuildingShapes.getSgwBuildingCoordinates());
         addPolygons(CampusBuildingShapes.getLoyolaBuildingCoordinates());
+        // disable default location button
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override

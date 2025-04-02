@@ -50,6 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
@@ -174,6 +175,10 @@ public class MapsActivity extends FragmentActivity
         Button shuttleScheduleView = findViewById(R.id.shuttleScheduleView);
         shuttleScheduleView.setOnClickListener(v -> showShuttleScheduleFragment());
 
+        // Location tracker button setup
+        MaterialButton locationButton = findViewById(R.id.locationTracker);
+        locationButton.setOnClickListener(v -> centerOnUserLocation());
+
         // Initialize BottomSheet
         ConstraintLayout bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -280,8 +285,8 @@ public class MapsActivity extends FragmentActivity
         LinearLayout washroomButton = findViewById(R.id.WashroomPOI);
 
         // Set click listeners for each button
-        restaurantButton.setOnClickListener(view -> map.displayPOI(new MapCoordinates(45.57613871349257, -73.8061654), POIType.RESTAURANT));
-        coffeeButton.setOnClickListener(view -> map.displayPOI(new MapCoordinates(45.57613871349257, -73.8061654), POIType.COFFEE_SHOP));
+        restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
+        coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
         //TODO handle Fountain, elevator and washroom (Indoor POI)
     }
 
@@ -707,6 +712,16 @@ public class MapsActivity extends FragmentActivity
         MapCoordinates location = building.getLocation();
 
         setDestination(building.getBuildingName(), location);
+    }
+
+    // Replacing default Maps center location button functionality
+    private void centerOnUserLocation() {
+        if (origin != null) {
+            map.centerOnCoordinates(origin);
+        } else {
+            getUserLocationPath();
+            Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
