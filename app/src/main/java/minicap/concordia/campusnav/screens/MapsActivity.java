@@ -277,8 +277,8 @@ public class MapsActivity extends FragmentActivity
         LinearLayout washroomButton = findViewById(R.id.WashroomPOI);
 
         // Set click listeners for each button
-        restaurantButton.setOnClickListener(view -> map.displayPOI(new MapCoordinates(45.57613871349257, -73.8061654), POIType.RESTAURANT));
-        coffeeButton.setOnClickListener(view -> map.displayPOI(new MapCoordinates(45.57613871349257, -73.8061654), POIType.COFFEE_SHOP));
+        restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
+        coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
         //TODO handle Fountain, elevator and washroom (Indoor POI)
     }
 
