@@ -1,6 +1,7 @@
 package minicap.concordia.campusnav.components;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -50,6 +51,7 @@ public class MainMenuDialog extends SideSheetDialog {
 
         initializeViews(view);
         populateButtons();
+        states.toggleMenu(true);
     }
 
 
@@ -103,6 +105,7 @@ public class MainMenuDialog extends SideSheetDialog {
     }
 
     public Intent campusMapRoutine(){
+        states.toggleMenu(false);
         return new Intent(context, MapsActivity.class);
     }
 
@@ -123,6 +126,7 @@ public class MainMenuDialog extends SideSheetDialog {
     }
 
     public void openClassSchedule() {
+        states.toggleMenu(false);
         Intent intent = new Intent(context, ClassScheduleActivity.class);
         context.startActivity(intent);
     }
@@ -134,6 +138,12 @@ public class MainMenuDialog extends SideSheetDialog {
 
     public void close(){
         cancel();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        states.toggleMenu(false);
     }
 
 }

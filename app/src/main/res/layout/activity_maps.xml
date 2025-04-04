@@ -205,9 +205,7 @@
     </FrameLayout>
     <include layout="@layout/poi_menu" />
 
-    <include
-        layout="@layout/directions_sheet"
-        android:visibility="gone" />
+    <include layout="@layout/directions_sheet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

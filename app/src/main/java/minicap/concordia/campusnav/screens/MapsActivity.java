@@ -671,8 +671,10 @@ public class MapsActivity extends FragmentActivity
     }
 
     public void showMainMenuDialog() {
-        MainMenuDialog dialog = new MainMenuDialog(this);
-        dialog.show();
+        if(!states.isMenuOpen()) {
+            MainMenuDialog dialog = new MainMenuDialog(this);
+            dialog.show();
+        }
     }
 
 
