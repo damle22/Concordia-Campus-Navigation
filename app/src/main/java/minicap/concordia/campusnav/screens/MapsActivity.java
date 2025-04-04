@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,8 @@ import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
+import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 
@@ -44,6 +47,7 @@ import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
@@ -168,6 +172,10 @@ public class MapsActivity extends FragmentActivity
         Button shuttleScheduleView = findViewById(R.id.shuttleScheduleView);
         shuttleScheduleView.setOnClickListener(v -> showShuttleScheduleFragment());
 
+        // Location tracker button setup
+        MaterialButton locationButton = findViewById(R.id.locationTracker);
+        locationButton.setOnClickListener(v -> centerOnUserLocation());
+
         // Initialize BottomSheet
         ConstraintLayout bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -265,6 +273,18 @@ public class MapsActivity extends FragmentActivity
         if(runDir){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
+
+        //Setup POI buttons
+        LinearLayout restaurantButton = findViewById(R.id.RestaurantPOI);
+        LinearLayout coffeeButton = findViewById(R.id.CoffeePOI);
+        LinearLayout fountainButton = findViewById(R.id.FountainPOI);
+        LinearLayout elevatorButton = findViewById(R.id.ElevatorPOI);
+        LinearLayout washroomButton = findViewById(R.id.WashroomPOI);
+
+        // Set click listeners for each button
+        restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
+        coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
+        //TODO handle Fountain, elevator and washroom (Indoor POI)
     }
 
     /**
@@ -338,6 +358,7 @@ public class MapsActivity extends FragmentActivity
             boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_IS_CURRENT_LOCATION_BOOL);
             setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
+
     }
 
     /**
@@ -673,6 +694,16 @@ public class MapsActivity extends FragmentActivity
         MapCoordinates location = building.getLocation();
 
         setDestination(building.getBuildingName(), location);
+    }
+
+    // Replacing default Maps center location button functionality
+    private void centerOnUserLocation() {
+        if (origin != null) {
+            map.centerOnCoordinates(origin);
+        } else {
+            getUserLocationPath();
+            Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
