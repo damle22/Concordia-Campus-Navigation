@@ -64,7 +64,7 @@
                 android:nestedScrollingEnabled="true"
                 android:scrollbars="vertical"
                 android:isScrollContainer="true"
-                android:text="building info placeholder"
+                android:text="@string/building_information"
                 android:textColor="@color/black"
                 android:textAlignment="textStart"
                 android:textSize="12sp"

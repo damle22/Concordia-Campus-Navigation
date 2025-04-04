@@ -23,4 +23,5 @@
     <string name="route_parse_error">Error parsing route data</string>
     <string name="ETAtemp">3min</string>
     <string name="timeEstimateTemp">1.5km - 23:21</string>
+    <string name="building_information">placeholder</string>
 </resources>
