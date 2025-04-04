@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.screens;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -45,6 +46,8 @@ import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.button.MaterialButton;
@@ -112,6 +115,10 @@ public class MapsActivity extends FragmentActivity
     private ImageButton transitButton;
     private ImageButton startRouteButton;
 
+    private Button buildingViewButton;
+    private int buildingViewButtonMargin;
+
+
     private BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior;
 
     private FusedLocationProviderClient fusedLocationClient;
@@ -129,6 +136,9 @@ public class MapsActivity extends FragmentActivity
     private String eventAddress;
 
     private final States states = States.getInstance();
+
+    private ConstraintLayout.LayoutParams buildingViewParams;
+
 
 
     // We use this to launch and capture the results of the search location activity
@@ -165,8 +175,10 @@ public class MapsActivity extends FragmentActivity
         startingCoords = new MapCoordinates(startingLat, startingLng);
 
         // Hook up the Buildings button to show the BuildingSelectorFragment
-        Button buildingViewButton = findViewById(R.id.buildingView);
+        buildingViewButton = findViewById(R.id.buildingView);
         buildingViewButton.setOnClickListener(v -> showBuildingSelectorFragment());
+        buildingViewParams = (ConstraintLayout.LayoutParams) buildingViewButton.getLayoutParams();
+        buildingViewButtonMargin = buildingViewParams.bottomMargin;
 
         // Shuttle Button to show the Shuttle Bus Schedule
         Button shuttleScheduleView = findViewById(R.id.shuttleScheduleView);
@@ -186,6 +198,21 @@ public class MapsActivity extends FragmentActivity
         bottomSheetBehavior.setFitToContents(true);
         bottomSheetBehavior.setHalfExpandedRatio(0.01f);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        //Adding bottom sheet call back to allow building view button to slide with bottom sheet
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                    updateButtonMargin(bottomSheet, 1);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                updateButtonMargin(bottomSheet, slideOffset);
+            }
+        });
 
         // Setup campus switching
         campusTextView = findViewById(R.id.ToCampus);
@@ -272,6 +299,7 @@ public class MapsActivity extends FragmentActivity
 
         if(runDir){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            bottomSheet.post(() -> updateButtonMargin(bottomSheet, 1));
         }
 
         //Setup POI buttons
@@ -285,6 +313,14 @@ public class MapsActivity extends FragmentActivity
         restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
         coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
         //TODO handle Fountain, elevator and washroom (Indoor POI)
+    }
+
+    private void updateButtonMargin(View bottomSheet, float slideOffset){
+        int progress = (int)(slideOffset * bottomSheet.getHeight());
+        int finalProgress = (int)(progress * 0.8f);
+        int newMargin = buildingViewButtonMargin + finalProgress;
+        buildingViewParams.bottomMargin = Math.max(0, newMargin);
+        buildingViewButton.setLayoutParams(buildingViewParams);
     }
 
     /**
@@ -612,6 +648,7 @@ public class MapsActivity extends FragmentActivity
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady() {
         if(isFirstTimeLoad) {
@@ -632,6 +669,20 @@ public class MapsActivity extends FragmentActivity
         // If we got an eventAddress, let's geocode it
         if (eventAddress != null && !eventAddress.isEmpty()) {
             geocodeAndSetDestination(eventAddress);
+        }
+
+        //Sets the onclick for POI Markers
+        if(currentMap == SupportedMaps.GOOGLE_MAPS){
+            ((InternalGoogleMaps)map).getmMap().setOnMarkerClickListener(marker -> {
+                if (marker.getTag() != null && "POI".equals(marker.getTag())) {
+                    LatLng position = marker.getPosition();
+                    double latitude = position.latitude;
+                    double longitude = position.longitude;
+                    setDestination(marker.getTitle(),new MapCoordinates(latitude,longitude));
+                    drawPath();
+                }
+                return false;
+            });
         }
     }
     private void geocodeAndSetDestination(String addressString) {
@@ -671,8 +722,10 @@ public class MapsActivity extends FragmentActivity
     }
 
     public void showMainMenuDialog() {
-        MainMenuDialog dialog = new MainMenuDialog(this);
-        dialog.show();
+        if(!states.isMenuOpen()) {
+            MainMenuDialog dialog = new MainMenuDialog(this);
+            dialog.show();
+        }
     }
 
 

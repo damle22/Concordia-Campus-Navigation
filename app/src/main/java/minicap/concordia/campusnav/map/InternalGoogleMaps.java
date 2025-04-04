@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.map;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -75,11 +76,8 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void centerOnCoordinates(MapCoordinates coordinates){
-        LatLng concordia = coordinates.toGoogleMapsLatLng();
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(concordia, defaultZoom));
+        resetCamera(coordinates);
     }
-
     @Override
     public void switchToFloor(String floorName) {
         //Google maps does not have floors, so do nothing
@@ -111,7 +109,9 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 .icon(icon)
                 .position(opoi.getLocation().toGoogleMapsLatLng())
                 .title(opoi.getPoiName());
-        poiMarkers.add(mMap.addMarker(newMarker));
+        Marker poiMarker = mMap.addMarker(newMarker);
+        poiMarker.setTag("POI");
+        poiMarkers.add(poiMarker);
     }
     @Override
     public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers){
@@ -163,6 +163,26 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 .zoom(16)
                 .bearing(bearing)
                 .tilt(45)
+                .build();
+
+        mMap.animateCamera(
+                CameraUpdateFactory.newCameraPosition(cameraPosition),
+                200,
+                null)
+        ;
+    }
+
+    /**
+     * Resets the map camera to a default view centered on the specified coordinates.
+     *
+     * @param position the target coordinates for resetting the camera position
+     */
+    private void resetCamera(MapCoordinates position){
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position.toGoogleMapsLatLng())
+                .zoom(defaultZoom)
+                .bearing(0)
+                .tilt(0)
                 .build();
 
         mMap.animateCamera(

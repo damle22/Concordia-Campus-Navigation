@@ -220,7 +220,6 @@ public abstract class AbstractMap {
     }
 
 
-
     public interface MapUpdateListener {
         /**
          * Method called when the map is ready for use
