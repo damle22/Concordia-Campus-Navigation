@@ -199,15 +199,15 @@ public class MapsActivity extends FragmentActivity
         //Adding bottom sheet call back to allow building view button to slide with bottom sheet
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {}
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if(newState == 3){
+                    updateButtonMargin(bottomSheet, 1);
+                }
+            }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                int progress = (int)(slideOffset * bottomSheet.getHeight());
-                int finalProgress = (int)(progress * 0.8f);
-                int newMargin = buildingViewButtonMargin + finalProgress;
-                buildingViewParams.bottomMargin = Math.max(0, newMargin);
-                buildingViewButton.setLayoutParams(buildingViewParams);
+                updateButtonMargin(bottomSheet, slideOffset);
             }
         });
 
@@ -296,6 +296,7 @@ public class MapsActivity extends FragmentActivity
 
         if(runDir){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            bottomSheet.post(() -> updateButtonMargin(bottomSheet, 1));
         }
 
         //Setup POI buttons
@@ -311,7 +312,13 @@ public class MapsActivity extends FragmentActivity
         //TODO handle Fountain, elevator and washroom (Indoor POI)
     }
 
-
+    private void updateButtonMargin(View bottomSheet, float slideOffset){
+        int progress = (int)(slideOffset * bottomSheet.getHeight());
+        int finalProgress = (int)(progress * 0.8f);
+        int newMargin = buildingViewButtonMargin + finalProgress;
+        buildingViewParams.bottomMargin = Math.max(0, newMargin);
+        buildingViewButton.setLayoutParams(buildingViewParams);
+    }
 
     /**
      * Handles Launching NavigationActivity when starting a live route
