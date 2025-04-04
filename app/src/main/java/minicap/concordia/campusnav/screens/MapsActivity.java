@@ -200,7 +200,7 @@ public class MapsActivity extends FragmentActivity
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if(newState == 3){
+                if(newState == BottomSheetBehavior.STATE_EXPANDED){
                     updateButtonMargin(bottomSheet, 1);
                 }
             }
