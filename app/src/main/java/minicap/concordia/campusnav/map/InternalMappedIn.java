@@ -3,22 +3,15 @@ package minicap.concordia.campusnav.map;
 import android.content.Context;
 import androidx.fragment.app.Fragment;
 
-
-import com.mappedin.sdk.MPIMapView;
-import com.mappedin.sdk.models.MPIMap;
-import com.mappedin.sdk.web.MPIOptions;
-
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.components.MappedInWebViewFragment;
 import minicap.concordia.campusnav.map.enums.MapColors;
 import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
-public class InternalMappedIn extends AbstractMap {
+public class InternalMappedIn extends AbstractMap implements MappedInWebViewFragment.MappedInMapEventListener {
 
     private MappedInWebViewFragment mappedInFragment;
-
-    private MPIMapView curMap;
 
     public InternalMappedIn(MapUpdateListener listener) {
         super(listener);
@@ -26,7 +19,7 @@ public class InternalMappedIn extends AbstractMap {
 
     @Override
     public Fragment initialize() {
-        mappedInFragment = MappedInWebViewFragment.newInstance();
+        mappedInFragment = MappedInWebViewFragment.newInstance(this);
 
         return mappedInFragment;
     }
@@ -43,12 +36,6 @@ public class InternalMappedIn extends AbstractMap {
         }
 
         String markerHTML = MapColorConversionHelper.getMappedInMarkerHTML(color, title);
-
-        MPIMap.MPICoordinate coord = position.toMappedInCoordinate(curMap.getCurrentMap());
-        curMap.getMarkerManager().addByCoordinate(coord,
-                markerHTML,
-                new MPIOptions.Marker(),
-                null);
     }
 
     @Override
@@ -68,7 +55,7 @@ public class InternalMappedIn extends AbstractMap {
 
     @Override
     public void clearAllMarkers() {
-        curMap.getMarkerManager().removeAll();
+
     }
 
     @Override
@@ -98,17 +85,22 @@ public class InternalMappedIn extends AbstractMap {
 
     @Override
     public boolean toggleLocationTracking(boolean isEnabled) {
-        if(isEnabled) {
-            curMap.getBlueDotManager().enable(new MPIOptions.BlueDot());
-        }
-        else {
-            curMap.getBlueDotManager().disable();
-        }
+
         return true;
     }
 
     @Override
     public void setStyle(Context context, int resourceID) {
         //Not used
+    }
+
+    @Override
+    public void mapLoaded() {
+        listener.onMapReady();
+    }
+
+    @Override
+    public void mapClicked(MapCoordinates coords) {
+        listener.onMapClicked(coords);
     }
 }
