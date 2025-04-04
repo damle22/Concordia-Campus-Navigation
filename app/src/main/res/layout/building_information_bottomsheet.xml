@@ -64,7 +64,7 @@
                 android:nestedScrollingEnabled="true"
                 android:scrollbars="vertical"
                 android:isScrollContainer="true"
-                android:text="The Henry F. Hall Building is a high-density hub, located on De Maisonneuve Boulevard, on Concordia's downtown Sir-George-Williams Campus. The cube-like structure was completed in 1966. Its exterior is made of pre-fabricated, stressed concrete, a feature of the brutalist movement, often associated with French architect Le Corbusier."
+                android:text="building info placeholder"
                 android:textColor="@color/black"
                 android:textAlignment="textStart"
                 android:textSize="12sp"
