@@ -255,6 +255,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void displayPOI(MapCoordinates origin, POIType type){
+        clearPathFromMap();
         if(type == POIType.RESTAURANT || type == POIType.COFFEE_SHOP){
             new FetchPathTask(this).fetchPOI(origin.toGoogleMapsLatLng(), type);
         } else{
