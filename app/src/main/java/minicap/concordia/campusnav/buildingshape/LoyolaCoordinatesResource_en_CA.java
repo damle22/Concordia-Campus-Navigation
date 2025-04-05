@@ -11,7 +11,7 @@ public class LoyolaCoordinatesResource_en_CA extends ListResourceBundle
     protected Object[][] getContents() {
         return new Object[][]{
                 // AD Building
-                {"adBuilding", new PolygonOptions()
+                {"AD Building", new PolygonOptions()
                         .add(
                                 new LatLng(45.45839399224641, -73.63977258745213),
                                 new LatLng(45.458259106407475, -73.63941464502126),

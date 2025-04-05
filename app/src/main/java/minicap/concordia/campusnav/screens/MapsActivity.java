@@ -45,6 +45,7 @@ import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.button.MaterialButton;
@@ -558,7 +559,16 @@ public class MapsActivity extends FragmentActivity
                             //If you are emulating and need to change your current location, use the emulator controls.
                             origin = new MapCoordinates(location.getLatitude(), location.getLongitude());
                             hasUserLocationBeenSet = true;
-                            setStartingPoint(true, "", origin);
+
+                            // if user is in campus building
+                            LatLng userLatlng = new LatLng(location.getLatitude(), location.getLongitude());
+                            String buildingName = CampusBuildingShapes.getBuildingNameAtLocation(userLatlng);
+                            if (buildingName != null) {
+                                Toast.makeText(this, "You're currently inside: " + buildingName, Toast.LENGTH_LONG).show();
+
+                            } else {
+                                setStartingPoint(true, "", origin);
+                            }
                         }
                     });
         } else {

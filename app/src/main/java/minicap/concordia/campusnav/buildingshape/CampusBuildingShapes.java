@@ -1,7 +1,10 @@
 package minicap.concordia.campusnav.buildingshape;
 
+import androidx.webkit.internal.ApiFeature;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +62,7 @@ public class CampusBuildingShapes
     static {
         ResourceBundle bundle = ResourceBundle.getBundle("minicap.concordia.campusnav.buildingshape.LoyolaCoordinatesResource_en_CA");
 
-        loyolaBuildingCoordinates.add((PolygonOptions) bundle.getObject("adBuilding"));
+        loyolaBuildingCoordinates.add((PolygonOptions) bundle.getObject("AD Building"));
         loyolaBuildingCoordinates.add((PolygonOptions) bundle.getObject("bbAnnex"));
         loyolaBuildingCoordinates.add((PolygonOptions) bundle.getObject("bhAnnex"));
         loyolaBuildingCoordinates.add((PolygonOptions) bundle.getObject("ccBuilding"));
@@ -90,5 +93,26 @@ public class CampusBuildingShapes
 
     public static List<PolygonOptions> getLoyolaBuildingCoordinates() {
         return loyolaBuildingCoordinates;
+    }
+
+    // method for building detections using polygon
+    public static String getBuildingNameAtLocation(LatLng location) {
+        ResourceBundle sgwBundle = ResourceBundle.getBundle("minicap.concordia.campusnav.buildingshape.SGWCoordinatesResource_en_CA");
+        for (String key : sgwBundle.keySet()) {
+            PolygonOptions polygon = (PolygonOptions) sgwBundle.getObject(key);
+            if(PolyUtil.containsLocation(location, polygon.getPoints(), true)) {
+                return key;
+            }
+        }
+
+        ResourceBundle loyBundle = ResourceBundle.getBundle("minicap.concordia.campusnav.buildingshape.LoyolaCoordinatesResource_en_CA");
+        for (String key : loyBundle.keySet()) {
+            PolygonOptions polygon = (PolygonOptions) loyBundle.getObject(key);
+            if(PolyUtil.containsLocation(location, polygon.getPoints(), true)) {
+                return key;
+            }
+        }
+
+        return null;
     }
 }
