@@ -11,7 +11,7 @@ public class LoyolaCoordinatesResource_en_CA extends ListResourceBundle
     protected Object[][] getContents() {
         return new Object[][]{
                 // AD Building
-                {"AD Building", new PolygonOptions()
+                {"adBuilding", new PolygonOptions()
                         .add(
                                 new LatLng(45.45839399224641, -73.63977258745213),
                                 new LatLng(45.458259106407475, -73.63941464502126),
@@ -85,7 +85,7 @@ public class LoyolaCoordinatesResource_en_CA extends ListResourceBundle
                 },
 
                 // CC Building
-                {"ccBuilding", new PolygonOptions()
+                {"Loyola Central Building", new PolygonOptions()
                         .add(
                                 new LatLng(45.45852800969131, -73.64068050109675),
                                 new LatLng(45.45844563657765, -73.64045821025437),
@@ -374,7 +374,7 @@ public class LoyolaCoordinatesResource_en_CA extends ListResourceBundle
                 },
 
                 // PT, SC, VE, VL (Vanier Library) Building
-                {"vanierBuilding", new PolygonOptions()
+                {"Vanier Library/Extension Building", new PolygonOptions()
                         .add(
                                 new LatLng(45.459109821843455, -73.63942270194411),
                                 new LatLng(45.45921518522731, -73.63934317638098),

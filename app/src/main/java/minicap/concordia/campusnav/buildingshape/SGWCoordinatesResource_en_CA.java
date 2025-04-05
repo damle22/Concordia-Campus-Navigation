@@ -276,7 +276,7 @@ public class SGWCoordinatesResource_en_CA extends ListResourceBundle
                 },
 
                 // Hall Building
-                {"hallBuilding", new PolygonOptions()
+                {"Hall Building", new PolygonOptions()
                         .add(
                                 new LatLng(45.497792802486664, -73.57903920534217),
                                 new LatLng(45.49740094139054, -73.57823087975878),
@@ -374,7 +374,7 @@ public class SGWCoordinatesResource_en_CA extends ListResourceBundle
                 },
 
                 // MB Building
-                {"mbBuilding", new PolygonOptions()
+                {"John Molson Building", new PolygonOptions()
                         .add(
                                 new LatLng(45.49553495679224, -73.57920819154843),
                                 new LatLng(45.495450588360725, -73.57895556708101),

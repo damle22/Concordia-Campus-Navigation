@@ -3,6 +3,7 @@ package minicap.concordia.campusnav.screens;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -23,6 +24,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -49,6 +51,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
@@ -564,8 +567,7 @@ public class MapsActivity extends FragmentActivity
                             LatLng userLatlng = new LatLng(location.getLatitude(), location.getLongitude());
                             String buildingName = CampusBuildingShapes.getBuildingNameAtLocation(userLatlng);
                             if (buildingName != null) {
-                                Toast.makeText(this, "You're currently inside: " + buildingName, Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(this, "You're in: " + buildingName, Toast.LENGTH_LONG).show();
                             } else {
                                 setStartingPoint(true, "", origin);
                             }
