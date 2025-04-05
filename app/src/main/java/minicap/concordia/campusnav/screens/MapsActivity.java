@@ -655,10 +655,18 @@ public class MapsActivity extends FragmentActivity
         Building currentBuilding = buildingManager.searchBuildingsByName(currentBuildingName).get(0);
         Collection<BuildingFloor> allFloors = currentBuilding.getFloors();
         List<BuildingFloor> validFloors = new ArrayList<>();
+        int currentSelectedFloor = 0;
+        int initialFloorForSpinner = 0;
 
         for(BuildingFloor floor : allFloors) {
             if(!floor.getFloorId().equals(BuildingFloor.NO_FLOOR_ID)) {
                 validFloors.add(floor);
+
+                if(floor.getFloorName().equals(currentFloorName)) {
+                    initialFloorForSpinner = currentSelectedFloor;
+                }
+
+                currentSelectedFloor++;
             }
         }
 
@@ -682,6 +690,8 @@ public class MapsActivity extends FragmentActivity
 
             }
         });
+
+        floorSpinner.setSelection(initialFloorForSpinner);
     }
 
     /**
