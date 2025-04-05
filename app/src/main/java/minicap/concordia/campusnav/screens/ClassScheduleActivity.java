@@ -179,9 +179,8 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
     }
 
     /**
-     * ADDED:
      * Show the user a list of all their calendars, let them pick one,
-     * then store the selection in States and optionally fetch events again.
+     * then store the selection in States and fetch events again.
      */
     private void showCalendarSelectionDialog() {
         new Thread(() -> {
@@ -228,12 +227,11 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
 
                 for (int i = 0; i < calendarEntries.size(); i++) {
                     CalendarListEntry entry = calendarEntries.get(i);
-                    calendarNames[i] = entry.getSummary(); // e.g. "My Classes"
-                    calendarIds[i] = entry.getId();        // e.g. "abc123@group.calendar.google.com"
+                    calendarNames[i] = entry.getSummary();
+                    calendarIds[i] = entry.getId();
                 }
 
                 runOnUiThread(() -> {
-                    // Show a simple AlertDialog with the list of calendar names
                     new androidx.appcompat.app.AlertDialog.Builder(this)
                             .setTitle("Choose a calendar")
                             .setItems(calendarNames, (dialog, which) -> {
@@ -242,8 +240,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                                 Toast.makeText(this,
                                         "Selected: " + calendarNames[which],
                                         Toast.LENGTH_SHORT).show();
-
-                                // You could automatically re-fetch events
                                 fetchCalendarEvents();
                             })
                             .show();
