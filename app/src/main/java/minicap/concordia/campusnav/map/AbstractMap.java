@@ -1,9 +1,11 @@
 package minicap.concordia.campusnav.map;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import java.util.List;
@@ -12,6 +14,7 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 
 public abstract class AbstractMap {
 
+    protected boolean isIndoor;
     protected MapUpdateListener listener;
 
     /**
@@ -87,10 +90,13 @@ public abstract class AbstractMap {
     public abstract void centerOnCoordinates(MapCoordinates coordinates);
 
     /**
-     * Switches the current floor to another one
-     * @param floorName the name of the floor that's being switched to
+     * Loads a building on an indoor map
+     * @param building The building of the floor
+     * @param initialFloor the name of the floor that's being switched to
      */
-    public abstract void switchToFloor(String floorName);
+    public void loadBuilding(Building building, String initialFloor) {
+
+    }
 
     /**
      * Enables current location tracking on the map
@@ -217,6 +223,14 @@ public abstract class AbstractMap {
      */
     public float calculatePathBearing(MapCoordinates currentPosition) {
         return 0;
+    }
+
+    /**
+     * Gets a flag indicating if this map is indoors
+     * @return True if indoors, false otherwise
+     */
+    public boolean getIsIndoor() {
+        return isIndoor;
     }
 
 

@@ -9,17 +9,28 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 public class MapCoordinates implements Parcelable {
+    public static final String DEFAULT_NAME = "UNKNOWN";
+
     private double lat;
     private double lng;
+
+    private String name;
 
     public MapCoordinates(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
+        this.name = DEFAULT_NAME;
+    }
+
+    public MapCoordinates(double lat, double lng, String name) {
+        this(lat, lng);
+        this.name = name;
     }
 
     protected MapCoordinates(Parcel in) {
         this.lat = in.readDouble();
         this.lng = in.readDouble();
+        this.name = in.readString();
     }
 
     /**
@@ -59,6 +70,14 @@ public class MapCoordinates implements Parcelable {
         return lng;
     }
 
+    /**
+     * Gets the name of the location
+     * @return String name of the location
+     */
+    public String getName() {
+        return name;
+    }
+
     public static final Parcelable.Creator<MapCoordinates> CREATOR = new Creator<MapCoordinates>() {
         @Override
         public MapCoordinates createFromParcel(Parcel source) {
@@ -80,5 +99,6 @@ public class MapCoordinates implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeDouble(this.lat);
         dest.writeDouble(this.lng);
+        dest.writeString(this.name);
     }
 }

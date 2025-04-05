@@ -11,12 +11,12 @@ public class BuildingFloor {
     private final String floorName;
     private final BuildingName associatedBuilding;
     private final List<IndoorPOI> floorPOIs;
-    private final String floorPlanResource;
+    private final String floorId;
 
-    public BuildingFloor(String floorName, BuildingName building, String floorPlan){
+    public BuildingFloor(String floorName, BuildingName building, String floorId){
         this.floorName = floorName;
         this.associatedBuilding = building;
-        this.floorPlanResource = floorPlan;
+        this.floorId = floorId;
         this.floorPOIs = new ArrayList<IndoorPOI>();
     }
 
@@ -69,8 +69,8 @@ public class BuildingFloor {
      * Gets the resource for the floor plan
      * @return The resource for the floor plan
      */
-    public String getFloorPlanResource() {
-        return floorPlanResource;
+    public String getFloorId() {
+        return floorId;
     }
 
     /**

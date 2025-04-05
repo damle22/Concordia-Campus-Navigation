@@ -300,7 +300,7 @@ public class ConcordiaBuildingManagerTests {
     public void IndoorPOI_GetPOIName() {
         List<String> expectedPOINames = new ArrayList<>(Arrays.asList(
                 "Test A",
-                "Test 2",
+                "Test B",
                 "Test Accessibility"
         ));
 
@@ -317,7 +317,6 @@ public class ConcordiaBuildingManagerTests {
 
         Assert.assertEquals(expectedNumberPOIs, actualPOIs.size());
 
-        int i = 0;
         for(IndoorPOI poi : actualPOIs) {
             Assert.assertEquals(expectedAssociatedBuilding, poi.getAssociatedBuilding());
             Assert.assertEquals(expectedFloorName, poi.getFloorName());

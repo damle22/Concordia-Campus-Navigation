@@ -7,6 +7,7 @@ import java.util.ListResourceBundle;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.IndoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 /**
  * Notes for maintainability:
@@ -20,15 +21,15 @@ public class IndoorPOIResource_en_CA extends ListResourceBundle {
         return new Object[][]{
                 {
                     BuildingName.HALL.getResourceName() + "_Floor1", new ArrayList<IndoorPOI>(Arrays.asList(
-                        new IndoorPOI("Test A", POIType.CLASS_ROOM, BuildingName.HALL, "1", false, 45.49719, -73.57926),
-                        new IndoorPOI("Test 2", POIType.WASHROOM, BuildingName.HALL, "1", false, 45.49738, -73.57864),
-                        new IndoorPOI("Test Accessibility", POIType.ELEVATOR, BuildingName.HALL, "1", true, 45.9738, -73.57864)
+                        new IndoorPOI(new MapCoordinates(45.49719, -73.57926, "Test A"), POIType.CLASS_ROOM, BuildingName.HALL, "1", false),
+                        new IndoorPOI(new MapCoordinates(45.49738, -73.57864, "Test B"), POIType.WASHROOM, BuildingName.HALL, "1", false),
+                        new IndoorPOI(new MapCoordinates(45.9738, -73.57864, "Test Accessibility"), POIType.ELEVATOR, BuildingName.HALL, "1", true)
                     ))
                 },
                 {
                     BuildingName.HALL.getResourceName() + "_Floor2", new ArrayList<IndoorPOI>(Arrays.asList(
-                        new IndoorPOI("Test B", POIType.CLASS_ROOM, BuildingName.HALL, "2", false, 45.49719, -73.57926),
-                        new IndoorPOI("Test 2", POIType.WASHROOM, BuildingName.HALL, "2", false, 45.49738, -73.57864)
+                        new IndoorPOI(new MapCoordinates(45.49719, -73.57926, "Test Hall F2"), POIType.CLASS_ROOM, BuildingName.HALL, "2", false),
+                        new IndoorPOI(new MapCoordinates(45.49738, -73.57864, "Test Washroom Hall F2"), POIType.WASHROOM, BuildingName.HALL, "2", false)
                     ))
                 },
                 {

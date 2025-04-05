@@ -5,10 +5,9 @@ import java.util.HashMap;
 
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 public class Building extends Location{
-
-    private String buildingName;
     private String description;
     private CampusName associatedCampus;
 
@@ -18,18 +17,18 @@ public class Building extends Location{
     private BuildingName buildingIdentifier;
     private HashMap<String, BuildingFloor> floors;
 
+    private String mapId;
 
 
-
-    public Building(String buildingName, String description, CampusName associatedCampus, HashMap<String, BuildingFloor> floors, double latitude, double longitude, int buildingImageRes, String buildingAddress, BuildingName buildingIdentifier) {
-        super(latitude, longitude);
+    public Building(MapCoordinates coordinates, String description, CampusName associatedCampus, HashMap<String, BuildingFloor> floors, int buildingImageRes, String buildingAddress, BuildingName buildingIdentifier, String mapId) {
+        super(coordinates);
         this.associatedCampus = associatedCampus;
-        this.buildingName = buildingName;
         this.description = description;
         this.floors = floors;
         this.buildingImageRes = buildingImageRes;
         this.buildingAddress = buildingAddress;
         this.buildingIdentifier = buildingIdentifier;
+        this.mapId = mapId;
     }
 
 
@@ -61,7 +60,7 @@ public class Building extends Location{
      * @return The building name
      */
     public String getBuildingName() {
-        return buildingName;
+        return this.getLocationName();
     }
 
     /**
@@ -99,6 +98,6 @@ public class Building extends Location{
 
     @Override
     public String toString(){
-        return this.buildingName;
+        return this.getLocationName();
     }
 }

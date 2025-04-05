@@ -31,6 +31,17 @@ public class MapCoordinatesTests {
     }
 
     @Test
+    public void testGetName_ReturnsCorrectName() {
+        double expectedLat = 0;
+        double expectedLng = 12;
+        String expectedName = "Test 1";
+
+        MapCoordinates coordinates = new MapCoordinates(expectedLat, expectedLng, expectedName);
+
+        Assert.assertEquals(expectedName, coordinates.getName());
+    }
+
+    @Test
     public void testCreateFromLatLng_ReturnsCorrectMapCoordinates() {
         double expectedLat = 12;
         double expectedLng = 15;
@@ -60,13 +71,15 @@ public class MapCoordinatesTests {
     public void testWriteToParcel() {
         double expectedLat = 12;
         double expectedLng = 20;
+        String expectedName = "Test 1";
 
-        MapCoordinates expected = new MapCoordinates(expectedLat, expectedLng);
+        MapCoordinates expected = new MapCoordinates(expectedLat, expectedLng, expectedName);
         Parcel parcelMock = Mockito.mock(Parcel.class);
 
         expected.writeToParcel(parcelMock, 0);
 
         Mockito.verify(parcelMock, Mockito.atLeast(2)).writeDouble(Mockito.anyDouble());
+        Mockito.verify(parcelMock).writeString(expectedName);
     }
 
     @Test
@@ -84,14 +97,17 @@ public class MapCoordinatesTests {
     public void testCreatorCreateFromParcel() {
         double expectedLat = 12;
         double expectedLng = 20;
+        String expectedName = "Test 1";
 
         Parcel parcelMock = Mockito.mock(Parcel.class);
         Mockito.when(parcelMock.readDouble()).thenReturn(expectedLat, expectedLng);
+        Mockito.when(parcelMock.readString()).thenReturn(expectedName);
 
         MapCoordinates actual = MapCoordinates.CREATOR.createFromParcel(parcelMock);
 
         Assert.assertEquals(expectedLat, actual.getLat(), 0.00001);
         Assert.assertEquals(expectedLng, actual.getLng(), 0.00001);
+        Assert.assertEquals(expectedName, actual.getName());
     }
 
     @Test

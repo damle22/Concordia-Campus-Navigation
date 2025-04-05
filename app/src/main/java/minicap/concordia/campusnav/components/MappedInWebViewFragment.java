@@ -1,10 +1,16 @@
 package minicap.concordia.campusnav.components;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +20,14 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 
 import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
@@ -32,6 +46,8 @@ public class MappedInWebViewFragment extends Fragment {
     private static final String MAPPED_IN_SECRET_STRING = "<MAPPED_IN_SECRET>";
     private static final String TAG = "MappedInWebViewFragment";
 
+    private FusedLocationProviderClient locationClient;
+    private LocationCallback locationCallback;
     private MappedInMapEventListener curListener;
     private WebView map;
 
@@ -63,6 +79,13 @@ public class MappedInWebViewFragment extends Fragment {
 
         map.getSettings().setJavaScriptEnabled(true);
         map.getSettings().setGeolocationEnabled(true);
+        map.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                testLoad();
+            }
+        });
         map.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -84,6 +107,82 @@ public class MappedInWebViewFragment extends Fragment {
         map.loadData(encodedHtml, "text/html", "base64");
     }
 
+
+    public void toggleLocationTracking(boolean isEnabled) {
+        String[] args = new String[1];
+        args[0] = String.valueOf(isEnabled);
+        runJavascriptCommand("toggleBlueDot", args);
+
+        args = new String[2];
+        args[0] = "45.49710655";
+        args[1] = "-73.57872092";
+
+        runJavascriptCommand("updateBlueDotPosition", args);
+
+        startManualLocationTracking(this.getContext());
+    }
+
+    private void startManualLocationTracking(Context context) {
+        locationClient = LocationServices.getFusedLocationProviderClient(context);
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) return;
+                for (Location location : locationResult.getLocations()) {
+
+                    updateUserPosition(MapCoordinates.fromAndroidLocation(location));
+                }
+            }
+        };
+
+        try {
+            LocationRequest locationRequest = new LocationRequest.Builder(
+                    Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(500).build();
+
+            if (ActivityCompat.checkSelfPermission(context,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error while setting up location updates", e);
+        }
+    }
+
+    private void testLoad() {
+        String[] args = new String[1];
+        args[0] = "67df02d0aa7c59000baf8d83";
+        runJavascriptCommand("loadMap", args);
+    }
+
+    private void updateUserPosition(MapCoordinates coords) {
+        String[] args = new String[2];
+        args[0] = String.valueOf(coords.getLat());
+        args[1] = String.valueOf(coords.getLng());
+
+        runJavascriptCommand("updateBlueDotPosition", args);
+    }
+
+    private void runJavascriptCommand(String methodName, String[] args) {
+        StringBuilder argList = new StringBuilder();
+        for(int i = 0; i < args.length - 1; i++) {
+            argList.append("'");
+            argList.append(args[i]);
+            argList.append("', ");
+        }
+        argList.append("'");
+        argList.append(args[args.length - 1]);
+        argList.append("'");
+
+        Log.d(TAG, "Running command: " + methodName + ", with params: " + argList);
+
+        map.post(new Runnable() {
+            @Override
+            public void run() {
+                map.evaluateJavascript("javascript:" + methodName + "(" + argList + ")", null);
+            }
+        });
+    }
+
     private class AndroidJSListener {
 
         private MappedInMapEventListener listener;
@@ -93,7 +192,7 @@ public class MappedInWebViewFragment extends Fragment {
         }
         @JavascriptInterface
         public void mapClicked(String name, double lat, double lng) {
-            MapCoordinates clicked = new MapCoordinates(lat, lng);
+            MapCoordinates clicked = new MapCoordinates(lat, lng, name);
 
             listener.mapClicked(clicked);
         }

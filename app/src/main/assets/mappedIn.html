@@ -122,32 +122,34 @@
             const KEY = '<MAPPED_IN_KEY>';
             const SECRET = '<MAPPED_IN_SECRET>';
 
-            const options = {
-                key: KEY,
-                secret: SECRET,
-                mapId: "67df02d0aa7c59000baf8d83"
-            };
+            function loadMap(mapId) {
+                const options = {
+                    key: KEY,
+                    secret: SECRET,
+                    mapId: mapId
+                };
 
-            getMapData(options).then(async (data) => {
-                mapView = await show3dMap(document.getElementById('mappedin-map'), data);
-                mapData = data;
-                mapView.Labels.all();
+                alert("mapId: " + mapId);
 
-                mapData.getByType('space').forEach(space => {
-                    mapView.updateState(space, {
-                        interactive: true,
-                        hoverColor: '#f26336',
+                getMapData(options).then(async (data) => {
+                    mapView = await show3dMap(document.getElementById('mappedin-map'), data);
+                    mapData = data;
+                    mapView.Labels.all();
+
+                    mapData.getByType('space').forEach(space => {
+                        mapView.updateState(space, {
+                            interactive: true,
+                        });
                     });
+
+                    mapView.on('click', async (e) => {
+                        mapClicked(e);
+                    });
+
+                    Android.mapReady();
                 });
-
-                mapView.on('click', async (e) => {
-                    mapClicked(e);
-                });
-
-                mapView.BlueDot.enable();
-                Android.mapReady();
-
-            });
+            }
+            window.loadMap = (mapId) => loadMap(mapId);
 
             function mapClicked(e) {
                 var name = "Location"
@@ -156,8 +158,6 @@
                 }
 
                 Android.mapClicked(name, e.coordinate.latitude, e.coordinate.longitude);
-                addMarker(e.coordinate, name);
-                drawPath('H196', 'H103');
             }
 
             function addMarker(coordinate, name) {
@@ -165,20 +165,46 @@
                 mapView.Markers.add(coordinate, markerContent);
             }
 
+            function addMarkerFromAndroid(lat, lng, name) {
+                const latAsNumber = Number(lat);
+                const lngAsNumber = Number(lng);
+                const coord = mapView.createCoordinate(latAsNumber, lngAsNumber);
+                addMarker(coord, name);
+            }
+            window.addMarkerFromAndroid = (lat, lng, name) => addMarkerFromAndroid(lat, lng, name);
+
             function drawPath(start, end) {
                 const firstSpace = mapData.getByType('space').find((s) => s.name === start);
                 const secondSpace = mapData.getByType('space').find((s) => s.name === end);
 
                 if(firstSpace && secondSpace) {
-                    alert("found first and second space");
+                    //alert("found first and second space");
                     const dir = mapData.getDirections(firstSpace, secondSpace);
 
                     if(dir) {
-                        alert("Found dir");
+                        //alert("Found dir");
                         mapView.Navigation.draw(dir);
                     }
                 }
             }
+            window.drawPath = (start, end) => drawPath(start, end);
+
+            function updateBlueDotPosition(lat, lng) {
+                const latAsNumber = Number(lat);
+                const lngAsNumber = Number(lng);
+                mapView.BlueDot.update({ latitude: latAsNumber, longitude: lngAsNumber })
+            }
+            window.updateBlueDotPosition = (lat, lng) => updateBlueDotPosition(lat, lng);
+
+            function toggleBlueDot(isEnabled) {
+                if(isEnabled) {
+                    mapView.BlueDot.enable();
+                }
+                else {
+                    mapView.BlueDot.disable();
+                }
+            }
+            window.toggleBlueDot = (isEnabled) => toggleBlueDot(isEnabled);
         </script>
     </div>
 </body>

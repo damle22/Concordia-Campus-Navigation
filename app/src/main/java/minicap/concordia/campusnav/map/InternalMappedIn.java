@@ -1,8 +1,11 @@
 package minicap.concordia.campusnav.map;
 
 import android.content.Context;
+import android.util.Log;
+
 import androidx.fragment.app.Fragment;
 
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.components.MappedInWebViewFragment;
@@ -15,6 +18,7 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     public InternalMappedIn(MapUpdateListener listener) {
         super(listener);
+        this.isIndoor = true;
     }
 
     @Override
@@ -79,13 +83,13 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
     }
 
     @Override
-    public void switchToFloor(String floorName) {
-
+    public void loadBuilding(Building building, String initialFloor) {
+        Log.d("eh", "eh");
     }
 
     @Override
     public boolean toggleLocationTracking(boolean isEnabled) {
-
+        mappedInFragment.toggleLocationTracking(isEnabled);
         return true;
     }
 
