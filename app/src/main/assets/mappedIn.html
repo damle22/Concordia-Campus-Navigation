@@ -210,14 +210,28 @@
             }
             window.drawPathFromBlueDot = (end) => drawPathFromBlueDot(end);
 
-            function drawPathWithCoordinates(startLat, startLng, endLat, endLng, isAccessible) {
+            function drawPathWithCoordinates(startLat, startLng, startFloorId, endLat, endLng, endFloorId, isAccessible) {
                 const startLatAsNumber = Number(startLat);
                 const startLngAsNumber = Number(startLng);
-                const startCoord = mapView.createCoordinate(startLatAsNumber, startLngAsNumber);
+                var startCoord;
+                if(startFloorId) {
+                    const floor = mapData.getByType('floor').find((s) => s.id === startFloorId);
+                    startCoord = mapView.createCoordinate(startLatAsNumber, startLngAsNumber, floor);
+                }
+                else {
+                    startCoord = mapView.createCoordinate(startLatAsNumber, startLngAsNumber);
+                }
 
                 const endLatAsNumber = Number(endLat);
                 const endLngAsNumber = Number(endLng);
-                const endCoord = mapView.createCoordinate(endLatAsNumber, endLngAsNumber);
+                var endCoord;
+                if(endFloorId) {
+                    const endFloor = mapData.getByType('floor').find((s) => s.id === endFloorId);
+                    endCoord = mapView.createCoordinate(endLatAsNumber, endLngAsNumber, endFloor);
+                }
+                else {
+                    endCoord = mapView.createCoordinate(endLatAsNumber, endLngAsNumber);
+                }
 
                 var dir;
                 const acccessible = isAccessible == 'true';
@@ -235,7 +249,7 @@
                     mapView.Navigation.draw(dir);
                 }
             }
-            window.drawPathWithCoordinates = (startLat, startLng, endLat, endLng, isAccessible) => drawPathWithCoordinates(startLat, startLng, endLat, endLng, isAccessible);
+            window.drawPathWithCoordinates = (startLat, startLng, startFloorId, endLat, endLng, endFloorId, isAccessible) => drawPathWithCoordinates(startLat, startLng, startFloorId, endLat, endLng, endFloorId, isAccessible);
 
             function updateBlueDotPosition(lat, lng) {
                 const latAsNumber = Number(lat);

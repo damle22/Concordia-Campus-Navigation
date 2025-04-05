@@ -100,12 +100,14 @@ public class MappedInWebViewFragment extends Fragment implements UserLocationSer
     }
 
     public void drawPath(MapCoordinates origin, MapCoordinates end, boolean isAccessibility) {
-        String[] args = new String[5];
+        String[] args = new String[7];
         args[0] = String.valueOf(origin.getLat());
         args[1] = String.valueOf(origin.getLng());
-        args[2] = String.valueOf(end.getLat());
-        args[3] = String.valueOf(end.getLng());
-        args[4] = String.valueOf(isAccessibility);
+        args[2] = String.valueOf(origin.getName());
+        args[3] = String.valueOf(end.getLat());
+        args[4] = String.valueOf(end.getLng());
+        args[5] = String.valueOf(end.getName());
+        args[6] = String.valueOf(isAccessibility);
 
         runJavascriptCommand("drawPathWithCoordinates", args);
     }

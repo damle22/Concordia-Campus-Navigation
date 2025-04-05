@@ -72,7 +72,16 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
     public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
         boolean isAccessibility = travelMode.equals("WHEELCHAIR");
 
-        mappedInFragment.drawPath(origin, destination, isAccessibility);
+        BuildingFloor startFloor = currentBuilding.getFloor(origin.getName());
+        BuildingFloor endFloor = currentBuilding.getFloor(destination.getName());
+
+        String startFloorId = startFloor == null ? null : startFloor.getFloorId();
+        String endFloorId = endFloor == null ? null : endFloor.getFloorId();
+
+        MapCoordinates startWithFloor = new MapCoordinates(origin.getLat(), origin.getLng(), startFloorId);
+        MapCoordinates endWithFloor = new MapCoordinates(destination.getLat(), destination.getLng(), endFloorId);
+
+        mappedInFragment.drawPath(startWithFloor, endWithFloor, isAccessibility);
     }
 
     @Override

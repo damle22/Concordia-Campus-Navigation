@@ -39,6 +39,8 @@ import androidx.annotation.NonNull;
 
 public class LocationSearchActivity extends AppCompatActivity {
 
+    private static final String DEFAULT_FLOOR = "1";
+
     public static final String KEY_PREVIOUS_INPUT_STRING = "previous_input";
     public static final String KEY_IS_STARTING_LOCATION = "is_starting_location";
 
@@ -147,7 +149,8 @@ public class LocationSearchActivity extends AppCompatActivity {
 
         //We want the buildings to be at the top, so that all the classrooms don't take up the screen
         for(Building cur : buildings) {
-            LocationItem building = new LocationItem(cur.getBuildingName(), cur.getLocation());
+            MapCoordinates coordsWithFloor = new MapCoordinates(cur.getLatitude(), cur.getLongitude(), DEFAULT_FLOOR);
+            LocationItem building = new LocationItem(cur.getBuildingName(), coordsWithFloor);
 
             locations.add(building);
 

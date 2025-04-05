@@ -89,6 +89,8 @@ public class MapsActivity extends FragmentActivity
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
+    private static final String DEFAULT_FLOOR = "1";
+
     private AbstractMap map;
 
     private ConcordiaBuildingManager buildingManager;
@@ -169,6 +171,7 @@ public class MapsActivity extends FragmentActivity
         isSwitchingMap = false;
         buildingManager = ConcordiaBuildingManager.getInstance();
         currentMap = SupportedMaps.GOOGLE_MAPS;
+        currentFloorName = DEFAULT_FLOOR;
 
         //Check bundle for any additional requests
         Bundle bundle = getIntent().getExtras();
@@ -489,6 +492,7 @@ public class MapsActivity extends FragmentActivity
         }
         else {
             hasUserLocationBeenSet = false;
+            MapCoordinates coordsWithFloor = new MapCoordinates(coordinates.getLat(), coordinates.getLng(), currentFloorName);
             origin = coordinates;
             yourLocationText = locationString;
         }
@@ -510,7 +514,8 @@ public class MapsActivity extends FragmentActivity
     private void setDestination(String locationString, MapCoordinates coordinates) {
         Log.d(MAPS_ACTIVITY_TAG, "Set destination to: " + locationString + " with coords: (" + coordinates.getLat() + ", " + coordinates.getLng() + ")");
 
-        destination = coordinates;
+        MapCoordinates coordinatesWithFloor = new MapCoordinates(coordinates.getLat(), coordinates.getLng(), currentFloorName);
+        destination = coordinatesWithFloor;
         runOnUiThread(() -> {
             destinationEditText.setText(locationString);
         });
@@ -854,7 +859,7 @@ public class MapsActivity extends FragmentActivity
     @Override
     public void OnUserLocationUpdated(MapCoordinates newPosition) {
         hasUserLocationBeenSet = true;
-        origin = newPosition;
+        origin = new MapCoordinates(newPosition.getLat(), newPosition.getLng(), DEFAULT_FLOOR);
         setStartingPoint(true, "", new MapCoordinates(0, 0));
     }
 }
