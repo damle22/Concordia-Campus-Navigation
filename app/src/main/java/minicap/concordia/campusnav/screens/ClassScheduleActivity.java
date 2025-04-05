@@ -56,6 +56,19 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
     private final States states = States.getInstance();
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            fetchCalendarEvents();
+        } else {
+            signIn();
+        }
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
@@ -84,8 +97,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        googleSignInClient.signOut().addOnCompleteListener(task -> {
-        });
 
         // "Import" button to handle Google Calendar import
         Button importButton = findViewById(R.id.button_import_calendar);
@@ -348,9 +359,4 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
         return dateTime.toStringRfc3339();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        // If you have special handling for menu or anything else, do it here
-    }
 }
