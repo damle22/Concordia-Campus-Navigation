@@ -68,7 +68,9 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     @Override
     public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
+        boolean isAccessibility = travelMode.equals("WHEELCHAIR");
 
+        mappedInFragment.drawPath(origin, destination, isAccessibility);
     }
 
     @Override

@@ -43,6 +43,7 @@ import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 
 import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
+import minicap.concordia.campusnav.helpers.UserLocationService;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
@@ -73,7 +74,7 @@ import minicap.concordia.campusnav.map.enums.SupportedMaps;
 import minicap.concordia.campusnav.savedstates.States;
 
 public class MapsActivity extends FragmentActivity
-        implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
+        implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener, UserLocationService.UserLocationUpdatedListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_COORDS = "starting_coords";
@@ -89,8 +90,6 @@ public class MapsActivity extends FragmentActivity
     private MapCoordinates startingCoords;
 
     private boolean isDestinationSet;
-
-    private boolean hasUserLocationBeenSet;
 
     private boolean runBus;
     private boolean runDir;
@@ -121,8 +120,6 @@ public class MapsActivity extends FragmentActivity
 
     private BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior;
 
-    private FusedLocationProviderClient fusedLocationClient;
-
     private String travelMode = "DRIVE";
 
     private MapCoordinates destination;
@@ -132,6 +129,8 @@ public class MapsActivity extends FragmentActivity
     private SupportedMaps currentMap;
 
     private Fragment curMapFragment;
+
+    private boolean hasUserLocationBeenSet;
 
     private String eventAddress;
 
@@ -246,9 +245,7 @@ public class MapsActivity extends FragmentActivity
         carButton.setSelected(true);
 
         walkButton.setOnClickListener(v -> changeSelectedTravelMethod(walkButton, "WALK"));
-
-        //google maps does not support "wheelchair" for now, travelMode is the same as walking
-        wheelchairButton.setOnClickListener(v -> changeSelectedTravelMethod(wheelchairButton, "WALK"));
+        wheelchairButton.setOnClickListener(v -> changeSelectedTravelMethod(wheelchairButton, "WHEELCHAIR"));
         carButton.setOnClickListener(v -> changeSelectedTravelMethod(carButton, "DRIVE"));
         transitButton.setOnClickListener(v -> changeSelectedTravelMethod(transitButton, "TRANSIT"));
 
@@ -291,7 +288,7 @@ public class MapsActivity extends FragmentActivity
                 new ActivityResultContracts.StartActivityForResult(),
                 this::HandleNavigationActivityResult);
 
-        getUserLocationPath();
+        setStartingPoint(true, "", new MapCoordinates(0, 0));
 
         if(runBus){
             showShuttleScheduleFragment();
@@ -375,12 +372,19 @@ public class MapsActivity extends FragmentActivity
         }
 
         boolean isIndoors = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_INDOORS);
+        boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_IS_CURRENT_LOCATION_BOOL);
 
-        if(isIndoors) {
-            switchToMap(SupportedMaps.MAPPED_IN);
+        if(!useCurrentLocation) {
+            if(isIndoors) {
+                switchToMap(SupportedMaps.MAPPED_IN);
+            }
+            else {
+                switchToMap(SupportedMaps.GOOGLE_MAPS);
+            }
         }
         else {
-            switchToMap(SupportedMaps.GOOGLE_MAPS);
+            //Force the user location to update
+            hasUserLocationBeenSet = false;
         }
 
         boolean isDestination = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_DESTINATION);
@@ -391,7 +395,6 @@ public class MapsActivity extends FragmentActivity
             setDestination(returnedLocation, newCoords);
         }
         else {
-            boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_IS_CURRENT_LOCATION_BOOL);
             setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
 
@@ -419,16 +422,15 @@ public class MapsActivity extends FragmentActivity
         Log.d(MAPS_ACTIVITY_TAG, "Set starting location to: " + locationString + " with coords: (" + coordinates.getLat() + ", " + coordinates.getLng() + "), is current location: " + useCurrentLocation);
 
         if(useCurrentLocation && !hasUserLocationBeenSet) {
-            //getUserLocationPath will set the starting point and then call this again
-            getUserLocationPath();
+            UserLocationService.getLastKnownLocation(this, this);
             return;
         }
+
         String yourLocationText;
         if(useCurrentLocation) {
             yourLocationText = getString(R.string.your_location);
         }
         else {
-            //Reset this flag in case the user wants to use their own location in the future
             hasUserLocationBeenSet = false;
             origin = coordinates;
             yourLocationText = locationString;
@@ -579,32 +581,6 @@ public class MapsActivity extends FragmentActivity
     }
 
     /**
-     * Gets the User Location and invokes drawPath
-     */
-    private void getUserLocationPath() {
-        if (fusedLocationClient == null) {
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        }
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, location -> {
-                        if (location != null) {
-                            //If you are emulating and need to change your current location, use the emulator controls.
-                            origin = new MapCoordinates(location.getLatitude(), location.getLongitude());
-                            hasUserLocationBeenSet = true;
-                            setStartingPoint(true, "", origin);
-                        }
-                    });
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST_CODE);
-        }
-    }
-
-    /**
      * Gets the address as a String given coordinates
      * @param latitude double
      * @param longitude double
@@ -658,8 +634,6 @@ public class MapsActivity extends FragmentActivity
 
         //By default, origin is user location
         enableMyLocation();
-        getUserLocationPath();
-
 
         if(isSwitchingMap) {
             isSwitchingMap = false;
@@ -754,9 +728,15 @@ public class MapsActivity extends FragmentActivity
         if (origin != null) {
             map.centerOnCoordinates(origin);
         } else {
-            getUserLocationPath();
+            setStartingPoint(true, "", new MapCoordinates(0, 0));
             Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
         }
     }
 
+    @Override
+    public void OnUserLocationUpdated(MapCoordinates newPosition) {
+        hasUserLocationBeenSet = true;
+        origin = newPosition;
+        setStartingPoint(true, "", new MapCoordinates(0, 0));
+    }
 }

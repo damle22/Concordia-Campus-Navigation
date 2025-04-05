@@ -22,32 +22,21 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
-
 import minicap.concordia.campusnav.BuildConfig;
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.helpers.HTMLAssetHelper;
+import minicap.concordia.campusnav.helpers.UserLocationService;
 import minicap.concordia.campusnav.map.MapCoordinates;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MappedInWebViewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class MappedInWebViewFragment extends Fragment {
+public class MappedInWebViewFragment extends Fragment implements UserLocationService.UserLocationUpdatedListener {
 
     private static final String MAPPED_IN_ASSET_NAME = "mappedIn.html";
     private static final String MAPPED_IN_KEY_STRING = "<MAPPED_IN_KEY>";
     private static final String MAPPED_IN_SECRET_STRING = "<MAPPED_IN_SECRET>";
     private static final String TAG = "MappedInWebViewFragment";
 
-    private FusedLocationProviderClient locationClient;
-    private LocationCallback locationCallback;
+    private UserLocationService locationService;
+
     private MappedInMapEventListener curListener;
     private WebView map;
 
@@ -116,6 +105,17 @@ public class MappedInWebViewFragment extends Fragment {
         startManualLocationTracking(this.getContext());
     }
 
+    public void drawPath(MapCoordinates origin, MapCoordinates end, boolean isAccessibility) {
+        String[] args = new String[5];
+        args[0] = String.valueOf(origin.getLat());
+        args[1] = String.valueOf(origin.getLng());
+        args[2] = String.valueOf(end.getLat());
+        args[3] = String.valueOf(end.getLng());
+        args[4] = String.valueOf(isAccessibility);
+
+        runJavascriptCommand("drawPathWithCoordinates", args);
+    }
+
     public void addMarker(MapCoordinates coordinates, String title) {
         String[] args = new String[3];
         args[0] = String.valueOf(coordinates.getLat());
@@ -130,29 +130,8 @@ public class MappedInWebViewFragment extends Fragment {
     }
 
     private void startManualLocationTracking(Context context) {
-        locationClient = LocationServices.getFusedLocationProviderClient(context);
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) return;
-                for (Location location : locationResult.getLocations()) {
-
-                    updateUserPosition(MapCoordinates.fromAndroidLocation(location));
-                }
-            }
-        };
-
-        try {
-            LocationRequest locationRequest = new LocationRequest.Builder(
-                    Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(500).build();
-
-            if (ActivityCompat.checkSelfPermission(context,
-                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error while setting up location updates", e);
-        }
+        locationService = new UserLocationService(context, this);
+        locationService.start(1000);
     }
 
     private void testLoad() {
@@ -198,6 +177,11 @@ public class MappedInWebViewFragment extends Fragment {
                 map.evaluateJavascript("javascript:" + methodName + "(" + argList + ")", null);
             }
         });
+    }
+
+    @Override
+    public void OnUserLocationUpdated(MapCoordinates newPosition) {
+        updateUserPosition(newPosition);
     }
 
     private class AndroidJSListener {

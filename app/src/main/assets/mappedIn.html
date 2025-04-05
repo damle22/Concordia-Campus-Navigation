@@ -121,6 +121,8 @@
             var mapData;
             const KEY = '<MAPPED_IN_KEY>';
             const SECRET = '<MAPPED_IN_SECRET>';
+            var lastKnownLat;
+            var lastKnownLng;
 
             function loadMap(mapId) {
                 const options = {
@@ -128,8 +130,6 @@
                     secret: SECRET,
                     mapId: mapId
                 };
-
-                alert("mapId: " + mapId);
 
                 getMapData(options).then(async (data) => {
                     mapView = await show3dMap(document.getElementById('mappedin-map'), data);
@@ -189,15 +189,59 @@
             }
             window.drawPath = (start, end) => drawPath(start, end);
 
+            function drawPathFromBlueDot(end) {
+                const coord = mapView.createCoordinate(lastKnownLat, lastKnownLng);
+                const destination = mapData.getByType('space').find((s) => s.name === end);
+
+                if(destination) {
+                    const dir = mapData.getDirections(coord, destination);
+
+                    if(dir) {
+                        mapView.Navigation.draw(dir);
+                    }
+                }
+            }
+            window.drawPathFromBlueDot = (end) => drawPathFromBlueDot(end);
+
+            function drawPathWithCoordinates(startLat, startLng, endLat, endLng, isAccessible) {
+                const startLatAsNumber = Number(startLat);
+                const startLngAsNumber = Number(startLng);
+                const startCoord = mapView.createCoordinate(startLatAsNumber, startLngAsNumber);
+
+                const endLatAsNumber = Number(endLat);
+                const endLngAsNumber = Number(endLng);
+                const endCoord = mapView.createCoordinate(endLatAsNumber, endLngAsNumber);
+
+                var dir;
+                const acccessible = isAccessible == 'true';
+                if(acccessible) {
+                    alert("With accessibility");
+                    dir = mapData.getDirections(startCoord, endCoord, { accessible: true });
+                }
+                else {
+                    alert("Without accessibility");
+                    dir = mapData.getDirections(startCoord, endCoord);
+                }
+
+                if(dir) {
+                    alert("found dir");
+                    mapView.Navigation.draw(dir);
+                }
+            }
+            window.drawPathWithCoordinates = (startLat, startLng, endLat, endLng, isAccessible) => drawPathWithCoordinates(startLat, startLng, endLat, endLng, isAccessible);
+
             function updateBlueDotPosition(lat, lng) {
                 const latAsNumber = Number(lat);
                 const lngAsNumber = Number(lng);
+                lastKnownLat = latAsNumber;
+                lastKnownLng = lngAsNumber;
                 mapView.BlueDot.update({ latitude: latAsNumber, longitude: lngAsNumber })
             }
             window.updateBlueDotPosition = (lat, lng) => updateBlueDotPosition(lat, lng);
 
             function toggleBlueDot(isEnabled) {
-                if(isEnabled) {
+                const enabled = isEnabled == 'true';
+                if(enabled) {
                     mapView.BlueDot.enable();
                 }
                 else {

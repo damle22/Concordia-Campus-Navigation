@@ -211,6 +211,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
+        //Google maps does not have accessibility options
+        if(travelMode.equals("WHEELCHAIR")) {
+            travelMode = "WALK";
+        }
         new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
     }
 
