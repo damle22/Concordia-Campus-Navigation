@@ -3,6 +3,8 @@ package minicap.concordia.campusnav.screens;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsMarker;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Address;
@@ -51,14 +53,11 @@ import minicap.concordia.campusnav.helpers.UserLocationService;
 import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -772,10 +771,7 @@ public class MapsActivity extends FragmentActivity
         if(currentMap == SupportedMaps.GOOGLE_MAPS){
             ((InternalGoogleMaps)map).getmMap().setOnMarkerClickListener(marker -> {
                 if (marker.getTag() != null && "POI".equals(marker.getTag())) {
-                    LatLng position = marker.getPosition();
-                    double latitude = position.latitude;
-                    double longitude = position.longitude;
-                    setDestination(marker.getTitle(),new MapCoordinates(latitude,longitude));
+                    setDestination(marker.getTitle(),fromGoogleMapsMarker(marker));
                     drawPath();
                 }
                 return false;

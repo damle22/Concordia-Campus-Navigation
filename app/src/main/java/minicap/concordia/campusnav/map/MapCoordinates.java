@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class MapCoordinates implements Parcelable {
     public static final String DEFAULT_NAME = "UNKNOWN";
@@ -31,6 +32,15 @@ public class MapCoordinates implements Parcelable {
         this.lat = in.readDouble();
         this.lng = in.readDouble();
         this.name = in.readString();
+    }
+
+    /**
+     * Creates a MapCoordinates object from GoogleMaps Marker
+     * @param marker The Marker to be detached
+     * @return new MapCoordinates object with the location of the marker
+     */
+    public static MapCoordinates fromGoogleMapsMarker(Marker marker) {
+        return new MapCoordinates(marker.getPosition().latitude, marker.getPosition().longitude);
     }
 
     /**
