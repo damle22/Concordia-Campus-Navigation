@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void subscribeButtons(Context appContext) {
 
-        Button sgwCampusBtn = (Button)findViewById(R.id.viewSGWCampusButton);
+        Button sgwCampusBtn = findViewById(R.id.viewSGWCampusButton);
 
         sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button loyCampusBtn = (Button)findViewById(R.id.viewLoyCampusButton);
+        Button loyCampusBtn = findViewById(R.id.viewLoyCampusButton);
 
         loyCampusBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -70,9 +70,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openIntent(){
-        Campus campus = states.getCampus();
-        MapCoordinates campusCoordinates = campus.getLocation();
-
         Intent i = new Intent(MainActivity.this, MapsActivity.class);
         startActivity(i);
     }
