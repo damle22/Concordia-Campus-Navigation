@@ -81,13 +81,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.itemView.setBackgroundColor(0xFFFFE5E5); // light red
         }
 
-        // "Go to class" button → open MapsActivity
+        // "Go to class" button → open MapsActivity if there is a location, if not we hide the icon
+        String location = item.getLocation();
+        if (location.equals("No location")){
+           holder.goToClassIV.setVisibility(View.GONE);
+        } else {
+            holder.goToClassIV.setVisibility(View.VISIBLE);
         holder.goToClassIV.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), MapsActivity.class);
             // Pass the event's address string
             intent.putExtra("EVENT_ADDRESS", item.getLocation());
             v.getContext().startActivity(intent);
-        });
+        });}
     }
 
     private boolean isNextUpcomingEvent(int position, long now) {

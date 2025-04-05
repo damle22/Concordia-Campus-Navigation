@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ImageButton;
@@ -55,15 +56,16 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
 
     private final States states = States.getInstance();
 
+    private Button importButton;
+
     @Override
     protected void onStart() {
         super.onStart();
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
+            importButton.setVisibility(View.INVISIBLE);
             fetchCalendarEvents();
-        } else {
-            signIn();
         }
     }
 
@@ -99,7 +101,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
 
 
         // "Import" button to handle Google Calendar import
-        Button importButton = findViewById(R.id.button_import_calendar);
+        importButton = findViewById(R.id.button_import_calendar);
         importButton.setOnClickListener(v -> signIn());
 
         // "Select Calendar" button to let user pick a different calendar
@@ -193,7 +195,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                     return;
                 }
 
-                // Build credential
+                // Building credential
                 GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                         this,
                         Collections.singleton(CalendarScopes.CALENDAR_READONLY)
@@ -210,7 +212,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                                 .setApplicationName("CampusNav")
                                 .build();
 
-                // Get list of calendars
+                // Getting the list of calendars
                 CalendarList calendarList = service.calendarList().list().execute();
                 List<CalendarListEntry> calendarEntries = calendarList.getItems();
 
@@ -221,7 +223,7 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                     return;
                 }
 
-                // Build arrays for calendar names & IDs
+                // Building arrays for calendar names & IDs
                 String[] calendarNames = new String[calendarEntries.size()];
                 String[] calendarIds = new String[calendarEntries.size()];
 
@@ -255,8 +257,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
     }
 
     private void fetchCalendarEvents() {
-        // Show a quick toast or progress
-        Toast.makeText(this, "Fetching calendar events...", Toast.LENGTH_SHORT).show();
 
         new Thread(() -> {
             try {
