@@ -10,7 +10,6 @@ import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.components.MappedInWebViewFragment;
 import minicap.concordia.campusnav.map.enums.MapColors;
-import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalMappedIn extends AbstractMap implements MappedInWebViewFragment.MappedInMapEventListener {
 
@@ -39,7 +38,7 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
             clearAllMarkers();
         }
 
-        String markerHTML = MapColorConversionHelper.getMappedInMarkerHTML(color, title);
+        mappedInFragment.addMarker(position, title);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     @Override
     public void clearAllMarkers() {
-
+        mappedInFragment.removeAllMarkers();
     }
 
     @Override

@@ -113,13 +113,20 @@ public class MappedInWebViewFragment extends Fragment {
         args[0] = String.valueOf(isEnabled);
         runJavascriptCommand("toggleBlueDot", args);
 
-        args = new String[2];
-        args[0] = "45.49710655";
-        args[1] = "-73.57872092";
-
-        runJavascriptCommand("updateBlueDotPosition", args);
-
         startManualLocationTracking(this.getContext());
+    }
+
+    public void addMarker(MapCoordinates coordinates, String title) {
+        String[] args = new String[3];
+        args[0] = String.valueOf(coordinates.getLat());
+        args[1] = String.valueOf(coordinates.getLng());
+        args[2] = title;
+
+        runJavascriptCommand("addMarkerFromAndroid", args);
+    }
+
+    public void removeAllMarkers() {
+        runJavascriptCommand("removeAllMarkers");
     }
 
     private void startManualLocationTracking(Context context) {
@@ -160,6 +167,16 @@ public class MappedInWebViewFragment extends Fragment {
         args[1] = String.valueOf(coords.getLng());
 
         runJavascriptCommand("updateBlueDotPosition", args);
+    }
+
+    private void runJavascriptCommand(String methodName) {
+        Log.d(TAG, "Running command: " + methodName);
+        map.post(new Runnable() {
+            @Override
+            public void run() {
+                map.evaluateJavascript("javascript:" + methodName + "()", null);
+            }
+        });
     }
 
     private void runJavascriptCommand(String methodName, String[] args) {

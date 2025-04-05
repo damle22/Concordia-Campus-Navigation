@@ -205,6 +205,11 @@
                 }
             }
             window.toggleBlueDot = (isEnabled) => toggleBlueDot(isEnabled);
+
+            function removeAllMarkers() {
+                mapView.Markers.removeAll();
+            }
+            window.removeAllMarkers = () => removeAllMarkers();
         </script>
     </div>
 </body>
