@@ -15,6 +15,8 @@ public class States {
 
     private boolean darkMode = false;
 
+    private boolean menuOpen = false;
+
     private static final States instance = new States();
 
     private States(){}
@@ -61,4 +63,11 @@ public class States {
         return otherCampusAbrev;
     }
 
+    public boolean isMenuOpen() {
+        return menuOpen;
+    }
+
+    public void toggleMenu(boolean state){
+        menuOpen = state;
+    }
 }
