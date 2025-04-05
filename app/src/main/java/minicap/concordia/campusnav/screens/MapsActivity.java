@@ -306,7 +306,10 @@ public class MapsActivity extends FragmentActivity
         // Set click listeners for each button
         restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
         coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
-        //TODO handle Fountain, elevator and washroom (Indoor POI)
+        fountainButton.setOnClickListener(view -> map.displayPOI(origin, POIType.WATER_FOUNTAIN));
+        elevatorButton.setOnClickListener(view -> map.displayPOI(origin, POIType.ELEVATOR));
+        washroomButton.setOnClickListener(view -> map.displayPOI(origin, POIType.WASHROOM));
+
     }
 
     private void updateButtonMargin(View bottomSheet, float slideOffset){
@@ -722,7 +725,6 @@ public class MapsActivity extends FragmentActivity
             dialog.show();
         }
     }
-
 
     // Show building selector fragment
     private void showBuildingSelectorFragment() {

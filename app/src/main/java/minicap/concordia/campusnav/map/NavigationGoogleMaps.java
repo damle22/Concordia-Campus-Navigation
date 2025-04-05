@@ -37,6 +37,7 @@ import java.util.List;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
+import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 
 public class NavigationGoogleMaps extends InternalGoogleMaps{
 
@@ -247,7 +248,7 @@ public class NavigationGoogleMaps extends InternalGoogleMaps{
             }
 
             @Override
-            public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location) {
+            public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location, POIType type) {
 
             }
         }).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
