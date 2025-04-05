@@ -233,8 +233,17 @@ public abstract class AbstractMap {
         return isIndoor;
     }
 
+    public void switchFloor(String newFloor) {
+
+    }
+
 
     public interface MapUpdateListener {
+
+        /**
+         * Method called when the UI element rendered, the map is not necessarily ready for use
+         */
+        void onMapElementLoaded();
         /**
          * Method called when the map is ready for use
          */

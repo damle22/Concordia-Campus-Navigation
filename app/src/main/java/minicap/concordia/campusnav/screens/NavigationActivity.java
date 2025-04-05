@@ -143,6 +143,11 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
 
     }
 
+    @Override
+    public void onMapElementLoaded() {
+        //Not used
+    }
+
     /**
      * Callback method invoked when the map is ready.
      * It sets up the map style, markers, route, and checks location permissions.

@@ -25,10 +25,13 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,7 @@ import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
@@ -57,6 +61,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import org.json.JSONArray;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -114,6 +120,8 @@ public class MapsActivity extends FragmentActivity
     private ImageButton transitButton;
     private ImageButton startRouteButton;
 
+    private Spinner floorSpinner;
+
     private Button buildingViewButton;
     private int buildingViewButtonMargin;
 
@@ -133,6 +141,10 @@ public class MapsActivity extends FragmentActivity
     private boolean hasUserLocationBeenSet;
 
     private String eventAddress;
+
+    private String currentBuildingName;
+
+    private String currentFloorName;
 
     private final States states = States.getInstance();
 
@@ -310,6 +322,8 @@ public class MapsActivity extends FragmentActivity
         restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
         coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
         //TODO handle Fountain, elevator and washroom (Indoor POI)
+
+        floorSpinner = findViewById(R.id.floorSpinner);
     }
 
     private void updateButtonMargin(View bottomSheet, float slideOffset){
@@ -373,9 +387,14 @@ public class MapsActivity extends FragmentActivity
 
         boolean isIndoors = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_BOOL_IS_INDOORS);
         boolean useCurrentLocation = returnData.getBoolean(LocationSearchActivity.KEY_RETURN_IS_CURRENT_LOCATION_BOOL);
+        String buildingName;
+        String floor;
 
         if(!useCurrentLocation) {
             if(isIndoors) {
+                buildingName = returnData.getString(LocationSearchActivity.KEY_RETURN_STRING_BUILDING_NAME);
+                floor = returnData.getString(LocationSearchActivity.KEY_RETURN_STRING_FLOOR_ID);
+                evaluateShouldSwitchFloor(buildingName, floor);
                 switchToMap(SupportedMaps.MAPPED_IN);
             }
             else {
@@ -398,6 +417,44 @@ public class MapsActivity extends FragmentActivity
             setStartingPoint(useCurrentLocation, returnedLocation, newCoords);
         }
 
+    }
+
+    private void evaluateShouldSwitchFloor(String buildingName, String floor) {
+        if(isSwitchingMap || !map.getIsIndoor()) {
+            currentBuildingName = buildingName;
+            currentFloorName = floor;
+            return;
+        }
+
+        if(currentBuildingName.equals(buildingName)) {
+            if(!currentFloorName.equals(floor)) {
+                currentFloorName = floor;
+                switchFloors();
+            }
+        }
+        else {
+            currentBuildingName = buildingName;
+            currentFloorName = floor;
+            switchBuilding();
+        }
+    }
+
+    private void switchBuilding() {
+        if(!map.getIsIndoor() || isSwitchingMap) {
+            return;
+        }
+
+        Building newBuilding = buildingManager.searchBuildingsByName(currentBuildingName).get(0);
+        map.loadBuilding(newBuilding, currentFloorName);
+        configureIndoorFloorSpinner();
+    }
+
+    private void switchFloors() {
+        if(!map.getIsIndoor() || isSwitchingMap) {
+            return;
+        }
+
+        map.switchFloor(currentFloorName);
     }
 
     /**
@@ -550,12 +607,12 @@ public class MapsActivity extends FragmentActivity
     private void initializeMap(boolean replace) {
         if(currentMap == SupportedMaps.GOOGLE_MAPS) {
             map = new InternalGoogleMaps(this);
-            campusSwitchBtn.setVisibility(VISIBLE);
         }
         else {
             map = new InternalMappedIn(this);
-            campusSwitchBtn.setVisibility(GONE);
         }
+
+        configureActivityForMap();
 
         curMapFragment = map.initialize();
         FragmentManager fm = getSupportFragmentManager();
@@ -569,6 +626,58 @@ public class MapsActivity extends FragmentActivity
         }
 
         ft.commit();
+    }
+
+    private void configureActivityForMap() {
+        if(map.getIsIndoor()) {
+            campusSwitchBtn.setVisibility(GONE);
+
+            if(floorSpinner != null) {
+                floorSpinner.setVisibility(VISIBLE);
+            }
+
+            configureIndoorFloorSpinner();
+        }
+        else {
+            campusSwitchBtn.setVisibility(VISIBLE);
+
+            if(floorSpinner != null) {
+                floorSpinner.setVisibility(GONE);
+            }
+        }
+    }
+
+    private void configureIndoorFloorSpinner() {
+        Building currentBuilding = buildingManager.searchBuildingsByName(currentBuildingName).get(0);
+        Collection<BuildingFloor> allFloors = currentBuilding.getFloors();
+        List<BuildingFloor> validFloors = new ArrayList<>();
+
+        for(BuildingFloor floor : allFloors) {
+            if(!floor.getFloorId().equals(BuildingFloor.NO_FLOOR_ID)) {
+                validFloors.add(floor);
+            }
+        }
+
+        ArrayAdapter<BuildingFloor> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, validFloors);
+
+        floorSpinner.setAdapter(adapter);
+
+        floorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                BuildingFloor selectedFloor = (BuildingFloor) parent.getItemAtPosition(position);
+
+                if(selectedFloor != null) {
+                    currentFloorName = selectedFloor.getFloorName();
+                    switchFloors();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     /**
@@ -624,6 +733,16 @@ public class MapsActivity extends FragmentActivity
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    @Override
+    public void onMapElementLoaded() {
+        if(!map.getIsIndoor()) {
+            return;
+        }
+
+        Building currentBuilding = buildingManager.searchBuildingsByName(currentBuildingName).get(0);
+        map.loadBuilding(currentBuilding, currentFloorName);
+    }
+
     @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady() {
@@ -632,7 +751,6 @@ public class MapsActivity extends FragmentActivity
             map.centerOnCoordinates(startingCoords);
         }
 
-        //By default, origin is user location
         enableMyLocation();
 
         if(isSwitchingMap) {

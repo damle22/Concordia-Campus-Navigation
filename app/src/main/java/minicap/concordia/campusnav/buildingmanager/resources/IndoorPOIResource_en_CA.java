@@ -28,7 +28,7 @@ public class IndoorPOIResource_en_CA extends ListResourceBundle {
                 },
                 {
                     BuildingName.HALL.getResourceName() + "_Floor2", new ArrayList<IndoorPOI>(Arrays.asList(
-                        new IndoorPOI(new MapCoordinates(45.49719, -73.57926, "Test Hall F2"), POIType.CLASS_ROOM, BuildingName.HALL, "2", false),
+                        new IndoorPOI(new MapCoordinates(45.49716762, -73.57915985, "H283"), POIType.CLASS_ROOM, BuildingName.HALL, "2", false),
                         new IndoorPOI(new MapCoordinates(45.49738, -73.57864, "Test Washroom Hall F2"), POIType.WASHROOM, BuildingName.HALL, "2", false)
                     ))
                 },

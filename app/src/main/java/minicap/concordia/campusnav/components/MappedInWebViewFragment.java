@@ -72,13 +72,7 @@ public class MappedInWebViewFragment extends Fragment implements UserLocationSer
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                testLoad();
-            }
-        });
-        map.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-                callback.invoke(origin, true, false);
+                curListener.mapPageLoaded();
             }
         });
 
@@ -134,10 +128,22 @@ public class MappedInWebViewFragment extends Fragment implements UserLocationSer
         locationService.start(1000);
     }
 
-    private void testLoad() {
-        String[] args = new String[1];
-        args[0] = "67df02d0aa7c59000baf8d83";
+    public void loadMap(String mapId, String floorId) {
+        String[] args = new String[2];
+        args[0] = mapId;
+        args[1] = floorId;
         runJavascriptCommand("loadMap", args);
+    }
+
+    public void switchFloor(String floorId) {
+        String[] args = new String[1];
+        args[0] = floorId;
+
+        runJavascriptCommand("switchFloor", args);
+    }
+
+    public void clearPath() {
+        runJavascriptCommand("clearPath");
     }
 
     private void updateUserPosition(MapCoordinates coords) {
@@ -205,6 +211,8 @@ public class MappedInWebViewFragment extends Fragment implements UserLocationSer
     }
 
     public interface MappedInMapEventListener {
+        void mapPageLoaded();
+
         void mapLoaded();
 
         void mapClicked(MapCoordinates coords);

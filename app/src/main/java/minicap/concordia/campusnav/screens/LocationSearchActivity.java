@@ -17,7 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 
 import minicap.concordia.campusnav.R;
@@ -25,6 +27,7 @@ import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.IndoorPOI;
+import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.map.MapCoordinates;
 
@@ -46,6 +49,10 @@ public class LocationSearchActivity extends AppCompatActivity {
     public static final String KEY_RETURN_BOOL_IS_INDOORS = "return_is_indoors";
 
     public static final String KEY_RETURN_CHOSEN_COORDS = "return_chosen_coordinates";
+
+    public static final String KEY_RETURN_STRING_BUILDING_NAME = "return_building_name";
+
+    public static final String KEY_RETURN_STRING_FLOOR_ID = "return_floor_id";
     private EditText searchInput;
     private RecyclerView resultsRecyclerView;
     private LocationAdapter adapter;
@@ -136,7 +143,7 @@ public class LocationSearchActivity extends AppCompatActivity {
         ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
 
         List<Building> buildings = manager.getAllBuildings();
-        List<IndoorPOI> poisToAdd = new ArrayList<>();
+        Map<BuildingName, List<IndoorPOI>> poisToAdd = new EnumMap<>(BuildingName.class);
 
         //We want the buildings to be at the top, so that all the classrooms don't take up the screen
         for(Building cur : buildings) {
@@ -144,16 +151,22 @@ public class LocationSearchActivity extends AppCompatActivity {
 
             locations.add(building);
 
+            List<IndoorPOI> allPoisForBuilding = new ArrayList<>();
             for(BuildingFloor floor : cur.getFloors()) {
                 List<IndoorPOI> indoorPOIs = floor.getPOIsOfType(POIType.CLASS_ROOM);
 
-                poisToAdd.addAll(indoorPOIs);
+                allPoisForBuilding.addAll(indoorPOIs);
             }
+            poisToAdd.put(cur.getBuildingIdentifier(), allPoisForBuilding);
         }
 
-        for(IndoorPOI poi : poisToAdd) {
-            LocationItem item = new LocationItem(poi.getPoiName(), poi.getLocation(), true);
-            locations.add(item);
+        for(Map.Entry<BuildingName, List<IndoorPOI>> entry : poisToAdd.entrySet()) {
+            String buildingName = manager.getBuilding(entry.getKey()).getBuildingName();
+
+            for(IndoorPOI poi : entry.getValue()) {
+                LocationItem item = new LocationItem(poi.getPoiName(), poi.getLocation(), buildingName, poi.getFloorName());
+                locations.add(item);
+            }
         }
 
         resultsRecyclerView = findViewById(R.id.results_recycler_view);
@@ -164,14 +177,30 @@ public class LocationSearchActivity extends AppCompatActivity {
 
         adapter.setOnClickListener(new LocationAdapter.OnItemClickedListener() {
             @Override
-            public void onClick(String locationName, MapCoordinates coordinates, boolean isIndoors) {
+            public void onOutdoorItemClick(String locationName, MapCoordinates coordinates) {
                 runOnUiThread(() -> {
                     Intent returnData = new Intent();
                     returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION_STRING, locationName);
                     returnData.putExtra(KEY_RETURN_IS_CURRENT_LOCATION_BOOL, false);
                     returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, !isStartLocation);
                     returnData.putExtra(KEY_RETURN_CHOSEN_COORDS, coordinates);
-                    returnData.putExtra(KEY_RETURN_BOOL_IS_INDOORS, isIndoors);
+                    returnData.putExtra(KEY_RETURN_BOOL_IS_INDOORS, false);
+                    setResult(RESULT_OK, returnData);
+                    finish();
+                });
+            }
+
+            @Override
+            public void onIndoorItemClick(String locationName, MapCoordinates coordinates, String buildingName, String floorId) {
+                runOnUiThread(() -> {
+                    Intent returnData = new Intent();
+                    returnData.putExtra(KEY_RETURN_CHOSEN_LOCATION_STRING, locationName);
+                    returnData.putExtra(KEY_RETURN_IS_CURRENT_LOCATION_BOOL, false);
+                    returnData.putExtra(KEY_RETURN_BOOL_IS_DESTINATION, !isStartLocation);
+                    returnData.putExtra(KEY_RETURN_CHOSEN_COORDS, coordinates);
+                    returnData.putExtra(KEY_RETURN_BOOL_IS_INDOORS, true);
+                    returnData.putExtra(KEY_RETURN_STRING_BUILDING_NAME, buildingName);
+                    returnData.putExtra(KEY_RETURN_STRING_FLOOR_ID, floorId);
                     setResult(RESULT_OK, returnData);
                     finish();
                 });
@@ -211,7 +240,12 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
         holder.locationText.setTextColor(Color.parseColor("#FFFFFF"));
         holder.itemView.setOnClickListener(v -> {
             if(onClickListener != null) {
-                onClickListener.onClick(cur.getLocationName(), cur.getCoordinates(), cur.getIsIndoors());
+                if(cur.getIsIndoors()) {
+                    onClickListener.onIndoorItemClick(cur.getLocationName(), cur.getCoordinates(), cur.getBuildingName(), cur.getFloorId());
+                }
+                else {
+                    onClickListener.onOutdoorItemClick(cur.getLocationName(), cur.getCoordinates());
+                }
             }
         });
     }
@@ -247,7 +281,9 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     }
 
     public interface OnItemClickedListener {
-        void onClick(String locationName, MapCoordinates coordinates, boolean isIndoors);
+        void onOutdoorItemClick(String locationName, MapCoordinates coordinates);
+
+        void onIndoorItemClick(String locationName, MapCoordinates coordinates, String buildingName, String floorId);
     }
 }
 
@@ -258,6 +294,10 @@ class LocationItem {
 
     private boolean isIndoors;
 
+    private String buildingName;
+
+    private String floorId;
+
     public LocationItem(String name, MapCoordinates coordinates) {
         this(name, coordinates, false);
     }
@@ -266,6 +306,14 @@ class LocationItem {
         this.locationName = name;
         this.coordinates = coordinates;
         this.isIndoors = isIndoors;
+    }
+
+    public LocationItem(String name, MapCoordinates coordinates, String buildingName, String floorId) {
+        this.locationName = name;
+        this.coordinates = coordinates;
+        this.isIndoors = true;
+        this.buildingName = buildingName;
+        this.floorId = floorId;
     }
 
     public String getLocationName() {
@@ -278,5 +326,13 @@ class LocationItem {
 
     public boolean getIsIndoors() {
         return isIndoors;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public String getFloorId() {
+        return floorId;
     }
 }

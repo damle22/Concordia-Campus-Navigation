@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.fragment.app.Fragment;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
+import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.components.MappedInWebViewFragment;
@@ -13,6 +14,7 @@ import minicap.concordia.campusnav.map.enums.MapColors;
 
 public class InternalMappedIn extends AbstractMap implements MappedInWebViewFragment.MappedInMapEventListener {
 
+    private Building currentBuilding;
     private MappedInWebViewFragment mappedInFragment;
 
     public InternalMappedIn(MapUpdateListener listener) {
@@ -63,7 +65,7 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     @Override
     public void clearPathFromMap() {
-
+        mappedInFragment.clearPath();
     }
 
     @Override
@@ -85,7 +87,20 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     @Override
     public void loadBuilding(Building building, String initialFloor) {
-        Log.d("eh", "eh");
+        currentBuilding = building;
+        String buildingId = building.getMapId();
+        BuildingFloor floor = building.getFloor(initialFloor);
+        String floorId = floor.getFloorId();
+
+        mappedInFragment.loadMap(buildingId, floorId);
+    }
+
+    @Override
+    public void switchFloor(String floor) {
+        BuildingFloor newFloor = currentBuilding.getFloor(floor);
+        String newFloorId = newFloor.getFloorId();
+
+        mappedInFragment.switchFloor(newFloorId);
     }
 
     @Override
@@ -97,6 +112,11 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
     @Override
     public void setStyle(Context context, int resourceID) {
         //Not used
+    }
+
+    @Override
+    public void mapPageLoaded() {
+        listener.onMapElementLoaded();
     }
 
     @Override

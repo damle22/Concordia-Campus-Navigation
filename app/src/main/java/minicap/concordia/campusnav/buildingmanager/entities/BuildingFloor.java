@@ -8,6 +8,8 @@ import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 
 public class BuildingFloor {
+    public static final String NO_FLOOR_ID = "none";
+
     private final String floorName;
     private final BuildingName associatedBuilding;
     private final List<IndoorPOI> floorPOIs;
@@ -88,5 +90,10 @@ public class BuildingFloor {
     public void setFloorPOIs(List<IndoorPOI> newPOIs) {
         this.floorPOIs.clear();
         this.floorPOIs.addAll(newPOIs);
+    }
+
+    @Override
+    public String toString() {
+        return "Floor " + this.getFloorName();
     }
 }

@@ -124,7 +124,7 @@
             var lastKnownLat;
             var lastKnownLng;
 
-            function loadMap(mapId) {
+            function loadMap(mapId, floorId) {
                 const options = {
                     key: KEY,
                     secret: SECRET,
@@ -132,7 +132,9 @@
                 };
 
                 getMapData(options).then(async (data) => {
-                    mapView = await show3dMap(document.getElementById('mappedin-map'), data);
+                    mapView = await show3dMap(document.getElementById('mappedin-map'), data, {
+                        initialFloor: floorId
+                    });
                     mapData = data;
                     mapView.Labels.all();
 
@@ -149,7 +151,12 @@
                     Android.mapReady();
                 });
             }
-            window.loadMap = (mapId) => loadMap(mapId);
+            window.loadMap = (mapId, floorId) => loadMap(mapId, floorId);
+
+            function switchFloor(floorId) {
+                mapView.setFloor(floorId);
+            }
+            window.switchFloor = (floorId) => switchFloor(floorId);
 
             function mapClicked(e) {
                 var name = "Location"
@@ -254,6 +261,12 @@
                 mapView.Markers.removeAll();
             }
             window.removeAllMarkers = () => removeAllMarkers();
+
+            function clearPath() {
+                mapView.Navigation.clear()
+            }
+            window.clearPath = () => clearPath();
+
         </script>
     </div>
 </body>

@@ -96,6 +96,14 @@ public class Building extends Location{
         return associatedCampus;
     }
 
+    /**
+     * Returns the mapId used for MappedIn
+     * @return mapId
+     */
+    public String getMapId() {
+        return mapId;
+    }
+
     @Override
     public String toString(){
         return this.getLocationName();
