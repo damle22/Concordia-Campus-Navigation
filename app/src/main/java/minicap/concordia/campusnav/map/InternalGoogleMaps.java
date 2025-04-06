@@ -46,7 +46,7 @@ import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
 
-    private static final float defaultZoom = 18;
+    private static final float DEFAULT_ZOOM = 18;
     private GoogleMap mMap;
 
     private List<Polyline> polylines = new ArrayList<>();
@@ -213,7 +213,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     private void resetCamera(MapCoordinates position){
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(position.toGoogleMapsLatLng())
-                .zoom(defaultZoom)
+                .zoom(DEFAULT_ZOOM)
                 .bearing(0)
                 .tilt(0)
                 .build();

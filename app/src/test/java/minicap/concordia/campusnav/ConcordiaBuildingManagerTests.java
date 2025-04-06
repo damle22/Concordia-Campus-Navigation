@@ -289,7 +289,7 @@ public class ConcordiaBuildingManagerTests {
 
     @Test
     public void BuildingFloor_GetAllPOIs() {
-        int expectedNumberOfPOIs = 3;
+        int expectedNumberOfPOIs = 74;
         BuildingName expectedAssociatedBuilding = BuildingName.HALL;
         String expectedFloorName = "1";
 
@@ -309,7 +309,7 @@ public class ConcordiaBuildingManagerTests {
 
     @Test
     public void BuildingFloor_GetPOIOfTypeClassroom() {
-        int expectedClassroomPOIs = 2;
+        int expectedClassroomPOIs = 61;
         String expectedFloorName = "1";
         BuildingName expectedAssociatedBuilding = BuildingName.HALL;
         POIType expectedPOIType = POIType.CLASS_ROOM;
@@ -331,7 +331,7 @@ public class ConcordiaBuildingManagerTests {
 
     @Test
     public void BuildingFloor_GetAccessibilityPOIs() {
-        int expectedAccessibilityPOIs = 1;
+        int expectedAccessibilityPOIs = 3;
         String expectedFloorName = "1";
         BuildingName expectedAssociatedBuilding = BuildingName.HALL;
         boolean expectedAccessibilityFlag = true;
@@ -354,20 +354,19 @@ public class ConcordiaBuildingManagerTests {
     @Test
     public void IndoorPOI_GetPOIName() {
         List<String> expectedPOINames = new ArrayList<>(Arrays.asList(
-                "H196",
-                "H103",
-                "Test Accessibility"
+                "JMSB S2.210",
+                "JMSB S2.275"
         ));
 
         int expectedNumberPOIs = expectedPOINames.size();
 
-        String expectedFloorName = "1";
-        BuildingName expectedAssociatedBuilding = BuildingName.HALL;
+        String expectedFloorName = "S2";
+        BuildingName expectedAssociatedBuilding = BuildingName.MOLSON_SCHOOL_OF_BUSINESS;
 
         ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
-        Building actualBuilding = manager.getBuilding(BuildingName.HALL);
+        Building actualBuilding = manager.getBuilding(BuildingName.MOLSON_SCHOOL_OF_BUSINESS);
 
-        BuildingFloor actualFloor = actualBuilding.getFloor("1");
+        BuildingFloor actualFloor = actualBuilding.getFloor("S2");
         List<IndoorPOI> actualPOIs = actualFloor.getAllPOIsForFloor();
 
         Assert.assertEquals(expectedNumberPOIs, actualPOIs.size());
