@@ -120,7 +120,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("10", new BuildingFloor("10", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
                                 entry("11", new BuildingFloor("11", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID))
                         )),
-                        R.drawable.hallbuilding,
+                        R.drawable.sgw_h,
                         "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8",
                         BuildingName.HALL,
                         "67df02d0aa7c59000baf8d83"
@@ -149,7 +149,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("14", new BuildingFloor("14", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
                                 entry("15", new BuildingFloor("15", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID))
                         )),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_mb,
                         "1450 Guy Street Montreal, QC H3H 0A1",
                         BuildingName.MOLSON_SCHOOL_OF_BUSINESS,
                         ""
@@ -162,7 +162,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         new HashMap<>(Map.ofEntries(
                                 entry("1", new BuildingFloor("1", BuildingName.LOYOLA_CENTRAL_BUILDING, BuildingFloor.NO_FLOOR_ID))
                         )),
-                        R.drawable.loy_central,
+                        R.drawable.loyola_cc,
                         "7141 Sherbrooke St W, Montreal, Quebec H4B 2A7",
                         BuildingName.LOYOLA_CENTRAL_BUILDING,
                         ""
@@ -177,7 +177,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("2", new BuildingFloor("2", BuildingName.VANIER_LIBRARY, BuildingFloor.NO_FLOOR_ID)),
                                 entry("3", new BuildingFloor("3", BuildingName.VANIER_LIBRARY, BuildingFloor.NO_FLOOR_ID))
                         )),
-                        R.drawable.vanier_library,
+                        R.drawable.loyola_vl,
                         "7141 Sherbrooke St W, Montreal, Quebec H4B 1R6",
                         BuildingName.VANIER_LIBRARY,
                         "67df46cc50cb29000b302af3"
@@ -192,7 +192,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("2", new BuildingFloor("2", BuildingName.VANIER_EXTENSION, BuildingFloor.NO_FLOOR_ID)),
                                 entry("3", new BuildingFloor("3", BuildingName.VANIER_EXTENSION, BuildingFloor.NO_FLOOR_ID))
                         )),
-                        R.drawable.vanier_library,
+                        R.drawable.loyola_ve,
                         "7141 Rue Sherbrooke O, Montréal, QC H4B 1R6",
                         BuildingName.VANIER_EXTENSION,
                         "67df46cc50cb29000b302af3"
@@ -203,7 +203,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The B Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_b,
                         "2160 Bishop",
                         BuildingName.B_ANNEX,
                         null
@@ -214,7 +214,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The CI Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_ci,
                         "2149 Mackay",
                         BuildingName.CI_ANNEX,
                         null
@@ -225,7 +225,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The CL Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_cl,
                         "1665 Ste-Catherine St. W.",
                         BuildingName.CL_ANNEX,
                         null
@@ -236,7 +236,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The D Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_d,
                         "2140 Bishop",
                         BuildingName.D_ANNEX,
                         null
@@ -247,7 +247,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The EN Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_en,
                         "2070 Mackay",
                         BuildingName.EN_ANNEX,
                         null
@@ -258,7 +258,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The ER Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_er,
                         "2155 Guy St.",
                         BuildingName.ER_BUILDING,
                         null
@@ -269,7 +269,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Engineering, Computer Science and Visual Arts Integrated Complex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_ev,
                         "1515 St. Catherine W.",
                         BuildingName.ENGINEERING_COMPUTER_SCIENCE_AND_VISUAL_ARTS_INTEGRATED_COMPLEX,
                         null
@@ -280,7 +280,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The FA Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_fa,
                         "2060 Mackay",
                         BuildingName.FA_ANNEX,
                         null
@@ -291,7 +291,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Faubourg Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_fb,
                         "1250 Guy",
                         BuildingName.FAUBOURG_BUILDING,
                         null
@@ -302,7 +302,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Faubourg Ste-Catherine Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_fg,
                         "1610 St. Catherine W.",
                         BuildingName.FAUBOURG_STE_CATHERINE_BUILDING,
                         null
@@ -313,7 +313,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Grey Nuns Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_ga,
                         "1211-1215 St-Mathieu St.",
                         BuildingName.GREY_NUNS_ANNEX,
                         null
@@ -324,7 +324,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Guy-De Maisonneuve Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_gm,
                         "1550 De Maisonneuve W.",
                         BuildingName.GUY_DE_MAISONNEUVE_BUILDING,
                         null
@@ -335,7 +335,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Grey Nuns Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_gn,
                         "1190 Guy St. (main entrance) | 1175 St-Mathieu St. | 1185 St-Mathieu St.",
                         BuildingName.GREY_NUNS_BUILDING,
                         null
@@ -346,7 +346,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The GS Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_gs,
                         "1538 Sherbrooke St. W.",
                         BuildingName.GS_BUILDING,
                         null
@@ -357,7 +357,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The K Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_k,
                         "2150 Bishop",
                         BuildingName.K_ANNEX,
                         null
@@ -368,7 +368,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The J.W. McConnell Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_lb,
                         "1400 De Maisonneuve Blvd. W.",
                         BuildingName.JW_MCCONNELL_BUILDING,
                         null
@@ -379,7 +379,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The LD Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_ld,
                         "1424 Bishop Street",
                         BuildingName.LD_BUILDING,
                         null
@@ -390,7 +390,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Learning Square (LS Building) at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_ls,
                         "1535 De Maisonneuve Blvd. W.",
                         BuildingName.LEARNING_SQUARE,
                         null
@@ -401,7 +401,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The M Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_m,
                         "2135 Mackay",
                         BuildingName.M_ANNEX,
                         null
@@ -412,7 +412,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The MI Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_mi,
                         "2130 Bishop",
                         BuildingName.MI_ANNEX,
                         null
@@ -423,7 +423,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The MU Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_mu,
                         "2170 Bishop",
                         BuildingName.MU_ANNEX,
                         null
@@ -434,7 +434,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The P Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_p,
                         "2020 Mackay",
                         BuildingName.P_ANNEX,
                         null
@@ -445,7 +445,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The PR Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_pr,
                         "2100 Mackay",
                         BuildingName.PR_ANNEX,
                         null
@@ -456,7 +456,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Q Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_q,
                         "2010 Mackay",
                         BuildingName.Q_ANNEX,
                         null
@@ -467,7 +467,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The R Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_r,
                         "2050 Mackay",
                         BuildingName.R_ANNEX,
                         null
@@ -478,7 +478,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The RR Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_rr,
                         "2040 Mackay",
                         BuildingName.RR_ANNEX,
                         null
@@ -489,7 +489,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The S Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_s,
                         "2145 Mackay St.",
                         BuildingName.S_ANNEX,
                         null
@@ -500,7 +500,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Samuel Bronfman Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_sb,
                         "1590 Docteur Penfield",
                         BuildingName.SAMUEL_BRONFMAN_BUILDING,
                         null
@@ -511,7 +511,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The T Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_t,
                         "2030 Mackay",
                         BuildingName.T_ANNEX,
                         null
@@ -522,7 +522,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Toronto-Dominion Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_td,
                         "1410 Guy",
                         BuildingName.TORONTO_DOMINION_BUILDING,
                         null
@@ -533,7 +533,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The V Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_v,
                         "2110 Mackay",
                         BuildingName.V_ANNEX,
                         null
@@ -544,7 +544,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Visual Arts Building at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_va,
                         "1395 René Lévesque W.",
                         BuildingName.VISUAL_ARTS_BUILDING,
                         null
@@ -555,7 +555,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The X Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_x,
                         "2080 Mackay",
                         BuildingName.X_ANNEX,
                         null
@@ -566,7 +566,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Z Annex at Concordia University's Sir George Williams Campus",
                         CampusName.SGW,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.sgw_z,
                         "2090 Mackay",
                         BuildingName.Z_ANNEX,
                         null
@@ -577,7 +577,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Administration Building at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_ad,
                         "7141 Sherbrooke St. W.",
                         BuildingName.ADMINISTRATION_BUILDING,
                         null
@@ -588,7 +588,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The BB Annex at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_bb,
                         "3502 Belmore",
                         BuildingName.BB_ANNEX,
                         null
@@ -599,7 +599,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The BH Annex at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_bh,
                         "3500 Belmore",
                         BuildingName.BH_ANNEX,
                         null
@@ -610,7 +610,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Communication Studies and Journalism Building at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_cj,
                         "7141 Sherbrooke W.",
                         BuildingName.COMMUNICATION_STUDIES_AND_JOURNALISM_BUILDING,
                         null
@@ -621,7 +621,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Stinger Dome (seasonal) at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_do,
                         "7141 Sherbrooke W.",
                         BuildingName.STINGER_DOME,
                         null
@@ -632,7 +632,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The F. C. Smith Building at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_fc,
                         "7141 Sherbrooke W.",
                         BuildingName.F_C_SMITH_BUILDING,
                         null
@@ -643,7 +643,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Centre for Structural and Functional Genomics at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_ge,
                         "7141 Sherbrooke W.",
                         BuildingName.CENTRE_FOR_STRUCTURAL_AND_FUNCTIONAL_GENOMICS,
                         null
@@ -654,7 +654,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Hingston Hall, wing HA at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_ha,
                         "7141 Sherbrooke W.",
                         BuildingName.HINGSTON_HALL_WING_HA,
                         null
@@ -665,7 +665,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Hingston Hall, wing HB at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_hb,
                         "7141 Sherbrooke W.",
                         BuildingName.HINGSTON_HALL_WING_HB,
                         null
@@ -676,7 +676,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Hingston Hall, wing HC at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_hc,
                         "7141 Sherbrooke W.",
                         BuildingName.HINGSTON_HALL_WING_HC,
                         null
@@ -687,7 +687,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Applied Science Hub at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_hu,
                         "7141 Sherbrooke W.",
                         BuildingName.APPLIED_SCIENCE_HUB,
                         null
@@ -698,7 +698,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Jesuit Residence at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_jr,
                         "7141 Sherbrooke W.",
                         BuildingName.JESUIT_RESIDENCE,
                         null
@@ -709,7 +709,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The PERFORM Centre at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_pc,
                         "7200 Sherbrooke St. W.",
                         BuildingName.PERFORM_CENTRE,
                         null
@@ -720,7 +720,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Physical Services Building at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_ps,
                         "7141 Sherbrooke W.",
                         BuildingName.PHYSICAL_SERVICES_BUILDING,
                         null
@@ -731,7 +731,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Oscar Peterson Concert Hall at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_pt,
                         "7141 Sherbrooke W.",
                         BuildingName.OSCAR_PETERSON_CONCERT_HALL,
                         null
@@ -742,7 +742,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Psychology Building at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_py,
                         "7141 Sherbrooke W.",
                         BuildingName.PSYCHOLOGY_BUILDING,
                         null
@@ -753,7 +753,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Quadrangle at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_qa,
                         "7141 Sherbrooke W.",
                         BuildingName.QUADRANGLE,
                         null
@@ -764,7 +764,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Recreation and Athletics Complex at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_ra,
                         "7200 Sherbrooke W.",
                         BuildingName.RECREATION_AND_ATHLETICS_COMPLEX,
                         null
@@ -775,7 +775,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Loyola Jesuit Hall and Conference Centre at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_rf,
                         "7141 Sherbrooke W.",
                         BuildingName.LOYOLA_JESUIT_HALL_AND_CONFERENCE_CENTRE,
                         null
@@ -786,7 +786,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Student Centre at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_sc,
                         "7141 Sherbrooke W.",
                         BuildingName.STUDENT_CENTRE,
                         null
@@ -797,7 +797,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Solar House at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_sh,
                         "7141 Sherbrooke W.",
                         BuildingName.SOLAR_HOUSE,
                         null
@@ -808,7 +808,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The St. Ignatius of Loyola Church at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_si,
                         "4455 Broadway",
                         BuildingName.ST_IGNATIUS_OF_LOYOLA_CHURCH,
                         null
@@ -819,7 +819,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Richard J. Renaud Science Complex at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_sp,
                         "7141 Sherbrooke W.",
                         BuildingName.RICHARD_J_RENAUD_SCIENCE_COMPLEX,
                         null
@@ -830,7 +830,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The Terrebonne Building at Concordia University's Loyola Campus",
                         CampusName.LOYOLA,
                         new HashMap<>(),
-                        R.drawable.jmsb,
+                        R.drawable.loyola_ta,
                         "7079 Terrebonne",
                         BuildingName.TERREBONNE_BUILDING,
                         null

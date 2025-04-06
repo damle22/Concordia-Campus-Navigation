@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         switchDarkMode = findViewById(R.id.switch_darkmode);
         switchDarkMode.setChecked(states.isDarkModeOn());
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            switchDarkMode.setChecked(states.isDarkModeOn());
             states.toggleDarkMode(isChecked);
         });
 
