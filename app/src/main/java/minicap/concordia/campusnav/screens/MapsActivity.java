@@ -78,7 +78,7 @@ import minicap.concordia.campusnav.map.enums.SupportedMaps;
 import minicap.concordia.campusnav.savedstates.States;
 
 public class MapsActivity extends AppCompatActivity
-        implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
+        implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener, UserLocationService.UserLocationUpdatedListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_COORDS = "starting_coords";
