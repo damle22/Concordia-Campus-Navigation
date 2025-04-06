@@ -244,7 +244,8 @@ public class FetchPathTask {
                         }
                     }
                 }
-                placesList.add(new OutdoorPOI(displayName, type, wheelchairAccessible, lat, lng));
+                MapCoordinates coords = new MapCoordinates(lat, lng, displayName);
+                placesList.add(new OutdoorPOI(coords, type, wheelchairAccessible));
             }
         } catch (JSONException e) {
             Log.e("parsePOI()", "Exception: " + e.toString());
