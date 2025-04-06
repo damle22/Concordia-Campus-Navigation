@@ -14,7 +14,7 @@ import minicap.concordia.campusnav.map.MapCoordinates;
  *  The naming convention follows: <buildingResourceName>_FloorX
  *  I recommend using the BuildingName's getResourceName for the buildingResourceName
  */
-public class     IndoorPOIResource_en_CA extends ListResourceBundle {
+public class IndoorPOIResource_en_CA extends ListResourceBundle {
         public static final String FLOOR_TAG = "_Floor";
 
     @Override
@@ -306,13 +306,20 @@ public class     IndoorPOIResource_en_CA extends ListResourceBundle {
                     BuildingName.HALL.getResourceName() + FLOOR_TAG + "11", new ArrayList<IndoorPOI>()
                 },
                 {
-                    BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "S2", new ArrayList<IndoorPOI>()
+                    BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "S2", new ArrayList<IndoorPOI>(Arrays.asList(
+                        new IndoorPOI(new MapCoordinates(45.49517953, -73.57886376, "JMSB S2.210"), POIType.CLASS_ROOM, BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "S2", false),
+                        new IndoorPOI(new MapCoordinates(45.49504150, -73.57869781, "JMSB S2.275"), POIType.CLASS_ROOM, BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "S2", false)
+                ))
                 },
                 {
                     BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "S1", new ArrayList<IndoorPOI>()
                 },
                 {
-                    BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "1", new ArrayList<IndoorPOI>()
+                    BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "1", new ArrayList<IndoorPOI>(Arrays.asList(
+                        new IndoorPOI(new MapCoordinates(45.49515228, -73.57888482, "JMSB 1.210"), POIType.CLASS_ROOM, BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "1", false),
+                        new IndoorPOI(new MapCoordinates(45.49519640, -73.57879643, "JMSB 1.218"), POIType.CLASS_ROOM, BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "1", false)
+
+                        ))
                 },
                 {
                     BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "2", new ArrayList<IndoorPOI>()
@@ -357,13 +364,23 @@ public class     IndoorPOIResource_en_CA extends ListResourceBundle {
                     BuildingName.MOLSON_SCHOOL_OF_BUSINESS.getResourceName() + FLOOR_TAG + "15", new ArrayList<IndoorPOI>()
                 },
                 {
-                    BuildingName.LOYOLA_CENTRAL_BUILDING.getResourceName() + FLOOR_TAG + "1", new ArrayList<>()
+                    BuildingName.LOYOLA_CENTRAL_BUILDING.getResourceName() + FLOOR_TAG + "1", new ArrayList<>(Arrays.asList(
+                        new IndoorPOI(new MapCoordinates(45.45829172, -73.64040142, "CC 116"), POIType.CLASS_ROOM, BuildingName.LOYOLA_CENTRAL_BUILDING, "1", false),
+                        new IndoorPOI(new MapCoordinates(45.45820843, -73.64045542, "CC 115"), POIType.CLASS_ROOM, BuildingName.LOYOLA_CENTRAL_BUILDING, "1", false)
+                ))
                 },
                 {
-                    BuildingName.VANIER_LIBRARY.getResourceName() + FLOOR_TAG + "1", new ArrayList<IndoorPOI>()
+                    BuildingName.VANIER_LIBRARY.getResourceName() + FLOOR_TAG + "1", new ArrayList<IndoorPOI>(Arrays.asList(
+                        new IndoorPOI(new MapCoordinates(45.45876976, -73.63850569, "VL 128"), POIType.CLASS_ROOM, BuildingName.VANIER_LIBRARY, "1", false),
+                        new IndoorPOI(new MapCoordinates(45.45879847, -73.63880083, "VL 121"), POIType.CLASS_ROOM, BuildingName.VANIER_LIBRARY, "1", false)
+
+                ))
                 },
                 {
-                    BuildingName.VANIER_LIBRARY.getResourceName() + FLOOR_TAG + "2", new ArrayList<IndoorPOI>()
+                    BuildingName.VANIER_LIBRARY.getResourceName() + FLOOR_TAG + "2", new ArrayList<IndoorPOI>(Arrays.asList(
+                        new IndoorPOI(new MapCoordinates(45.45912088, -73.63866360, "VL 201"), POIType.CLASS_ROOM, BuildingName.VANIER_LIBRARY, "2", false),
+                        new IndoorPOI(new MapCoordinates(45.45904643, -73.63877435, "VL 204"), POIType.CLASS_ROOM, BuildingName.VANIER_LIBRARY, "2", false)
+                ))
                 },
                 {
                     BuildingName.VANIER_LIBRARY.getResourceName() + FLOOR_TAG + "3", new ArrayList<IndoorPOI>()

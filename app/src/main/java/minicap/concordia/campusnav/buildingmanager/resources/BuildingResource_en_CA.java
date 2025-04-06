@@ -115,8 +115,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                                 entry("5", new BuildingFloor("5", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
                                 entry("6", new BuildingFloor("6", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
                                 entry("7", new BuildingFloor("7", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
-                                entry("8", new BuildingFloor("8", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
-                                entry("9", new BuildingFloor("9", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
+                                entry("8", new BuildingFloor("8", BuildingName.HALL, "m_60db7dff71a44370")),
+                                entry("9", new BuildingFloor("9", BuildingName.HALL, "m_20a3f55cfa5df04e")),
                                 entry("10", new BuildingFloor("10", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID)),
                                 entry("11", new BuildingFloor("11", BuildingName.HALL, BuildingFloor.NO_FLOOR_ID))
                         )),
@@ -131,9 +131,9 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "In 2009 the John Molson Building officially opened on the corner of Guy and de Maisonneuve. It includes digitally equipped teaching amphitheatres and classrooms, faculty and graduate student offices, the Office of the Dean, student and faculty social space, as well as space for privatized programs. Special features also include case study rooms designed for group work, and laboratories for consumer behaviour research.",
                         CampusName.SGW,
                         new HashMap<String, BuildingFloor>(Map.ofEntries(
-                                entry("S2", new BuildingFloor("S2", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
+                                entry("S2", new BuildingFloor("S2", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "m_332633928c7c3640")),
                                 entry("S1", new BuildingFloor("S1", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
-                                entry("1", new BuildingFloor("1", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
+                                entry("1", new BuildingFloor("1", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, "m_a7b5321e525dbec0")),
                                 entry("2", new BuildingFloor("2", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
                                 entry("3", new BuildingFloor("3", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
                                 entry("4", new BuildingFloor("4", BuildingName.MOLSON_SCHOOL_OF_BUSINESS, BuildingFloor.NO_FLOOR_ID)),
@@ -152,7 +152,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         R.drawable.sgw_mb,
                         "1450 Guy Street Montreal, QC H3H 0A1",
                         BuildingName.MOLSON_SCHOOL_OF_BUSINESS,
-                        ""
+                        "67f2ae593060f8000b749661"
                 )},
                 {
                     BuildingName.LOYOLA_CENTRAL_BUILDING.getResourceName(), new Building(
@@ -165,7 +165,7 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         R.drawable.loyola_cc,
                         "7141 Sherbrooke St W, Montreal, Quebec H4B 2A7",
                         BuildingName.LOYOLA_CENTRAL_BUILDING,
-                        ""
+                        "67f2d62b73bd2d000bfb169e"
                 )},
                 {
                     BuildingName.VANIER_LIBRARY.getResourceName(), new Building(
@@ -173,8 +173,8 @@ public class BuildingResource_en_CA extends ListResourceBundle {
                         "The library is named after Major-General the Right Honourable Georges Philias Vanier, distinguished lawyer, soldier, diplomat, and Governor-General of Canada 1959-67. Vanier was a Loyola graduate (1906) and the recipient of the first Loyola Medal in 1963. In 1966 a 4.1-metre plaster replica of Michelangelo’s David was installed in the Vanier Library, a gift of Simpson's Department Store. It became a Loyola landmark and was the object of a number of student hi-jinks over the years, including painting it emerald green for St. Patrick‘s Day in 1967, and adorning it with fig leaves, hats, banana peels, and diapers.",
                         CampusName.LOYOLA,
                         new HashMap<>(Map.ofEntries(
-                                entry("1", new BuildingFloor("1", BuildingName.VANIER_LIBRARY, BuildingFloor.NO_FLOOR_ID)),
-                                entry("2", new BuildingFloor("2", BuildingName.VANIER_LIBRARY, BuildingFloor.NO_FLOOR_ID)),
+                                entry("1", new BuildingFloor("1", BuildingName.VANIER_LIBRARY, "m_4ab988a52765f684")),
+                                entry("2", new BuildingFloor("2", BuildingName.VANIER_LIBRARY, "m_3118f32d8d3dacac")),
                                 entry("3", new BuildingFloor("3", BuildingName.VANIER_LIBRARY, BuildingFloor.NO_FLOOR_ID))
                         )),
                         R.drawable.loyola_vl,
