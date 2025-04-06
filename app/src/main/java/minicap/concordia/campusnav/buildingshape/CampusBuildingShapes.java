@@ -14,6 +14,8 @@ public class CampusBuildingShapes
     private static final List<PolygonOptions> sgwBuildingCoordinates = new ArrayList<>();
     private static final List<PolygonOptions> loyolaBuildingCoordinates = new ArrayList<>();
 
+    private CampusBuildingShapes() {}
+
     // SGW Campus
     static {
         ResourceBundle bundle = ResourceBundle.getBundle("minicap.concordia.campusnav.buildingshape.SGWCoordinatesResource_en_CA");

@@ -22,6 +22,13 @@ import java.util.Locale
 
 class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
 
+    object ShuttleBusScheduleConstants {
+        const val MONDAY_TO_THURSDAY = "Monday-Thursday"
+        const val FRIDAY = "Friday"
+        const val CAMPUS_SGW = "SGW"
+        const val CAMPUS_LOYOLA = "Loyola"
+    }
+
     private var _binding: ShuttleBusScheduleBinding? = null
     private val binding get() = _binding!!
 
@@ -37,9 +44,6 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Fetch the shuttle schedule
-        fetchShuttleSchedule()
-
         // Set up button click listeners
         val sgwMonThursButton: Button = binding.root.findViewById(R.id.sgwMonThursButton)
         val sgwFridayButton: Button = binding.root.findViewById(R.id.sgwFridayButton)
@@ -50,33 +54,33 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
             sgwMonThursButton.isSelected = true
             sgwFridayButton.isSelected = false
 
-            filterSchedule("SGW", "Monday-Thursday")
+            filterSchedule(ShuttleBusScheduleConstants.CAMPUS_SGW, ShuttleBusScheduleConstants.MONDAY_TO_THURSDAY)
         }
 
         sgwFridayButton.setOnClickListener {
             sgwMonThursButton.isSelected = false
             sgwFridayButton.isSelected = true
 
-            filterSchedule("SGW", "Friday")
+            filterSchedule(ShuttleBusScheduleConstants.CAMPUS_SGW, ShuttleBusScheduleConstants.FRIDAY)
         }
 
         loyMonThursButton.setOnClickListener {
             loyMonThursButton.isSelected = true
             loyFridayButton.isSelected = false
 
-            filterSchedule("Loyola", "Monday-Thursday")
+            filterSchedule(ShuttleBusScheduleConstants.CAMPUS_LOYOLA, ShuttleBusScheduleConstants.MONDAY_TO_THURSDAY)
         }
 
         loyFridayButton.setOnClickListener {
             loyMonThursButton.isSelected = false
             loyFridayButton.isSelected = true
 
-            filterSchedule("Loyola", "Friday")
+            filterSchedule(ShuttleBusScheduleConstants.CAMPUS_LOYOLA, ShuttleBusScheduleConstants.FRIDAY)
         }
 
         // Apply default filters for both campuses when the fragment loads
-        filterSchedule("SGW", "Monday-Thursday")
-        filterSchedule("Loyola", "Monday-Thursday")
+        filterSchedule(ShuttleBusScheduleConstants.CAMPUS_SGW, ShuttleBusScheduleConstants.MONDAY_TO_THURSDAY)
+        filterSchedule(ShuttleBusScheduleConstants.CAMPUS_LOYOLA, ShuttleBusScheduleConstants.MONDAY_TO_THURSDAY)
     }
 
     private fun filterSchedule(campus: String, day: String) {
@@ -92,16 +96,10 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         })
     }
 
-    private fun fetchShuttleSchedule() {
-        ScheduleFetcher.fetch(object : ScheduleFetcher.ScheduleFetchListener {
-            override fun onScheduleFetched(schedules: List<ShuttleSchedule>) {}
-        })
-    }
-
     private fun updateUI(schedules: List<ShuttleSchedule>, campus: String) {
         val gridLayout = when (campus) {
-            "SGW" -> binding.root.findViewById<GridLayout>(R.id.sgwGridLayout)
-            "Loyola" -> binding.root.findViewById<GridLayout>(R.id.loyGridLayout)
+            ShuttleBusScheduleConstants.CAMPUS_SGW -> binding.root.findViewById<GridLayout>(R.id.sgwGridLayout)
+            ShuttleBusScheduleConstants.CAMPUS_LOYOLA -> binding.root.findViewById<GridLayout>(R.id.loyGridLayout)
             else -> return
         }
 
@@ -173,7 +171,7 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         }
 
         // Add empty slots to fill out Grid
-        val emptySlots = if (schedules.any {it.day == "Monday-Thursday"}) 2 else 1
+        val emptySlots = if (schedules.any {it.day == ShuttleBusScheduleConstants.MONDAY_TO_THURSDAY}) 2 else 1
         repeat(emptySlots){
             val emptyTextView = TextView(requireContext()).apply {
                 text = ""

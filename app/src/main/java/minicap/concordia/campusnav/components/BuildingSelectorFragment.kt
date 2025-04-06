@@ -1,6 +1,5 @@
 package minicap.concordia.campusnav.components
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager
 import minicap.concordia.campusnav.buildingmanager.entities.Building
-import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName
-import minicap.concordia.campusnav.components.BuildingAdapter
-import minicap.concordia.campusnav.components.BuildingInfoBottomSheetFragment
 import minicap.concordia.campusnav.databinding.FragmentBuildingSelectorBinding
 
 class BuildingSelectorFragment : BottomSheetDialogFragment() {

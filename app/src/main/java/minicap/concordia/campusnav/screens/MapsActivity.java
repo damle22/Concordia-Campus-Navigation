@@ -37,20 +37,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
-import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 
-import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.UserLocationService;
-import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -80,7 +75,7 @@ import minicap.concordia.campusnav.savedstates.States;
 public class MapsActivity extends AppCompatActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener, UserLocationService.UserLocationUpdatedListener {
 
-    private final String MAPS_ACTIVITY_TAG = "MapsActivity";
+    private static final String MAPS_ACTIVITY_TAG = "MapsActivity";
     public static final String KEY_STARTING_COORDS = "starting_coords";
     public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
     public static final String KEY_SHOW_SGW = "show_sgw";
@@ -294,11 +289,11 @@ public class MapsActivity extends AppCompatActivity
         // Register your activity result launcher
         searchLocationLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                this::HandleSearchLocationResult);
+                this::handleSearchLocationResult);
 
         navigationActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                this::HandleNavigationActivityResult);
+                this::handleNavigationActivityResult);
 
         setStartingPoint(true, "", new MapCoordinates(0, 0));
 
@@ -360,7 +355,7 @@ public class MapsActivity extends AppCompatActivity
 
     }
 
-    private void HandleNavigationActivityResult(ActivityResult result) {
+    private void handleNavigationActivityResult(ActivityResult result) {
         //Empty since no result is being passed
     }
 
@@ -368,7 +363,7 @@ public class MapsActivity extends AppCompatActivity
      * Handles the result of the SearchLocationActivity
      * @param result The result received from the activity
      */
-    private void HandleSearchLocationResult(ActivityResult result) {
+    private void handleSearchLocationResult(ActivityResult result) {
         runOnUiThread(() -> {
             searchText.clearFocus();
             destinationEditText.clearFocus();
@@ -495,8 +490,7 @@ public class MapsActivity extends AppCompatActivity
         }
         else {
             hasUserLocationBeenSet = false;
-            MapCoordinates coordsWithFloor = new MapCoordinates(coordinates.getLat(), coordinates.getLng(), currentFloorName);
-            origin = coordinates;
+            origin = new MapCoordinates(coordinates.getLat(), coordinates.getLng(), currentFloorName);
             yourLocationText = locationString;
         }
 
@@ -691,7 +685,7 @@ public class MapsActivity extends AppCompatActivity
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                //Not needed, the menu will just close
             }
         });
 
@@ -871,7 +865,7 @@ public class MapsActivity extends AppCompatActivity
         states.toggleMenu(false);
     }
 
-    public void OnUserLocationUpdated(MapCoordinates newPosition) {
+    public void onUserLocationUpdated(MapCoordinates newPosition) {
         hasUserLocationBeenSet = true;
         origin = new MapCoordinates(newPosition.getLat(), newPosition.getLng(), DEFAULT_FLOOR);
         setStartingPoint(true, "", new MapCoordinates(0, 0));

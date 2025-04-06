@@ -1,4 +1,4 @@
-package minicap.concordia.campusnav.CalendarService;
+package minicap.concordia.campusnav.calendarservice;
 
 
 import com.google.api.client.util.DateTime;

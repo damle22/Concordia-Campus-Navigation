@@ -41,7 +41,7 @@ public class UserLocationService {
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lastKnownLocation = MapCoordinates.fromAndroidLocation(location);
-                    listener.OnUserLocationUpdated(lastKnownLocation);
+                    listener.onUserLocationUpdated(lastKnownLocation);
                 }
             }
         };
@@ -65,13 +65,13 @@ public class UserLocationService {
 
     public static void getLastKnownLocation(Context context, UserLocationUpdatedListener listener) {
         if (lastKnownLocation != null) {
-            listener.OnUserLocationUpdated(lastKnownLocation);
+            listener.onUserLocationUpdated(lastKnownLocation);
         }
 
         FusedLocationProviderClient temporaryClient = LocationServices.getFusedLocationProviderClient(context);
         try {
             temporaryClient.getLastLocation().addOnSuccessListener(location -> {
-                listener.OnUserLocationUpdated(MapCoordinates.fromAndroidLocation(location));
+                listener.onUserLocationUpdated(MapCoordinates.fromAndroidLocation(location));
             });
         }
         catch (SecurityException e) {
@@ -80,6 +80,6 @@ public class UserLocationService {
     }
 
     public interface UserLocationUpdatedListener {
-        void OnUserLocationUpdated(MapCoordinates newPosition);
+        void onUserLocationUpdated(MapCoordinates newPosition);
     }
 }

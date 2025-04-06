@@ -12,7 +12,6 @@ import android.widget.Toast;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 
 
 import androidx.annotation.NonNull;
@@ -20,8 +19,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import minicap.concordia.campusnav.CalendarService.EventAdapter;
-import minicap.concordia.campusnav.CalendarService.EventItem;
+import minicap.concordia.campusnav.calendarservice.EventAdapter;
+import minicap.concordia.campusnav.calendarservice.EventItem;
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.savedstates.States;
@@ -80,11 +79,11 @@ public class ClassScheduleActivity extends AppCompatActivity implements MainMenu
         rvEventList.setLayoutManager(new LinearLayoutManager(this));
 
         List<EventItem> emptyList = new ArrayList<>();
-        EventAdapter eventAdapter = new EventAdapter(emptyList);
-        rvEventList.setAdapter(eventAdapter);
+        EventAdapter adapter = new EventAdapter(emptyList);
+        rvEventList.setAdapter(adapter);
 
         // Keep a reference so we can update it after fetching
-        this.eventAdapter = eventAdapter;
+        this.eventAdapter = adapter;
 
         // Main Menu dialog
         ImageButton menuButton = findViewById(R.id.button_menu);
@@ -337,15 +336,6 @@ public class ClassScheduleActivity extends AppCompatActivity implements MainMenu
                 );
             }
         }).start();
-    }
-
-    /**
-     * Example method to format Google's DateTime object
-     */
-    private String formatDateTime(DateTime dateTime) {
-        if (dateTime == null) return "";
-        // dateTime.toStringRfc3339() will return "2025-03-23T13:00:00.000Z"
-        return dateTime.toStringRfc3339();
     }
 
     @Override

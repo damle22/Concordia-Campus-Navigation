@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import org.w3c.dom.Text;
+
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
@@ -27,7 +29,9 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
     private static final String ARG_BUILDING_NAME = "building_name";
     private static final String TAG = "BuildingInfoBottomSheet";
 
-    private TextView buildingNameText, buildingAddress, buildingDetails;
+    private TextView buildingNameText;
+    private TextView buildingAddress;
+    private TextView buildingDetails;
     private ImageView buildingImage;
     private ImageButton directionsButton;
 
@@ -42,8 +46,8 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
         super.onAttach(context);
 
         // Set listener only if the activity implements BuildingInfoListener
-        if (context instanceof BuildingInfoListener) {
-            listener = (BuildingInfoListener) context;
+        if (context instanceof BuildingInfoListener buildingInfoListener) {
+            listener = buildingInfoListener;
         }
     }
 

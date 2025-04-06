@@ -46,7 +46,7 @@ import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
 
-    private final float defaultZoom = 18;
+    private static final float defaultZoom = 18;
     private GoogleMap mMap;
 
     private List<Polyline> polylines = new ArrayList<>();
@@ -265,7 +265,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 cur.remove();
                 allMarkers.remove();
             }
-            ArrayList<Building> buildings = ConcordiaBuildingManager.getInstance().getAllBuildings();
+            List<Building> buildings = ConcordiaBuildingManager.getInstance().getAllBuildings();
             for(Building building: buildings){
                 // 500m radius
                 if(getDistance(origin,building.getLocation()) <= 0.5){

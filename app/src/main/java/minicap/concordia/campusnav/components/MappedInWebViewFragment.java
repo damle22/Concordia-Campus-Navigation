@@ -188,7 +188,7 @@ public class MappedInWebViewFragment extends Fragment implements UserLocationSer
     }
 
     @Override
-    public void OnUserLocationUpdated(MapCoordinates newPosition) {
+    public void onUserLocationUpdated(MapCoordinates newPosition) {
         updateUserPosition(newPosition);
     }
 

@@ -1,13 +1,14 @@
 package minicap.concordia.campusnav.map;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import minicap.concordia.campusnav.map.enums.MapColors;
@@ -21,7 +22,7 @@ public abstract class AbstractMap {
      * Constructor
      * @param listener Listener for map events
      */
-    public AbstractMap(MapUpdateListener listener) {
+    protected AbstractMap(MapUpdateListener listener) {
         this.listener = listener;
     }
 
@@ -199,7 +200,7 @@ public abstract class AbstractMap {
      * @return List of MapCoordinates
      */
     public List<MapCoordinates> decodePolyline(String encodedPolyline) {
-        return null;
+        return new ArrayList<>();
     }
 
 

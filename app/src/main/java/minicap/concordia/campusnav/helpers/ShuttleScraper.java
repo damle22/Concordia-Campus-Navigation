@@ -1,5 +1,7 @@
 package minicap.concordia.campusnav.helpers;
 
+import android.util.Log;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,6 +15,11 @@ import minicap.concordia.campusnav.components.ShuttleSchedule;
 
 // Scrapes shuttle schedule from Concordia website
 public class ShuttleScraper {
+
+    private static final String SHUTTLE_SCRAPER_TAG = "ShuttleScraper";
+
+    private ShuttleScraper() {}
+
     // Fetches and parses schedule from HTML
     public static List<ShuttleSchedule> fetchSchedule() {
         List<ShuttleSchedule> schedules = new ArrayList<>();
@@ -42,7 +49,9 @@ public class ShuttleScraper {
             schedules.add(new ShuttleSchedule("Friday", "Loyola", loyolaDeparturesFriday));
             schedules.add(new ShuttleSchedule("Friday", "SGW", sgwDeparturesFriday));
 
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            Log.e(SHUTTLE_SCRAPER_TAG, "Exception while fetching shuttle schedule: ", e);
+        }
 
         return schedules;
     }
