@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
@@ -13,13 +14,13 @@ import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
-import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.savedstates.States;
 
 public class MainActivity extends AppCompatActivity {
 
     private ConcordiaBuildingManager buildingManager;
     private Switch switchDarkMode;
+
 
     private final States states = States.getInstance();
 
@@ -29,11 +30,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         buildingManager = ConcordiaBuildingManager.getInstance();
-        switchDarkMode = findViewById(R.id.switch_darkmode);
 
-        // Initialize UI based on current state
+        switchDarkMode = findViewById(R.id.switch_darkmode);
         switchDarkMode.setChecked(states.isDarkModeOn());
-        states.applyDarkMode();
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             states.toggleDarkMode(isChecked);
         });
@@ -70,7 +69,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openIntent(){
-        Intent i = new Intent(MainActivity.this, MapsActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(this, MapsActivity.class);
+        this.startActivity(intent);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 }

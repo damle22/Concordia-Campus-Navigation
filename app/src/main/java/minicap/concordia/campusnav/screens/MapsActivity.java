@@ -3,10 +3,12 @@ package minicap.concordia.campusnav.screens;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static androidx.databinding.adapters.CompoundButtonBindingAdapter.setChecked;
 import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsMarker;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 
@@ -31,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -132,8 +135,6 @@ public class MapsActivity extends FragmentActivity
     private final States states = States.getInstance();
 
     private ConstraintLayout.LayoutParams buildingViewParams;
-
-
 
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
@@ -307,6 +308,11 @@ public class MapsActivity extends FragmentActivity
         restaurantButton.setOnClickListener(view -> map.displayPOI(origin, POIType.RESTAURANT));
         coffeeButton.setOnClickListener(view -> map.displayPOI(origin, POIType.COFFEE_SHOP));
         //TODO handle Fountain, elevator and washroom (Indoor POI)
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
     }
 
     private void updateButtonMargin(View bottomSheet, float slideOffset){

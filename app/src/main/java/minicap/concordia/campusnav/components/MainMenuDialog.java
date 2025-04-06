@@ -1,16 +1,15 @@
 package minicap.concordia.campusnav.components;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Switch;
-import android.widget.CompoundButton;
 
 import com.google.android.material.sidesheet.SideSheetDialog;
 
@@ -63,9 +62,7 @@ public class MainMenuDialog extends SideSheetDialog {
         directionsRedirect = view.findViewById(R.id.directionsRedirect);
         campusMapRedirect = view.findViewById(R.id.campusMapRedirect);
         busScheduleRedirect = view.findViewById(R.id.busScheduleRedirect);
-
-        switchDarkMode = view.findViewById(R.id.switch_darkmode);
-        switchDarkMode.setChecked(states.isDarkModeOn());
+        switchDarkMode = view.findViewById(R.id.switch_darkmodeMainMenu);
     }
 
     //This populates button
@@ -106,14 +103,10 @@ public class MainMenuDialog extends SideSheetDialog {
             }
         });
 
-        switchDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                states.toggleDarkMode(isChecked);
-                openCampusMap();
-            }
+        switchDarkMode.setChecked(states.isDarkModeOn());
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            states.toggleDarkMode(isChecked);
         });
-
     }
 
     public Intent campusMapRoutine(){
