@@ -269,7 +269,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
             for(Building building: buildings){
                 // 500m radius
                 if(getDistance(origin,building.getLocation()) <= 0.5){
-                    OutdoorPOI poi = new OutdoorPOI(building.getBuildingName(),type, true, (float)building.getLatitude(),(float)building.getLongitude());
+                    OutdoorPOI poi = new OutdoorPOI(building.getLocation(),type, true);
                     addMarker(poi);
                 }
             }
