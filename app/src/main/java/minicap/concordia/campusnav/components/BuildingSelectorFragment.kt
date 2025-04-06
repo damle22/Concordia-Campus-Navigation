@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -33,19 +34,72 @@ class BuildingSelectorFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get the bottom sheet behavior and set it to half-expanded
         val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         bottomSheet?.let {
             val behavior = BottomSheetBehavior.from(it)
-            behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
             behavior.isHideable = true
+
+            // Set initial height to 90% of screen
+            val displayMetrics = resources.displayMetrics
+            val screenHeight = displayMetrics.heightPixels
+            behavior.peekHeight = (screenHeight * 0.9).toInt()
+            behavior.maxHeight = screenHeight
+
+            behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                private var lastSlideOffset = 0f
+                private var dragStartOffset = 0f
+                private var isDraggingDown = false
+                private val dismissThreshold = 0.4f // 40% threshold
+
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    // Handle state changes
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    val scrollView = binding.root as ScrollView
+                    val canScrollUp = scrollView.canScrollVertically(-1)
+
+                    when {
+                        // User starts dragging down
+                        slideOffset < lastSlideOffset && !isDraggingDown -> {
+                            isDraggingDown = true
+                            dragStartOffset = slideOffset
+                        }
+
+                        // User is scrolling up
+                        slideOffset > lastSlideOffset -> {
+                            isDraggingDown = false
+                        }
+
+                        // Handle dragging down
+                        isDraggingDown -> {
+                            if (!canScrollUp) { // Only allow dismiss when at top of content
+                                val dragDistance = dragStartOffset - slideOffset
+                                if (dragDistance >= dismissThreshold) {
+                                    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                                }
+                            } else {
+                                // If content can still scroll up, prevent dismiss
+                                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                            }
+                        }
+                    }
+
+                    lastSlideOffset = slideOffset
+                }
+            })
         }
 
-        // Set up RecyclerViews with GridLayoutManager (2 columns)
+        // Set nested scrolling for RecyclerViews
+        binding.sgwRecyclerView.isNestedScrollingEnabled = true
+        binding.loyRecyclerView.isNestedScrollingEnabled = true
+
+        // Set up RecyclerViews
         binding.sgwRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.loyRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
-        // Fetch building data and update RecyclerViews
         fetchBuildings()
     }
 
