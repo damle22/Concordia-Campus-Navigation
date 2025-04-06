@@ -1,7 +1,5 @@
 package minicap.concordia.campusnav.buildingshape;
 
-import androidx.webkit.internal.ApiFeature;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.PolyUtil;

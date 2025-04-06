@@ -28,6 +28,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
+
 @RunWith(MockitoJUnitRunner.class)
 public class InternalGoogleMapsTests {
 
@@ -372,12 +374,13 @@ public class InternalGoogleMapsTests {
     }
 
     @Test
-    public void testSwitchToFloor() {
+    public void testLoadBuilding() {
         InternalGoogleMaps igm = new InternalGoogleMaps(mockListener);
         igm.setMap(mapMock);
 
+        Building mockBuilding = Mockito.mock(Building.class);
         String floorName = "1";
-        igm.switchToFloor(floorName);
+        igm.loadBuilding(mockBuilding, floorName);
 
         Mockito.verifyNoInteractions(mapMock);
         Mockito.verifyNoInteractions(mockListener);

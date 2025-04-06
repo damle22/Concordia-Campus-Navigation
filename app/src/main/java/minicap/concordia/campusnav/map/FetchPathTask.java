@@ -207,7 +207,7 @@ public class FetchPathTask {
                     List<OutdoorPOI> outdoorPOIS = parsePOI(response.toString(), type);
                     mainThreadHandler.post(() -> {
                         if (listener != null) {
-                            listener.onPlacesFetched(outdoorPOIS, new MapCoordinates(originObj.latitude,originObj.longitude));
+                            listener.onPlacesFetched(outdoorPOIS, new MapCoordinates(originObj.latitude,originObj.longitude), type);
                         }
                     });
                 }
@@ -244,7 +244,8 @@ public class FetchPathTask {
                         }
                     }
                 }
-                placesList.add(new OutdoorPOI(displayName, type, wheelchairAccessible, lat, lng));
+                MapCoordinates coords = new MapCoordinates(lat, lng, displayName);
+                placesList.add(new OutdoorPOI(coords, type, wheelchairAccessible));
             }
         } catch (JSONException e) {
             Log.e("parsePOI()", "Exception: " + e.toString());
@@ -269,6 +270,6 @@ public class FetchPathTask {
      */
     public interface OnRouteFetchedListener {
         void onRouteFetched(JSONArray steps);
-        void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location);
+        void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location, POIType type);
     }
 }

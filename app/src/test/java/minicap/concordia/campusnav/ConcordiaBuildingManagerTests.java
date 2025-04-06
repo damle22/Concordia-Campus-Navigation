@@ -254,7 +254,7 @@ public class ConcordiaBuildingManagerTests {
 
     @Test
     public void BuildingFloor_GetPOIOfTypeClassroom() {
-        int expectedClassroomPOIs = 1;
+        int expectedClassroomPOIs = 2;
         String expectedFloorName = "1";
         BuildingName expectedAssociatedBuilding = BuildingName.HALL;
         POIType expectedPOIType = POIType.CLASS_ROOM;
@@ -299,8 +299,8 @@ public class ConcordiaBuildingManagerTests {
     @Test
     public void IndoorPOI_GetPOIName() {
         List<String> expectedPOINames = new ArrayList<>(Arrays.asList(
-                "Test A",
-                "Test 2",
+                "H196",
+                "H103",
                 "Test Accessibility"
         ));
 
@@ -317,7 +317,6 @@ public class ConcordiaBuildingManagerTests {
 
         Assert.assertEquals(expectedNumberPOIs, actualPOIs.size());
 
-        int i = 0;
         for(IndoorPOI poi : actualPOIs) {
             Assert.assertEquals(expectedAssociatedBuilding, poi.getAssociatedBuilding());
             Assert.assertEquals(expectedFloorName, poi.getFloorName());

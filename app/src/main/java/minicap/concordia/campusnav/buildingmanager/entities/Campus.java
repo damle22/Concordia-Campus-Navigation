@@ -3,16 +3,14 @@ package minicap.concordia.campusnav.buildingmanager.entities;
 import java.util.ArrayList;
 
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
+import minicap.concordia.campusnav.map.MapCoordinates;
 
 public class Campus extends Location {
 
     private ArrayList<BuildingName> associatedBuildings;
 
-    private String campusName;
-
-    public Campus(String campusName, ArrayList<BuildingName> associatedBuildings, double latitude, double longitude) {
-        super(latitude, longitude);
-        this.campusName = campusName;
+    public Campus(MapCoordinates coordinates, ArrayList<BuildingName> associatedBuildings) {
+        super(coordinates);
         this.associatedBuildings = associatedBuildings;
     }
 
@@ -29,6 +27,6 @@ public class Campus extends Location {
      * @return The name of the campus
      */
     public String getCampusName(){
-        return campusName;
+        return this.getLocationName();
     }
 }
