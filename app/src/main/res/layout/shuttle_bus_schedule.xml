@@ -100,7 +100,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:text="Mon-Thurs"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:theme="@style/ShuttleButtonsTheme"/>
 
                 <!-- Fri Button -->
                 <Button
@@ -113,7 +114,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:text="Friday"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:theme="@style/ShuttleButtonsTheme"/>
             </LinearLayout>
 
             <GridLayout
@@ -179,7 +181,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:text="Mon-Thurs"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:theme="@style/ShuttleButtonsTheme"/>
 
                 <Button
                     android:id="@+id/loyFridayButton"
@@ -191,7 +194,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:text="Friday"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:theme="@style/ShuttleButtonsTheme"/>
             </LinearLayout>
 
             <GridLayout

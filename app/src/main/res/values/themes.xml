@@ -8,5 +8,10 @@
         <item name="android:statusBarColor">@color/concordia_red</item>
     </style>
 
+    <style name="ShuttleButtonsTheme" parent="ThemeOverlay.Material3.Button">
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="Theme.MiniCapstone" parent="Base.Theme.MiniCapstone" />
 </resources>

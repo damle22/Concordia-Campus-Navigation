@@ -7,4 +7,9 @@
         <item name="colorSurface">@color/gray</item>
         <item name="colorOnSurface">@color/white</item>
     </style>
+
+    <style name="ShuttleButtonsTheme" parent="ThemeOverlay.Material3.Button">
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>
