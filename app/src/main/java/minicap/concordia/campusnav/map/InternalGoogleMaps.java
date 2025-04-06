@@ -55,6 +55,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     public InternalGoogleMaps(MapUpdateListener listener){
         super(listener);
+        this.isIndoor = false;
     }
 
     @Override
@@ -77,10 +78,6 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     @Override
     public void centerOnCoordinates(MapCoordinates coordinates){
         resetCamera(coordinates);
-    }
-    @Override
-    public void switchToFloor(String floorName) {
-        //Google maps does not have floors, so do nothing
     }
 
     /**
@@ -214,6 +211,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode) {
+        //Google maps does not have accessibility options
+        if(travelMode.equals("WHEELCHAIR")) {
+            travelMode = "WALK";
+        }
         new FetchPathTask(this).fetchRoute(origin.toGoogleMapsLatLng(), destination.toGoogleMapsLatLng(), travelMode);
     }
 
