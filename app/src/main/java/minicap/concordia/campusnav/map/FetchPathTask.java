@@ -207,7 +207,7 @@ public class FetchPathTask {
                     List<OutdoorPOI> outdoorPOIS = parsePOI(response.toString(), type);
                     mainThreadHandler.post(() -> {
                         if (listener != null) {
-                            listener.onPlacesFetched(outdoorPOIS, new MapCoordinates(originObj.latitude,originObj.longitude));
+                            listener.onPlacesFetched(outdoorPOIS, new MapCoordinates(originObj.latitude,originObj.longitude), type);
                         }
                     });
                 }
@@ -270,6 +270,6 @@ public class FetchPathTask {
      */
     public interface OnRouteFetchedListener {
         void onRouteFetched(JSONArray steps);
-        void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location);
+        void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location, POIType type);
     }
 }

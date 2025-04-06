@@ -36,6 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import minicap.concordia.campusnav.R;
+import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
+import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
@@ -91,53 +93,68 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     }
     @Override
     public void addMarker(OutdoorPOI opoi){
-        //Setting icon
-        BitmapDescriptor icon = switch (opoi.getPOIType()) {
-            case RESTAURANT ->
-                    BitmapDescriptorFactory.fromResource(R.drawable.ic_restaunrant_marker);
-            case COFFEE_SHOP ->
-                    BitmapDescriptorFactory.fromResource(R.drawable.ic_coffee_marker);
-            default ->
-                    BitmapDescriptorFactory.defaultMarker();
-            //TODO add icons for indoor POI
-        };
+        if (markerDoesNotExists(opoi.getLocation())){
+            //Setting icon
+            BitmapDescriptor icon = switch (opoi.getPOIType()) {
+                case RESTAURANT ->
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_restaunrant_marker);
+                case COFFEE_SHOP ->
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_coffee_marker);
+                case ELEVATOR ->
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_elevator_marker);
+                case WATER_FOUNTAIN ->
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_fountain_marker);
+                case WASHROOM ->
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_washroom_marker);
+                default ->
+                        BitmapDescriptorFactory.defaultMarker();
+            };
 
-        MarkerOptions newMarker = new MarkerOptions()
-                .icon(icon)
-                .position(opoi.getLocation().toGoogleMapsLatLng())
-                .title(opoi.getPoiName());
-        Marker poiMarker = mMap.addMarker(newMarker);
-        poiMarker.setTag("POI");
-        poiMarkers.add(poiMarker);
+            MarkerOptions newMarker = new MarkerOptions()
+                    .icon(icon)
+                    .position(opoi.getLocation().toGoogleMapsLatLng())
+                    .title(opoi.getPoiName())
+                    .zIndex(1.0f);
+            Marker poiMarker = mMap.addMarker(newMarker);
+            poiMarker.setTag("POI");
+            poiMarkers.add(poiMarker);
+        }
     }
     @Override
     public void addMarker(MapCoordinates position, String title, MapColors color, boolean clearOtherMarkers){
         if(clearOtherMarkers) {
             clearAllMarkers();
         }
+        if (markerDoesNotExists(position)) {
+            float markerColor = MapColorConversionHelper.getGoogleMapsColor(color);
 
-        float markerColor = MapColorConversionHelper.getGoogleMapsColor(color);
-
-        MarkerOptions newMarker = new MarkerOptions()
-                                        .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
-                                        .position(position.toGoogleMapsLatLng())
-                                        .title(title);
-        markers.add(mMap.addMarker(newMarker));
+            MarkerOptions newMarker = new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
+                    .position(position.toGoogleMapsLatLng())
+                    .title(title);
+            markers.add(mMap.addMarker(newMarker));
+        }
     }
 
     @Override
     public void addMarker(MapCoordinates position, String title) {
-        addMarker(position, title, MapColors.DEFAULT, false);
+        if (markerDoesNotExists(position)) {
+            addMarker(position, title, MapColors.DEFAULT, false);
+        }
     }
 
     @Override
     public void addMarker(MapCoordinates position, String title, MapColors color) {
-        addMarker(position, title, color, false);
+        if (markerDoesNotExists(position)) {
+            addMarker(position, title, color, false);
+        }
     }
 
     @Override
     public void addMarker(MapCoordinates position, String title, boolean clearOtherMarkers) {
-        addMarker(position, title, MapColors.DEFAULT, clearOtherMarkers);
+        if (markerDoesNotExists(position)) {
+            addMarker(position, title, MapColors.DEFAULT, clearOtherMarkers);
+        }
     }
 
     @Override
@@ -167,6 +184,25 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 200,
                 null)
         ;
+    }
+
+    /**
+     * Checks that the coordinates do not already have a marker
+     * @param coordinates
+     * @return
+     */
+    private boolean markerDoesNotExists(MapCoordinates coordinates){
+        for (Marker marker : poiMarkers) {
+            if (marker.getPosition().equals(coordinates.toGoogleMapsLatLng())) {
+                return false;
+            }
+        }
+        for (Marker marker : markers) {
+            if (marker.getPosition().equals(coordinates.toGoogleMapsLatLng())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -220,7 +256,27 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     @Override
     public void displayPOI(MapCoordinates origin, POIType type){
-        new FetchPathTask(this).fetchPOI(origin.toGoogleMapsLatLng(), type);
+        clearPathFromMap();
+        if(type == POIType.RESTAURANT || type == POIType.COFFEE_SHOP){
+            new FetchPathTask(this).fetchPOI(origin.toGoogleMapsLatLng(), type);
+        } else{
+            for (Iterator<Marker> allMarkers = poiMarkers.iterator(); allMarkers.hasNext();) {
+                Marker cur = allMarkers.next();
+                cur.remove();
+                allMarkers.remove();
+            }
+            ArrayList<Building> buildings = ConcordiaBuildingManager.getInstance().getAllBuildings();
+            for(Building building: buildings){
+                // 500m radius
+                if(getDistance(origin,building.getLocation()) <= 0.5){
+                    OutdoorPOI poi = new OutdoorPOI(building.getLocation(),type, true);
+                    addMarker(poi);
+                }
+            }
+            if(poiMarkers.isEmpty()){
+                Toast.makeText(mapFrag.getContext(), "No " + type.getValue() +" found nearby.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -334,7 +390,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     }
 
     @Override
-    public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS, MapCoordinates location) {
+    public void onPlacesFetched(List<OutdoorPOI> outdoorPOIS, MapCoordinates location, POIType type) {
         //Deleting previous POI markers
         for (Iterator<Marker> allMarkers = poiMarkers.iterator(); allMarkers.hasNext();) {
             Marker cur = allMarkers.next();
@@ -343,6 +399,9 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         }
         for(OutdoorPOI op : outdoorPOIS){
             addMarker(op);
+        }
+        if(poiMarkers.isEmpty()){
+            Toast.makeText(mapFrag.getContext(), "No " + type.getValue() + " found nearby.", Toast.LENGTH_SHORT).show();
         }
       moveCameraToPOI(location, calculatePathBearing(location));
     }
@@ -363,4 +422,24 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, resourceID));
     }
 
+    /**
+     * Gets the distance in KM from origin to destination using Haversine formula
+     * @param origin
+     * @param destination
+     * @return
+     */
+    private double getDistance(MapCoordinates origin, MapCoordinates destination) {
+        final int R = 6371;
+
+        double latDist = Math.toRadians(destination.getLat() - origin.getLat());
+        double lonDist = Math.toRadians(destination.getLng() - origin.getLng());
+
+        double a = Math.sin(latDist / 2) * Math.sin(latDist / 2) +
+                Math.cos(Math.toRadians(origin.getLat())) * Math.cos(Math.toRadians(destination.getLat())) *
+                        Math.sin(lonDist / 2) * Math.sin(lonDist / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+    }
 }
