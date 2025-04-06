@@ -1,6 +1,5 @@
 package minicap.concordia.campusnav.components;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -16,8 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import org.w3c.dom.Text;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
@@ -81,6 +78,7 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
 
     /**
      * Initializes UI elements.
+     * @param view The view being initialized
      */
     private void initializeViews(View view) {
         buildingNameText = view.findViewById(R.id.building_name);
@@ -118,6 +116,7 @@ public class BuildingInfoBottomSheetFragment extends BottomSheetDialogFragment {
 
     /**
      * Populates UI elements with building data.
+     * @param building The building used to populate information
      */
     private void populateBuildingData(Building building) {
         buildingNameText.setText(building.getBuildingName());

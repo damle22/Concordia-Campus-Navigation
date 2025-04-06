@@ -68,11 +68,6 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
         return buildingList.size();
     }
 
-    public void updateBuildings(List<Building> newList) {
-        this.buildingList = newList;
-        notifyDataSetChanged();
-    }
-
     public static class BuildingViewHolder extends RecyclerView.ViewHolder {
         private TextView tvBuildingName;
 
@@ -81,6 +76,10 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
             tvBuildingName = itemView.findViewById(R.id.tvBuildingName);
         }
 
+        /**
+         * Gets the UI element for the building name
+         * @return TextView for building name
+         */
         public TextView getTvBuildingName() {
             return tvBuildingName;
         }

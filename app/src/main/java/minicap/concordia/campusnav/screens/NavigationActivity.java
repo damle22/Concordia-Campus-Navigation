@@ -1,7 +1,6 @@
 package minicap.concordia.campusnav.screens;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -235,7 +234,6 @@ public class NavigationActivity extends AppCompatActivity implements AbstractMap
     /**
      * Determines whether the route should be updated based on the distance threshold.
      * @param position The current position.
-     * @return True if the distance from the last update exceeds the threshold; false otherwise.
      */
     private void updateCameraPosition(MapCoordinates position, float bearing) {
         float markerRotation = (bearing + 110) % 360;

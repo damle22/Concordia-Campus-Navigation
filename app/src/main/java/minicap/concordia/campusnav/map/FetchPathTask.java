@@ -4,8 +4,6 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import com.google.maps.android.PolyUtil;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import minicap.concordia.campusnav.BuildConfig;
-import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
 
@@ -151,7 +148,11 @@ public class FetchPathTask {
         return null;
     }
 
-
+    /**
+     * Fetches information about nearby POIs that match the given type
+     * @param originObj The origin of the search radius
+     * @param type The type of POI that is desired
+     */
     public void fetchPOI(LatLng originObj, POIType type) {
         String urlString = "https://places.googleapis.com/v1/places:searchNearby?key=" + BuildConfig.MAPS_API_KEY;
         Log.d(FETCH_POI_TAG,urlString);
@@ -221,6 +222,12 @@ public class FetchPathTask {
         });
     }
 
+    /**
+     * Parses JSON response for desired POIs
+     * @param json The json response from the query
+     * @param type The type of POI that is wanted
+     * @return List of OutdoorPOI that match the query
+     */
     public List<OutdoorPOI> parsePOI(String json, POIType type) {
         List<OutdoorPOI> placesList = new ArrayList<>();
         try {
@@ -257,6 +264,11 @@ public class FetchPathTask {
         return placesList;
     }
 
+    /**
+     * Converts seconds into a standard time format
+     * @param secondsStr The seconds as a string
+     * @return Formatted string of time
+     */
     public String convertSecondsToTime(String secondsStr) {
         long seconds = Long.parseLong(secondsStr.replace("s", ""));
         long minutes = seconds / 60;
@@ -273,7 +285,18 @@ public class FetchPathTask {
      * Listener for Google Api
      */
     public interface OnRouteFetchedListener {
+        /**
+         * Invoked when a route is fetched for the map
+         * @param steps The steps of the route
+         */
         void onRouteFetched(JSONArray steps);
+
+        /**
+         * Invoked when POIs of the given type are parsed
+         * @param outdoorPOIS The list of pois
+         * @param location The location of the origin
+         * @param type The type of POI
+         */
         void onPlacesFetched(List<OutdoorPOI> outdoorPOIS,  MapCoordinates location, POIType type);
     }
 }

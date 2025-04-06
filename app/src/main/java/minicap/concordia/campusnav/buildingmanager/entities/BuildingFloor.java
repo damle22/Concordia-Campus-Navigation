@@ -19,7 +19,7 @@ public class BuildingFloor {
         this.floorName = floorName;
         this.associatedBuilding = building;
         this.floorId = floorId;
-        this.floorPOIs = new ArrayList<IndoorPOI>();
+        this.floorPOIs = new ArrayList<>();
     }
 
     /**

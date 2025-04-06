@@ -47,6 +47,11 @@ public class UserLocationService {
         };
     }
 
+    /**
+     * Starts the user location tracking service
+     * @param interval The interval that we should ideally receive updates (in milliseconds)
+     *                 NOTE: The minimum interval for updates is half the interval
+     */
     public void start(long interval) {
         long maxUpdateInterval = interval / 2;
 
@@ -63,6 +68,11 @@ public class UserLocationService {
         }
     }
 
+    /**
+     * Gets the last known location of the user
+     * @param context The context for the location service if needed to poll for last location
+     * @param listener The listener who will receive the data update
+     */
     public static void getLastKnownLocation(Context context, UserLocationUpdatedListener listener) {
         if (lastKnownLocation != null) {
             listener.onUserLocationUpdated(lastKnownLocation);

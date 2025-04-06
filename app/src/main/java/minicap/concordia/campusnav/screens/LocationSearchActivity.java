@@ -140,7 +140,9 @@ public class LocationSearchActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * Sets the default list of locations shown
+     */
     private void setDefaultLocationList() {
         ConcordiaBuildingManager manager = ConcordiaBuildingManager.getInstance();
 
@@ -225,6 +227,10 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
         this.filteredLocations.addAll(locations);
     }
 
+    /**
+     * Sets the on click listener for the adapter
+     * @param onClickListener The new listener
+     */
     public void setOnClickListener(OnItemClickedListener onClickListener) {
         this.onClickListener = onClickListener;
     }
@@ -258,6 +264,10 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
         return filteredLocations.size();
     }
 
+    /**
+     * Filters the locations in the list
+     * @param filterText The string for filtering
+     */
     public void filter(String filterText) {
         filteredLocations.clear();
         if(filterText.isBlank() || filterText.isEmpty()) {
@@ -284,8 +294,20 @@ class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     }
 
     public interface OnItemClickedListener {
+        /**
+         * Invoked when an outdoor item is clicked
+         * @param locationName The name of the location
+         * @param coordinates The coordinates of the location
+         */
         void onOutdoorItemClick(String locationName, MapCoordinates coordinates);
 
+        /**
+         * Invoked when an indoor item is clicked
+         * @param locationName The name of the location
+         * @param coordinates The coordinates of the location
+         * @param buildingName The name of the building as a string
+         * @param floorId The id for the floor
+         */
         void onIndoorItemClick(String locationName, MapCoordinates coordinates, String buildingName, String floorId);
     }
 }
@@ -319,22 +341,42 @@ class LocationItem {
         this.floorId = floorId;
     }
 
+    /**
+     * Gets the location name for the item
+     * @return The location name
+     */
     public String getLocationName() {
         return locationName;
     }
 
+    /**
+     * Gets the coordinates for this item
+     * @return This location's coordinates
+     */
     public MapCoordinates getCoordinates() {
         return coordinates;
     }
 
+    /**
+     * Gets flag indicating if the location item is indoors or outdoors
+     * @return True if indoors, false otherwise
+     */
     public boolean getIsIndoors() {
         return isIndoors;
     }
 
+    /**
+     * Gets the building name associated to this item
+     * @return The string buiding name
+     */
     public String getBuildingName() {
         return buildingName;
     }
 
+    /**
+     * Gets the floor id for the item
+     * @return String floor id
+     */
     public String getFloorId() {
         return floorId;
     }

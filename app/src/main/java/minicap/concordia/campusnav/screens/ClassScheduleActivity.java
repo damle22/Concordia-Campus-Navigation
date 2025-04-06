@@ -121,6 +121,9 @@ public class ClassScheduleActivity extends AppCompatActivity implements MainMenu
         });
     }
 
+    /**
+     * Shows the main menu if it's not open
+     */
     public void showMainMenuDialog() {
         if (!states.isMenuOpen()) {
             MainMenuDialog dialog = new MainMenuDialog(this);
@@ -128,6 +131,9 @@ public class ClassScheduleActivity extends AppCompatActivity implements MainMenu
         }
     }
 
+    /**
+     * Signs in to a google account
+     */
     private void signIn() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -151,6 +157,9 @@ public class ClassScheduleActivity extends AppCompatActivity implements MainMenu
         }
     }
 
+    /**
+     * Requests calendar permissions from the user
+     */
     private void requestCalendarPermission() {
         // we are requesting the permission if it is not granted yet
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR)
@@ -254,6 +263,9 @@ public class ClassScheduleActivity extends AppCompatActivity implements MainMenu
         }).start();
     }
 
+    /**
+     * Fetches events from the calendar
+     */
     private void fetchCalendarEvents() {
 
         new Thread(() -> {

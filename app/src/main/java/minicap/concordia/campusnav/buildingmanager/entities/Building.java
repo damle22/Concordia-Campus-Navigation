@@ -1,7 +1,6 @@
 package minicap.concordia.campusnav.buildingmanager.entities;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;

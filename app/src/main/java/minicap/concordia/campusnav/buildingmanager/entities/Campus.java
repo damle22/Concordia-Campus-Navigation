@@ -1,6 +1,5 @@
 package minicap.concordia.campusnav.buildingmanager.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;

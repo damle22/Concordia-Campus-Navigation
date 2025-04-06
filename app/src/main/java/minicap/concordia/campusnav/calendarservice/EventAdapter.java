@@ -27,6 +27,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         this.eventList = eventList;
     }
 
+    /**
+     * Sets the data used by the adapter
+     * @param newData New list of EventItem that is displayed by the adapter
+     */
     public void setData(List<EventItem> newData) {
         long now = System.currentTimeMillis();
         List<EventItem> filteredList = new ArrayList<>();
@@ -94,6 +98,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         });}
     }
 
+    /**
+     * Determines which event comes next in the schedule
+     * @param position The position of the item in the adapter
+     * @param now Current time in Milliseconds
+     * @return True if it's the next event, false otherwise
+     */
     private boolean isNextUpcomingEvent(int position, long now) {
         for (int i = 0; i < eventList.size(); i++) {
             Date futureStart = new Date(eventList.get(i).getStartTime().getValue());
@@ -115,15 +125,34 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView locationText;
         ImageView goToClassIV;
 
+        /**
+         * Gets The UI element for the titleText
+         * @return TextView for title
+         */
         public TextView getTitleText() {
             return titleText;
         }
+
+        /**
+         * Gets the UI element for the event's time
+         * @return TextView for time
+         */
         public TextView getTimeText() {
             return timeText;
         }
+
+        /**
+         * Gets the UI element for the event's location
+         * @return TextView for the event's location
+         */
         public TextView getLocationText() {
             return locationText;
         }
+
+        /**
+         * Gets the UI element for the event's "Go to class" image view
+         * @return ImageView for "Go to class"
+         */
         public ImageView getGoToClassIV() {
             return goToClassIV;
         }

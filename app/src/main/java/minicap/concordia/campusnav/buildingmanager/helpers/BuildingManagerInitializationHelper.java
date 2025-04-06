@@ -3,7 +3,6 @@ package minicap.concordia.campusnav.buildingmanager.helpers;
 import android.util.Log;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

@@ -168,8 +168,8 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     /**
      * Moves the camera to view all currently showing POI
-     * @param position
-     * @param bearing
+     * @param position The position for the camera
+     * @param bearing The bearing, which shows the direction faced
      */
     public void moveCameraToPOI(MapCoordinates position, float bearing){
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -188,8 +188,8 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     /**
      * Checks that the coordinates do not already have a marker
-     * @param coordinates
-     * @return
+     * @param coordinates The coordinates to check
+     * @return True if no marker exists, false otherwise
      */
     private boolean markerDoesNotExists(MapCoordinates coordinates){
         for (Marker marker : poiMarkers) {
@@ -414,6 +414,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         mMap = map;
     }
 
+    /**
+     * Gets the map
+     * @return The google map
+     */
     public GoogleMap getmMap(){
         return this.mMap;
     }

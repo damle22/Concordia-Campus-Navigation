@@ -14,6 +14,11 @@ public class GoogleCalendarService {
 
     private GoogleCalendarService() {}
 
+    /**
+     * Gets the Google calendar service
+     * @param context The context for who wants the calendar
+     * @return Calendar instance for this app
+     */
     public static Calendar getCalendarService(Context context) {
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                 context, java.util.Collections.singleton("https://www.googleapis.com/auth/calendar.readonly"));

@@ -83,6 +83,9 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         filterSchedule(ShuttleBusScheduleConstants.CAMPUS_LOYOLA, ShuttleBusScheduleConstants.MONDAY_TO_THURSDAY)
     }
 
+    /**
+     * Filters the schedule based on campus and day
+     */
     private fun filterSchedule(campus: String, day: String) {
         ScheduleFetcher.fetch(object : ScheduleFetcher.ScheduleFetchListener {
             override fun onScheduleFetched(schedules: List<ShuttleSchedule>) {
@@ -96,6 +99,9 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         })
     }
 
+    /**
+     * Updates the layout of the shuttle bus schedule
+     */
     private fun updateUI(schedules: List<ShuttleSchedule>, campus: String) {
         val gridLayout = when (campus) {
             ShuttleBusScheduleConstants.CAMPUS_SGW -> binding.root.findViewById<GridLayout>(R.id.sgwGridLayout)

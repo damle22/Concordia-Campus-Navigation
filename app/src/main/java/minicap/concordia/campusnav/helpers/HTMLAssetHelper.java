@@ -1,7 +1,6 @@
 package minicap.concordia.campusnav.helpers;
 
 import android.content.Context;
-import android.util.Base64;
 import android.util.Log;
 
 import java.io.BufferedReader;

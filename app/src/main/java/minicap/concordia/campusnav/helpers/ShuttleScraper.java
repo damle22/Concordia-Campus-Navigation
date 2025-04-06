@@ -20,7 +20,10 @@ public class ShuttleScraper {
 
     private ShuttleScraper() {}
 
-    // Fetches and parses schedule from HTML
+    /**
+     * Fetches and parses the shuttle bus schedule
+     * @return The schedule of the shuttle bus as a list of schedules
+     */
     public static List<ShuttleSchedule> fetchSchedule() {
         List<ShuttleSchedule> schedules = new ArrayList<>();
         // Uses Jsoup for web scraping
@@ -56,7 +59,12 @@ public class ShuttleScraper {
         return schedules;
     }
 
-    // Helper to extract table data
+    /**
+     * Helper function that extracts data from given table
+     * @param table The table with the data to extract
+     * @param loyolaDepartures The list of loyola departures to populate
+     * @param sgwDepartures The list of SGW departures to populate
+     */
     private static void extractTableData(Element table, List<String> loyolaDepartures, List<String> sgwDepartures) {
         // Parses HTML table rows/columns
         Elements rows = table.select("tr");
