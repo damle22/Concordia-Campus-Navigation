@@ -90,7 +90,7 @@
                     android:textStyle="bold" />
 
                 <!-- Mon-thurs Button -->
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/sgwMonThursButton"
                     android:layout_width="102dp"
                     android:layout_height="36dp"
@@ -100,11 +100,10 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:text="Mon-Thurs"
-                    android:textColor="@color/black"
-                    android:theme="@style/ShuttleButtonsTheme"/>
+                    android:textColor="@color/black" />
 
                 <!-- Fri Button -->
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/sgwFridayButton"
                     android:layout_width="102dp"
                     android:layout_height="36dp"
@@ -171,7 +170,7 @@
                     android:textSize="19sp"
                     android:textStyle="bold" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/loyMonThursButton"
                     android:layout_width="102dp"
                     android:layout_height="36dp"
@@ -184,7 +183,7 @@
                     android:textColor="@color/black"
                     android:theme="@style/ShuttleButtonsTheme"/>
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/loyFridayButton"
                     android:layout_width="102dp"
                     android:layout_height="36dp"
