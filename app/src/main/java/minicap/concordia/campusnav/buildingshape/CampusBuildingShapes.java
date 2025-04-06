@@ -14,6 +14,8 @@ public class CampusBuildingShapes
     private static final List<PolygonOptions> sgwBuildingCoordinates = new ArrayList<>();
     private static final List<PolygonOptions> loyolaBuildingCoordinates = new ArrayList<>();
 
+    private CampusBuildingShapes() {}
+
     // SGW Campus
     static {
         ResourceBundle bundle = ResourceBundle.getBundle("minicap.concordia.campusnav.buildingshape.SGWCoordinatesResource_en_CA");
@@ -84,16 +86,27 @@ public class CampusBuildingShapes
         loyolaBuildingCoordinates.add((PolygonOptions) bundle.getObject("taBuilding"));
     }
 
-    // method to get campus building coordinates
+    /**
+     * Gets the coordinates for the polygons that represent the SGW buildings
+     * @return List of PolygonOptions that represent the shapes of the various buildings
+     */
     public static List<PolygonOptions> getSgwBuildingCoordinates() {
         return sgwBuildingCoordinates;
     }
 
+    /**
+     * Gets the coordinates for the polygons that represent the Loyola buildings
+     * @return List of PolygonOptions that represent the shapes of the various buildings
+     */
     public static List<PolygonOptions> getLoyolaBuildingCoordinates() {
         return loyolaBuildingCoordinates;
     }
 
-    // method for building detections using polygon
+    /**
+     * Method used to determine if you're inside a building based on location
+     * @param location The user's current location
+     * @return The key for the resource that represents the building
+     */
     public static String getBuildingNameAtLocation(LatLng location) {
         ResourceBundle sgwBundle = ResourceBundle.getBundle("minicap.concordia.campusnav.buildingshape.SGWCoordinatesResource_en_CA");
         for (String key : sgwBundle.keySet()) {

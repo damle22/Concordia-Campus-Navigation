@@ -1,13 +1,8 @@
 package minicap.concordia.campusnav.buildingmanager.helpers;
 
-import static java.util.Map.entry;
-
 import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -18,19 +13,23 @@ import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.IndoorPOI;
-import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.BuildingName;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
+import minicap.concordia.campusnav.buildingmanager.resources.IndoorPOIResource_en_CA;
 
 public class BuildingManagerInitializationHelper {
+
+    private static final String TAG = "BuildingManagerInitializationHelper";
+
+    private BuildingManagerInitializationHelper() {}
 
     /**
      * Creates a map of CampusName, Campus objects that are read from the resource bundle
      * @return Map of CampusName, Campus based on resources
      */
-    public static HashMap<CampusName, Campus> createCampuses() {
+    public static Map<CampusName, Campus> createCampuses() {
         CampusName[] campusesToGet = new CampusName[] {CampusName.SGW, CampusName.LOYOLA};
-        HashMap<CampusName, Campus> finalCampuses = new HashMap<>();
+        Map<CampusName, Campus> finalCampuses = new EnumMap<>(CampusName.class);
 
         try {
             Locale locale = new Locale("en", "CA");
@@ -42,10 +41,10 @@ public class BuildingManagerInitializationHelper {
             }
         }
         catch(MissingResourceException e){
-            Log.d("BuildingManagerInitializationHelper", "Missing campus resource: " + e.getMessage());
+            Log.d(TAG, "Missing campus resource: " + e.getMessage());
         }
         catch(ClassCastException ce){
-            Log.d("BuildingManagerInitializationHelper", "One of the resources could not be casted as a campus!\nError: " + ce.getMessage());
+            Log.d(TAG, "One of the resources could not be casted as a campus!\nError: " + ce.getMessage());
         }
 
         return finalCampuses;
@@ -56,7 +55,7 @@ public class BuildingManagerInitializationHelper {
      *  Also populates indoor points of interest for each building floor
      * @return Map of BuildingName, Building based on the resource bundles
      */
-    public static HashMap<BuildingName, Building> createBuildings(){
+    public static Map<BuildingName, Building> createBuildings(){
         // When adding a building, add the key and the resource key below
         // Maintaining the order is extremely important
         BuildingName[] buildingsToGet = new BuildingName[] {
@@ -125,8 +124,7 @@ public class BuildingManagerInitializationHelper {
                 BuildingName.D_ANNEX
         };
 
-
-        HashMap<BuildingName, Building> finalBuildings = new HashMap<>();
+        EnumMap<BuildingName, Building> finalBuildings = new EnumMap<>(BuildingName.class);
 
         try {
             Locale locale = new Locale("en", "CA");
@@ -138,7 +136,7 @@ public class BuildingManagerInitializationHelper {
 
                 Collection<BuildingFloor> floors = fetchedBuilding.getFloors();
                 for(BuildingFloor floor : floors) {
-                    String desiredResource = buildingsToGet[i].getResourceName() + "_Floor" + floor.getFloorName();
+                    String desiredResource = buildingsToGet[i].getResourceName() + IndoorPOIResource_en_CA.FLOOR_TAG + floor.getFloorName();
                     List<IndoorPOI> fetchedPOIs = (List<IndoorPOI>) indoorPOIBundle.getObject(desiredResource);
 
                     floor.setFloorPOIs(fetchedPOIs);
@@ -148,20 +146,12 @@ public class BuildingManagerInitializationHelper {
             }
         }
         catch(MissingResourceException e){
-            Log.d("BuildingManagerInitializationHelper", "Missing building resource: " + e.getMessage());
+            Log.d(TAG, "Missing building resource: " + e.getMessage());
         }
         catch(ClassCastException ce){
-            Log.d("BuildingManagerInitializationHelper", "One of the resources could not be casted as a building!\nError: " + ce.getMessage());
+            Log.d(TAG, "One of the resources could not be casted as a building!\nError: " + ce.getMessage());
         }
 
         return finalBuildings;
-    }
-
-    public static ArrayList<OutdoorPOI> createOutdoorPOIs(){
-        ArrayList<OutdoorPOI> outdoorPOIS = new ArrayList<>();
-
-        //Nothing to create for now...
-
-        return outdoorPOIS;
     }
 }

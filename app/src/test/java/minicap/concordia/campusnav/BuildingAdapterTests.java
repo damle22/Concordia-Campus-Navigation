@@ -50,7 +50,7 @@ public class BuildingAdapterTests {
         adapter.onBindViewHolder(vh, 0);
 
         // The text in tvBuildingName should match "Mock Building"
-        String actualText = vh.tvBuildingName.getText().toString();
+        String actualText = vh.getTvBuildingName().getText().toString();
         assertEquals("Mock Building", actualText);
     }
 

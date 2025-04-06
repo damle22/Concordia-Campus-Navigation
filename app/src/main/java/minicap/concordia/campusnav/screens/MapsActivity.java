@@ -37,20 +37,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import android.widget.EditText;
 
 import minicap.concordia.campusnav.R;
 import minicap.concordia.campusnav.buildingmanager.entities.BuildingFloor;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
-import minicap.concordia.campusnav.buildingshape.CampusBuildingShapes;
 import minicap.concordia.campusnav.components.MainMenuDialog;
 import minicap.concordia.campusnav.components.placeholder.ShuttleBusScheduleFragment;
 
-import minicap.concordia.campusnav.databinding.ActivityMapsBinding;
 import minicap.concordia.campusnav.helpers.UserLocationService;
-import minicap.concordia.campusnav.map.FetchPathTask;
 import minicap.concordia.campusnav.map.InternalGoogleMaps;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -80,10 +75,7 @@ import minicap.concordia.campusnav.savedstates.States;
 public class MapsActivity extends AppCompatActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener, UserLocationService.UserLocationUpdatedListener {
 
-    private final String MAPS_ACTIVITY_TAG = "MapsActivity";
-    public static final String KEY_STARTING_COORDS = "starting_coords";
-    public static final String KEY_CAMPUS_NOT_SELECTED = "campus_not_selected";
-    public static final String KEY_SHOW_SGW = "show_sgw";
+    private static final String MAPS_ACTIVITY_TAG = "MapsActivity";
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -294,11 +286,11 @@ public class MapsActivity extends AppCompatActivity
         // Register your activity result launcher
         searchLocationLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                this::HandleSearchLocationResult);
+                this::handleSearchLocationResult);
 
         navigationActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                this::HandleNavigationActivityResult);
+                this::handleNavigationActivityResult);
 
         setStartingPoint(true, "", new MapCoordinates(0, 0));
 
@@ -332,6 +324,11 @@ public class MapsActivity extends AppCompatActivity
         super.onResume();
     }
 
+    /**
+     * Updates the button margins on the bottom sheet
+     * @param bottomSheet The bottom sheet to update
+     * @param slideOffset The offset for sliding the menu
+     */
     private void updateButtonMargin(View bottomSheet, float slideOffset){
         int progress = (int)(slideOffset * bottomSheet.getHeight());
         int finalProgress = (int)(progress * 0.8f);
@@ -360,7 +357,11 @@ public class MapsActivity extends AppCompatActivity
 
     }
 
-    private void HandleNavigationActivityResult(ActivityResult result) {
+    /**
+     * Handles the result from the navigation activity
+     * @param result The result from the navigation activity
+     */
+    private void handleNavigationActivityResult(ActivityResult result) {
         //Empty since no result is being passed
     }
 
@@ -368,7 +369,7 @@ public class MapsActivity extends AppCompatActivity
      * Handles the result of the SearchLocationActivity
      * @param result The result received from the activity
      */
-    private void HandleSearchLocationResult(ActivityResult result) {
+    private void handleSearchLocationResult(ActivityResult result) {
         runOnUiThread(() -> {
             searchText.clearFocus();
             destinationEditText.clearFocus();
@@ -425,6 +426,11 @@ public class MapsActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Checks if the map needs to switch building/floors
+     * @param buildingName The name of the building
+     * @param floor The requested floor
+     */
     private void evaluateShouldSwitchFloor(String buildingName, String floor) {
         if(isSwitchingMap || !map.getIsIndoor()) {
             currentBuildingName = buildingName;
@@ -445,6 +451,9 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Switches the map to another building
+     */
     private void switchBuilding() {
         if(!map.getIsIndoor() || isSwitchingMap) {
             return;
@@ -455,6 +464,9 @@ public class MapsActivity extends AppCompatActivity
         configureIndoorFloorSpinner();
     }
 
+    /**
+     * Switches the map to another floor
+     */
     private void switchFloors() {
         if(!map.getIsIndoor() || isSwitchingMap) {
             return;
@@ -495,8 +507,7 @@ public class MapsActivity extends AppCompatActivity
         }
         else {
             hasUserLocationBeenSet = false;
-            MapCoordinates coordsWithFloor = new MapCoordinates(coordinates.getLat(), coordinates.getLng(), currentFloorName);
-            origin = coordinates;
+            origin = new MapCoordinates(coordinates.getLat(), coordinates.getLng(), currentFloorName);
             yourLocationText = locationString;
         }
 
@@ -636,6 +647,9 @@ public class MapsActivity extends AppCompatActivity
         ft.commit();
     }
 
+    /**
+     * Configures UI elements for the current map
+     */
     private void configureActivityForMap() {
         if(map.getIsIndoor()) {
             campusSwitchBtn.setVisibility(GONE);
@@ -655,6 +669,9 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Configures the floor spinner for the current building
+     */
     private void configureIndoorFloorSpinner() {
         Building currentBuilding = buildingManager.searchBuildingsByName(currentBuildingName).get(0);
         Collection<BuildingFloor> allFloors = currentBuilding.getFloors();
@@ -691,7 +708,7 @@ public class MapsActivity extends AppCompatActivity
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                //Not needed, the menu will just close
             }
         });
 
@@ -792,6 +809,11 @@ public class MapsActivity extends AppCompatActivity
             });
         }
     }
+
+    /**
+     * Gets coordinates associated with an address
+     * @param addressString The address to get coordinates for
+     */
     private void geocodeAndSetDestination(String addressString) {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
@@ -828,6 +850,9 @@ public class MapsActivity extends AppCompatActivity
         setDestination(address, coordinates);
     }
 
+    /**
+     * Shows the main menu
+     */
     public void showMainMenuDialog() {
         if(!states.isMenuOpen()) {
             MainMenuDialog dialog = new MainMenuDialog(this);
@@ -835,13 +860,17 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    // Show building selector fragment
+    /**
+     * Shows the building selector fragment
+     */
     private void showBuildingSelectorFragment() {
         BuildingSelectorFragment fragment = new BuildingSelectorFragment();
         fragment.show(getSupportFragmentManager(), "BuildingSelectorFragment");
     }
 
-    // Show shuttle schedule fragment
+    /**
+     * Shows the shuttle schedule fragment
+     */
     private void showShuttleScheduleFragment(){
         ShuttleBusScheduleFragment shuttleBusScheduleFragment = new ShuttleBusScheduleFragment();
         shuttleBusScheduleFragment.show(getSupportFragmentManager(), "ShuttleBusScheduleFragment");
@@ -855,7 +884,9 @@ public class MapsActivity extends AppCompatActivity
         setDestination(building.getBuildingName(), location);
     }
 
-    // Replacing default Maps center location button functionality
+    /**
+     * Centers the map on the user's location
+     */
     private void centerOnUserLocation() {
         if (origin != null) {
             map.centerOnCoordinates(origin);
@@ -871,7 +902,8 @@ public class MapsActivity extends AppCompatActivity
         states.toggleMenu(false);
     }
 
-    public void OnUserLocationUpdated(MapCoordinates newPosition) {
+    @Override
+    public void onUserLocationUpdated(MapCoordinates newPosition) {
         hasUserLocationBeenSet = true;
         origin = new MapCoordinates(newPosition.getLat(), newPosition.getLng(), DEFAULT_FLOOR);
         setStartingPoint(true, "", new MapCoordinates(0, 0));

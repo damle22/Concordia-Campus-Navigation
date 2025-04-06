@@ -41,12 +41,17 @@ public class UserLocationService {
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lastKnownLocation = MapCoordinates.fromAndroidLocation(location);
-                    listener.OnUserLocationUpdated(lastKnownLocation);
+                    listener.onUserLocationUpdated(lastKnownLocation);
                 }
             }
         };
     }
 
+    /**
+     * Starts the user location tracking service
+     * @param interval The interval that we should ideally receive updates (in milliseconds)
+     *                 NOTE: The minimum interval for updates is half the interval
+     */
     public void start(long interval) {
         long maxUpdateInterval = interval / 2;
 
@@ -63,15 +68,20 @@ public class UserLocationService {
         }
     }
 
+    /**
+     * Gets the last known location of the user
+     * @param context The context for the location service if needed to poll for last location
+     * @param listener The listener who will receive the data update
+     */
     public static void getLastKnownLocation(Context context, UserLocationUpdatedListener listener) {
         if (lastKnownLocation != null) {
-            listener.OnUserLocationUpdated(lastKnownLocation);
+            listener.onUserLocationUpdated(lastKnownLocation);
         }
 
         FusedLocationProviderClient temporaryClient = LocationServices.getFusedLocationProviderClient(context);
         try {
             temporaryClient.getLastLocation().addOnSuccessListener(location -> {
-                listener.OnUserLocationUpdated(MapCoordinates.fromAndroidLocation(location));
+                listener.onUserLocationUpdated(MapCoordinates.fromAndroidLocation(location));
             });
         }
         catch (SecurityException e) {
@@ -80,6 +90,6 @@ public class UserLocationService {
     }
 
     public interface UserLocationUpdatedListener {
-        void OnUserLocationUpdated(MapCoordinates newPosition);
+        void onUserLocationUpdated(MapCoordinates newPosition);
     }
 }

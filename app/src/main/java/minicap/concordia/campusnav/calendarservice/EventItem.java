@@ -1,4 +1,4 @@
-package minicap.concordia.campusnav.CalendarService;
+package minicap.concordia.campusnav.calendarservice;
 
 
 import com.google.api.client.util.DateTime;
@@ -16,8 +16,27 @@ public class EventItem {
         this.endTime = endTime;
     }
 
+    /**
+     * Gets the title of the event item
+     * @return String title of event
+     */
     public String getTitle() { return title; }
+
+    /**
+     * Gets the location of the event item
+     * @return String location of event
+     */
     public String getLocation() { return location; }
+
+    /**
+     * Gets the start time of the event
+     * @return DateTime start of the event
+     */
     public DateTime getStartTime() { return startTime; }
+
+    /**
+     * Gets the end time of the event
+     * @return DateTime end of event
+     */
     public DateTime getEndTime() { return endTime; }
 }

@@ -51,10 +51,8 @@ public class InternalGoogleMapsTests {
 
     @Test
     public void testCenterOnCoordinates() {
-        GoogleMap mapMock = Mockito.mock(GoogleMap.class);
         MapCoordinates updatedCoors = new MapCoordinates(1, 1);
         CameraUpdate mockUpdate = Mockito.mock(CameraUpdate.class);
-        AbstractMap.MapUpdateListener mockListener = Mockito.mock(AbstractMap.MapUpdateListener.class);
 
         try (MockedStatic<CameraUpdateFactory> staticMock = Mockito.mockStatic(CameraUpdateFactory.class)) {
             staticMock.when(() -> CameraUpdateFactory.newCameraPosition(Mockito.any(CameraPosition.class)))

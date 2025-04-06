@@ -52,6 +52,11 @@ public class MapCoordinates implements Parcelable {
         return new MapCoordinates(coordinate.latitude, coordinate.longitude);
     }
 
+    /**
+     * Creates a MapCoordinates object from an Android.Location
+     * @param loc The location to transform
+     * @return MapCoordinates for the given location
+     */
     public static MapCoordinates fromAndroidLocation(Location loc) {
         return new MapCoordinates(loc.getLatitude(), loc.getLongitude());
     }

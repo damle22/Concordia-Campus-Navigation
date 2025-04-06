@@ -1,7 +1,6 @@
 package minicap.concordia.campusnav.map;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
@@ -31,7 +30,7 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     @Override
     public void addMarker(OutdoorPOI opoi) {
-        //TODO
+        //Not used in Indoor
     }
 
     @Override
@@ -86,12 +85,12 @@ public class InternalMappedIn extends AbstractMap implements MappedInWebViewFrag
 
     @Override
     public void displayPOI(MapCoordinates origin, POIType type) {
-
+        //Not used
     }
 
     @Override
     public void centerOnCoordinates(MapCoordinates newCameraPosition) {
-
+        //Not used
     }
 
     @Override

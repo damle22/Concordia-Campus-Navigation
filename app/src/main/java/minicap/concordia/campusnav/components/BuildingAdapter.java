@@ -75,11 +75,19 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
     }
 
     public static class BuildingViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvBuildingName;
+        private TextView tvBuildingName;
 
         public BuildingViewHolder(@NonNull View itemView) {
             super(itemView);
             tvBuildingName = itemView.findViewById(R.id.tvBuildingName);
+        }
+
+        /**
+         * Gets the UI element for the building name
+         * @return TextView for building name
+         */
+        public TextView getTvBuildingName() {
+            return tvBuildingName;
         }
     }
 }

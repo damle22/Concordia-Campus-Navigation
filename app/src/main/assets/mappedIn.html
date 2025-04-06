@@ -185,11 +185,9 @@
                 const secondSpace = mapData.getByType('space').find((s) => s.name === end);
 
                 if(firstSpace && secondSpace) {
-                    //alert("found first and second space");
                     const dir = mapData.getDirections(firstSpace, secondSpace);
 
                     if(dir) {
-                        //alert("Found dir");
                         mapView.Navigation.draw(dir);
                     }
                 }
@@ -214,7 +212,7 @@
                 const startLatAsNumber = Number(startLat);
                 const startLngAsNumber = Number(startLng);
                 var startCoord;
-                if(startFloorId) {
+                if(startFloorId != 'null') {
                     const floor = mapData.getByType('floor').find((s) => s.id === startFloorId);
                     startCoord = mapView.createCoordinate(startLatAsNumber, startLngAsNumber, floor);
                 }
@@ -225,7 +223,7 @@
                 const endLatAsNumber = Number(endLat);
                 const endLngAsNumber = Number(endLng);
                 var endCoord;
-                if(endFloorId) {
+                if(endFloorId != 'null') {
                     const endFloor = mapData.getByType('floor').find((s) => s.id === endFloorId);
                     endCoord = mapView.createCoordinate(endLatAsNumber, endLngAsNumber, endFloor);
                 }
@@ -236,16 +234,13 @@
                 var dir;
                 const acccessible = isAccessible == 'true';
                 if(acccessible) {
-                    alert("With accessibility");
                     dir = mapData.getDirections(startCoord, endCoord, { accessible: true });
                 }
                 else {
-                    alert("Without accessibility");
                     dir = mapData.getDirections(startCoord, endCoord);
                 }
 
                 if(dir) {
-                    alert("found dir");
                     mapView.Navigation.draw(dir);
                 }
             }

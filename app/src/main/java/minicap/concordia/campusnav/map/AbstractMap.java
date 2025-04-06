@@ -1,13 +1,14 @@
 package minicap.concordia.campusnav.map;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Building;
 import minicap.concordia.campusnav.buildingmanager.entities.poi.OutdoorPOI;
 import minicap.concordia.campusnav.buildingmanager.enumerations.POIType;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import minicap.concordia.campusnav.map.enums.MapColors;
@@ -21,7 +22,7 @@ public abstract class AbstractMap {
      * Constructor
      * @param listener Listener for map events
      */
-    public AbstractMap(MapUpdateListener listener) {
+    protected AbstractMap(MapUpdateListener listener) {
         this.listener = listener;
     }
 
@@ -30,6 +31,11 @@ public abstract class AbstractMap {
      * @return The fragment used to display the map
      */
     public abstract Fragment initialize();
+
+    /**
+     * Adds a marker using an OutdoorPOI
+     * @param opoi The OutdoorPOI used to create the marker
+     */
     public abstract void addMarker(OutdoorPOI opoi);
     /**
      * Adds a marker to the map with the specified parameters
@@ -81,6 +87,11 @@ public abstract class AbstractMap {
      */
     public abstract void displayRoute(MapCoordinates origin, MapCoordinates destination, String travelMode);
 
+    /**
+     * Displays all POI within a radius of the origin that match the given type
+     * @param origin The origin point of the search radius
+     * @param type The type of POI to display
+     */
     public abstract void displayPOI(MapCoordinates origin, POIType type);
 
     /**
@@ -199,7 +210,7 @@ public abstract class AbstractMap {
      * @return List of MapCoordinates
      */
     public List<MapCoordinates> decodePolyline(String encodedPolyline) {
-        return null;
+        return new ArrayList<>();
     }
 
 
@@ -233,6 +244,10 @@ public abstract class AbstractMap {
         return isIndoor;
     }
 
+    /**
+     * Switches floor of the map
+     * @param newFloor The new floor to switch to
+     */
     public void switchFloor(String newFloor) {
 
     }

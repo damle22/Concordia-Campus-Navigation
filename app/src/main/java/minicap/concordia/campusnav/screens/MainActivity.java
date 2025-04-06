@@ -37,11 +37,13 @@ public class MainActivity extends AppCompatActivity {
             states.toggleDarkMode(isChecked);
         });
 
-        subscribeButtons(this);
+        subscribeButtons();
     }
 
-
-    protected void subscribeButtons(Context appContext) {
+    /**
+     * Sets on click listeners for the button
+     */
+    protected void subscribeButtons() {
 
         Button sgwCampusBtn = findViewById(R.id.viewSGWCampusButton);
 
@@ -68,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Opens the MapsActivity
+     */
     private void openIntent(){
         Intent intent = new Intent(this, MapsActivity.class);
         this.startActivity(intent);

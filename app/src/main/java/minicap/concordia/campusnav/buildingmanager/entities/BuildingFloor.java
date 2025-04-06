@@ -19,7 +19,7 @@ public class BuildingFloor {
         this.floorName = floorName;
         this.associatedBuilding = building;
         this.floorId = floorId;
-        this.floorPOIs = new ArrayList<IndoorPOI>();
+        this.floorPOIs = new ArrayList<>();
     }
 
     /**
@@ -35,8 +35,8 @@ public class BuildingFloor {
      * @param type The desired type
      * @return ArrayList of IndoorPOI that match the given type
      */
-    public ArrayList<IndoorPOI> getPOIsOfType(POIType type) {
-        ArrayList<IndoorPOI> foundPOIs = new ArrayList<>();
+    public List<IndoorPOI> getPOIsOfType(POIType type) {
+        List<IndoorPOI> foundPOIs = new ArrayList<>();
         for (IndoorPOI poi:floorPOIs) {
             if(poi.getPOIType() == type){
                 foundPOIs.add(poi);
@@ -49,8 +49,8 @@ public class BuildingFloor {
      * Returns all points of interest for the floor that have the accessibility flag set to true
      * @return ArrayList of IndoorPOI
      */
-    public ArrayList<IndoorPOI> getAccessibilityPOIs() {
-        ArrayList<IndoorPOI> accessibilityPOIs = new ArrayList<>();
+    public List<IndoorPOI> getAccessibilityPOIs() {
+        List<IndoorPOI> accessibilityPOIs = new ArrayList<>();
         for(IndoorPOI poi:floorPOIs){
             if(poi.getIsAccessibilityFeature()){
                 accessibilityPOIs.add(poi);

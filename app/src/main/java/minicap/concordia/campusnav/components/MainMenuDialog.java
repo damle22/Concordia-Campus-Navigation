@@ -53,7 +53,10 @@ public class MainMenuDialog extends SideSheetDialog {
         states.toggleMenu(true);
     }
 
-
+    /**
+     * Initializes this menu's UI elements
+     * @param view The view used to initialize the private variables
+     */
     private void initializeViews(View view) {
         slidingMenu = view.findViewById(R.id.sliding_menu);
         closeMenuButton = view.findViewById(R.id.closeMenu);
@@ -64,7 +67,9 @@ public class MainMenuDialog extends SideSheetDialog {
         switchDarkMode = view.findViewById(R.id.switch_darkmodeMainMenu);
     }
 
-    //This populates button
+    /**
+     * Initializes buttons and sets listeners
+     */
     public void populateButtons(){
 
         closeMenuButton.setOnClickListener(new View.OnClickListener() {
@@ -108,11 +113,18 @@ public class MainMenuDialog extends SideSheetDialog {
         });
     }
 
+    /**
+     * Creates an intent for launching the MapsActivity
+     * @return Intent for launching MapsActivity
+     */
     public Intent campusMapRoutine(){
         states.toggleMenu(false);
         return new Intent(context, MapsActivity.class);
     }
 
+    /**
+     * Opens the MapsActivity and then opens the bus schedule on that page
+     */
     public void openBusSchedule(){
         Intent intent = campusMapRoutine();
 
@@ -121,6 +133,9 @@ public class MainMenuDialog extends SideSheetDialog {
         context.startActivity(intent);
     }
 
+    /**
+     * Opens the MapsActivity and then opens the Directions menu on launch
+     */
     public void openDirections(){
         Intent intent = campusMapRoutine();
 
@@ -129,17 +144,26 @@ public class MainMenuDialog extends SideSheetDialog {
         context.startActivity(intent);
     }
 
+    /**
+     * Opens the ClassScheduleActivity
+     */
     public void openClassSchedule() {
         states.toggleMenu(false);
         Intent intent = new Intent(context, ClassScheduleActivity.class);
         context.startActivity(intent);
     }
 
+    /**
+     * Opens the MapsActivity
+     */
     public void openCampusMap(){
         Intent intent = campusMapRoutine();
         context.startActivity(intent);
     }
 
+    /**
+     * Closes the menu
+     */
     public void close(){
         cancel();
     }

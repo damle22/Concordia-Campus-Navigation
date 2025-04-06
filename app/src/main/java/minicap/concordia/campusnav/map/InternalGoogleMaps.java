@@ -46,7 +46,7 @@ import minicap.concordia.campusnav.map.helpers.MapColorConversionHelper;
 
 public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallback, FetchPathTask.OnRouteFetchedListener {
 
-    private final float defaultZoom = 18;
+    private static final float DEFAULT_ZOOM = 18;
     private GoogleMap mMap;
 
     private List<Polyline> polylines = new ArrayList<>();
@@ -168,8 +168,8 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     /**
      * Moves the camera to view all currently showing POI
-     * @param position
-     * @param bearing
+     * @param position The position for the camera
+     * @param bearing The bearing, which shows the direction faced
      */
     public void moveCameraToPOI(MapCoordinates position, float bearing){
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -188,8 +188,8 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
 
     /**
      * Checks that the coordinates do not already have a marker
-     * @param coordinates
-     * @return
+     * @param coordinates The coordinates to check
+     * @return True if no marker exists, false otherwise
      */
     private boolean markerDoesNotExists(MapCoordinates coordinates){
         for (Marker marker : poiMarkers) {
@@ -213,7 +213,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
     private void resetCamera(MapCoordinates position){
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(position.toGoogleMapsLatLng())
-                .zoom(defaultZoom)
+                .zoom(DEFAULT_ZOOM)
                 .bearing(0)
                 .tilt(0)
                 .build();
@@ -265,7 +265,7 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
                 cur.remove();
                 allMarkers.remove();
             }
-            ArrayList<Building> buildings = ConcordiaBuildingManager.getInstance().getAllBuildings();
+            List<Building> buildings = ConcordiaBuildingManager.getInstance().getAllBuildings();
             for(Building building: buildings){
                 // 500m radius
                 if(getDistance(origin,building.getLocation()) <= 0.5){
@@ -414,6 +414,10 @@ public class InternalGoogleMaps extends AbstractMap implements OnMapReadyCallbac
         mMap = map;
     }
 
+    /**
+     * Gets the map
+     * @return The google map
+     */
     public GoogleMap getmMap(){
         return this.mMap;
     }
