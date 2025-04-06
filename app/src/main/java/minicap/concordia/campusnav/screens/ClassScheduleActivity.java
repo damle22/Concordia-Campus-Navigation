@@ -9,6 +9,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ImageButton;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 
@@ -43,7 +45,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class ClassScheduleActivity extends FragmentActivity implements MainMenuDialog.MainMenuListener{
+public class ClassScheduleActivity extends AppCompatActivity implements MainMenuDialog.MainMenuListener{
 
     private static final int RC_SIGN_IN = 100;
     private static final int REQUEST_CALENDAR_PERMISSION = 101;
@@ -58,11 +60,9 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        // 1. Setup the RecyclerView
         RecyclerView rvEventList = findViewById(R.id.rv_event_list);
         rvEventList.setLayoutManager(new LinearLayoutManager(this));
 
-        // 2. Create an empty adapter initially
         List<EventItem> emptyList = new ArrayList<>();
         EventAdapter eventAdapter = new EventAdapter(emptyList);
         rvEventList.setAdapter(eventAdapter);
@@ -148,7 +148,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
 
         new Thread(() -> {
             try {
-                // 1. Check if user is signed in
                 GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
                 if (account == null) {
                     runOnUiThread(() ->
@@ -157,14 +156,12 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                     return;
                 }
 
-                // 2. Build GoogleAccountCredential with the calendar scope
                 GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                         this,
                         Collections.singleton(CalendarScopes.CALENDAR_READONLY)
                 );
                 credential.setSelectedAccount(account.getAccount());
 
-                // 3. Create the Calendar service
                 com.google.api.services.calendar.Calendar service = new com.google.api.services.calendar.Calendar.Builder(
                         new NetHttpTransport(),
                         GsonFactory.getDefaultInstance(),
@@ -173,7 +170,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                         .setApplicationName("CampusNav")
                         .build();
 
-                // 4. Fetch events from the primary calendar
                 Events events = service.events().list("primary")
                         .setMaxResults(10) // max 10 events at a time for performance purposes
                         .setTimeMin(new DateTime(System.currentTimeMillis())) // we are just fetching events that are taking place now and in the future (we don't want past events)
@@ -189,7 +185,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                     return;
                 }
 
-                // 5. Convert them to EventItem objects
                 List<EventItem> eventItemList = new ArrayList<>();
                 for (Event event : items) {
                     String title = event.getSummary() != null ? event.getSummary() : "Untitled";
@@ -210,7 +205,6 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
                     eventItemList.add(new EventItem(title, location, start, end));
                 }
 
-                // 6. Update the RecyclerView on the main thread
                 runOnUiThread(() -> {
                     if (eventAdapter != null) {
                         eventAdapter.setData(eventItemList);
@@ -232,6 +226,12 @@ public class ClassScheduleActivity extends FragmentActivity implements MainMenuD
         if (dateTime == null) return "";
         // dateTime.toStringRfc3339() will return "2025-03-23T13:00:00.000Z"
         return dateTime.toStringRfc3339();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        states.toggleMenu(false);
     }
 
 

@@ -3,14 +3,7 @@ package minicap.concordia.campusnav.savedstates;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 
-import android.content.Context;
-import android.util.Log;
-import android.widget.Switch;
-
 import androidx.appcompat.app.AppCompatDelegate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 
@@ -31,7 +24,7 @@ public class States {
     private static final States instance = new States();
 
     private long lastToggleTime = 0;
-    private static final long DEBOUNCE_DELAY_MS = 500;
+    private static final long DEBOUNCE_DELAY_MS = 1000;
 
     private States(){}
 

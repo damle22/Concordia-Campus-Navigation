@@ -3,12 +3,10 @@ package minicap.concordia.campusnav.screens;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import static androidx.databinding.adapters.CompoundButtonBindingAdapter.setChecked;
 import static minicap.concordia.campusnav.map.MapCoordinates.fromGoogleMapsMarker;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 
@@ -16,11 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -33,7 +31,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +51,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -72,7 +68,7 @@ import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
 import minicap.concordia.campusnav.savedstates.States;
 
-public class MapsActivity extends FragmentActivity
+public class MapsActivity extends AppCompatActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
@@ -143,6 +139,7 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("DARKMODE", "Creating Maps Activity");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_maps);
@@ -758,6 +755,12 @@ public class MapsActivity extends FragmentActivity
             getUserLocationPath();
             Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        states.toggleMenu(false);
     }
 
 }
