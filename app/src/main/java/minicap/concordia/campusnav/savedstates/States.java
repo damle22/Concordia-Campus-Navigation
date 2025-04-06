@@ -1,7 +1,11 @@
 package minicap.concordia.campusnav.savedstates;
 
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
+
+import androidx.appcompat.app.AppCompatDelegate;
+
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
-import minicap.concordia.campusnav.map.MapCoordinates;
 
 public class States {
 
@@ -21,18 +25,36 @@ public class States {
 
     private static final States instance = new States();
 
+    private long lastToggleTime = 0;
+    private static final long DEBOUNCE_DELAY_MS = 1000;
+
     private States(){}
 
     public static States getInstance(){
         return instance;
     }
 
-    public void toggleDarkMode(){
-        darkMode = !darkMode;
+    public void toggleDarkMode(boolean check) {
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - lastToggleTime < DEBOUNCE_DELAY_MS) {
+            return;
+        }
+
+        lastToggleTime = currentTime;
+        darkMode = check;
+        applyDarkMode();
     }
 
     public boolean isDarkModeOn(){
         return darkMode;
+    }
+
+    public void applyDarkMode() {
+        AppCompatDelegate.setDefaultNightMode(
+                darkMode ? MODE_NIGHT_YES
+                        : MODE_NIGHT_NO
+        );
     }
 
     public Campus getCampus() {

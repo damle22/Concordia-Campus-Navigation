@@ -14,11 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -58,7 +58,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,7 +77,7 @@ import minicap.concordia.campusnav.components.BuildingSelectorFragment;
 import minicap.concordia.campusnav.map.enums.SupportedMaps;
 import minicap.concordia.campusnav.savedstates.States;
 
-public class MapsActivity extends FragmentActivity
+public class MapsActivity extends AppCompatActivity
         implements AbstractMap.MapUpdateListener, BuildingInfoBottomSheetFragment.BuildingInfoListener, MainMenuDialog.MainMenuListener, UserLocationService.UserLocationUpdatedListener {
 
     private final String MAPS_ACTIVITY_TAG = "MapsActivity";
@@ -151,8 +150,6 @@ public class MapsActivity extends FragmentActivity
 
     private ConstraintLayout.LayoutParams buildingViewParams;
 
-
-
     // We use this to launch and capture the results of the search location activity
     private ActivityResultLauncher<Intent> searchLocationLauncher;
 
@@ -160,6 +157,7 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("DARKMODE", "Creating Maps Activity");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_maps);
@@ -327,6 +325,11 @@ public class MapsActivity extends FragmentActivity
         elevatorButton.setOnClickListener(view -> map.displayPOI(origin, POIType.ELEVATOR));
         washroomButton.setOnClickListener(view -> map.displayPOI(origin, POIType.WASHROOM));
         floorSpinner = findViewById(R.id.floorSpinner);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
     }
 
     private void updateButtonMargin(View bottomSheet, float slideOffset){
@@ -863,6 +866,11 @@ public class MapsActivity extends FragmentActivity
     }
 
     @Override
+    public void onDestroy(){
+        super.onDestroy();
+        states.toggleMenu(false);
+    }
+
     public void OnUserLocationUpdated(MapCoordinates newPosition) {
         hasUserLocationBeenSet = true;
         origin = new MapCoordinates(newPosition.getLat(), newPosition.getLng(), DEFAULT_FLOOR);

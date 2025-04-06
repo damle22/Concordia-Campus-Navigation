@@ -7,17 +7,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import minicap.concordia.campusnav.R;
 
 import minicap.concordia.campusnav.buildingmanager.ConcordiaBuildingManager;
 import minicap.concordia.campusnav.buildingmanager.entities.Campus;
 import minicap.concordia.campusnav.buildingmanager.enumerations.CampusName;
-import minicap.concordia.campusnav.map.MapCoordinates;
 import minicap.concordia.campusnav.savedstates.States;
 
 public class MainActivity extends AppCompatActivity {
 
     private ConcordiaBuildingManager buildingManager;
+    private Switch switchDarkMode;
+
 
     private final States states = States.getInstance();
 
@@ -28,12 +30,19 @@ public class MainActivity extends AppCompatActivity {
 
         buildingManager = ConcordiaBuildingManager.getInstance();
 
+        switchDarkMode = findViewById(R.id.switch_darkmode);
+        switchDarkMode.setChecked(states.isDarkModeOn());
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            states.toggleDarkMode(isChecked);
+        });
+
         subscribeButtons(this);
     }
-    
+
+
     protected void subscribeButtons(Context appContext) {
 
-        Button sgwCampusBtn = (Button)findViewById(R.id.viewSGWCampusButton);
+        Button sgwCampusBtn = findViewById(R.id.viewSGWCampusButton);
 
         sgwCampusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button loyCampusBtn = (Button)findViewById(R.id.viewLoyCampusButton);
+        Button loyCampusBtn = findViewById(R.id.viewLoyCampusButton);
 
         loyCampusBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -59,10 +68,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openIntent(){
-        Campus campus = states.getCampus();
-        MapCoordinates campusCoordinates = campus.getLocation();
+        Intent intent = new Intent(this, MapsActivity.class);
+        this.startActivity(intent);
+    }
 
-        Intent i = new Intent(MainActivity.this, MapsActivity.class);
-        startActivity(i);
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 }
