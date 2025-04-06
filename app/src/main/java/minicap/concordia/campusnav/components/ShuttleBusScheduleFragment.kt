@@ -46,9 +46,29 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         val loyMonThursButton: Button = binding.root.findViewById(R.id.loyMonThursButton)
         val loyFridayButton: Button = binding.root.findViewById(R.id.loyFridayButton)
 
+        // button background
+        fun updateShuttleButtonStyle() {
+            sgwMonThursButton.setBackgroundResource(
+                if (sgwMonThursButton.isSelected) R.drawable.ic_circle_selected else R.drawable.ic_circle_default
+            )
+
+            sgwFridayButton.setBackgroundResource(
+                if (sgwFridayButton.isSelected) R.drawable.ic_circle_selected else R.drawable.ic_circle_default
+            )
+
+            loyMonThursButton.setBackgroundResource(
+                if (loyMonThursButton.isSelected) R.drawable.ic_circle_selected else R.drawable.ic_circle_default
+            )
+
+            loyFridayButton.setBackgroundResource(
+                if (loyFridayButton.isSelected) R.drawable.ic_circle_selected else R.drawable.ic_circle_default
+            )
+        }
+
         sgwMonThursButton.setOnClickListener {
             sgwMonThursButton.isSelected = true
             sgwFridayButton.isSelected = false
+            updateShuttleButtonStyle()
 
             filterSchedule("SGW", "Monday-Thursday")
         }
@@ -56,6 +76,7 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         sgwFridayButton.setOnClickListener {
             sgwMonThursButton.isSelected = false
             sgwFridayButton.isSelected = true
+            updateShuttleButtonStyle()
 
             filterSchedule("SGW", "Friday")
         }
@@ -63,6 +84,7 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         loyMonThursButton.setOnClickListener {
             loyMonThursButton.isSelected = true
             loyFridayButton.isSelected = false
+            updateShuttleButtonStyle()
 
             filterSchedule("Loyola", "Monday-Thursday")
         }
@@ -70,6 +92,7 @@ class ShuttleBusScheduleFragment : BottomSheetDialogFragment() {
         loyFridayButton.setOnClickListener {
             loyMonThursButton.isSelected = false
             loyFridayButton.isSelected = true
+            updateShuttleButtonStyle()
 
             filterSchedule("Loyola", "Friday")
         }
