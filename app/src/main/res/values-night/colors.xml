@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="concordia_yellow">#FFFFFFFF</color>
+    <color name="concordia_yellow">#FF000000</color>
     <color name="concordia_red">#FF000000</color>
     <color name="red">#FF000000</color>
     <color name="yellow">#4CAF50</color>
